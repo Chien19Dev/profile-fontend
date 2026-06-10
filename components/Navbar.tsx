@@ -49,14 +49,14 @@ export default function Navbar() {
           >
             Home
           </Button>
-          <Button
+          {/* <Button
             component={Link}
             href="/admin"
             startIcon={<AdminPanelSettingsIcon />}
             sx={{ display: { xs: "none", sm: "inline-flex" } }}
           >
             Admin
-          </Button>
+          </Button> */}
           <Tooltip title="Theme">
             <IconButton onClick={(event) => setAnchorEl(event.currentTarget)}>
               <PaletteIcon />

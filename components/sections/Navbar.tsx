@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Home, LayoutDashboard, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { ModeToggle } from "./ButtonTheme";
+import { ModeToggle } from "./button-theme";
 import { cn } from "@/lib/utils";
 
 const navLinks = [

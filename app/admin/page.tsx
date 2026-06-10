@@ -1,28 +1,17 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import {
-  Alert,
-  Box,
-  Button,
-  Chip,
-  Container,
-  Divider,
-  Grid,
-  IconButton,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { alpha } from "@mui/material/styles";
-import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import DoneIcon from "@mui/icons-material/Done";
-import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import { Check, Edit, MailCheck, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { api, ContactMessage, Profile, Project, Skill } from "@/lib/api";
-import { brandColors } from "@/theme";
+import { DecoFrame } from "@/components/sections/deco-frame";
+import { SectionHeading } from "@/components/sections/section-heading";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 
 type ProfileForm = Omit<Profile, "id" | "createdAt" | "updatedAt">;
 type ProjectForm = Omit<Project, "id" | "createdAt" | "updatedAt"> & {
@@ -61,6 +50,16 @@ const skillForm: SkillForm = {
   order: 0,
 };
 
+const profileFieldLabels: Record<string, string> = {
+  avatar: "Ảnh đại diện (URL)",
+  email: "Email",
+  phone: "Số điện thoại",
+  location: "Địa điểm",
+  githubUrl: "GitHub URL",
+  linkedinUrl: "LinkedIn URL",
+  websiteUrl: "Website URL",
+};
+
 export default function AdminPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -90,17 +89,7 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    Promise.all([
-      api.profiles.list(),
-      api.projects.list(),
-      api.skills.list(),
-      api.contacts.list(),
-    ]).then(([profileData, projectData, skillData, contactData]) => {
-      setProfiles(profileData);
-      setProjects(projectData);
-      setSkills(skillData);
-      setContacts(contactData);
-    });
+    load();
   }, []);
 
   async function saveProfile(event: FormEvent<HTMLFormElement>) {
@@ -112,7 +101,7 @@ export default function AdminPage() {
     }
     setProfile(profileForm);
     setEditingProfileId("");
-    setNotice("Profile saved");
+    setNotice("Đã lưu hồ sơ.");
     await load();
   }
 
@@ -134,7 +123,7 @@ export default function AdminPage() {
     }
     setProject(projectForm);
     setEditingProjectId("");
-    setNotice("Project saved");
+    setNotice("Đã lưu dự án.");
     await load();
   }
 
@@ -153,159 +142,136 @@ export default function AdminPage() {
     }
     setSkill(skillForm);
     setEditingSkillId("");
-    setNotice("Skill saved");
+    setNotice("Đã lưu kỹ năng.");
     await load();
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          sx={{ justifyContent: "space-between", gap: 2, mb: 3 }}
-        >
-          <Box>
-            <Typography component="h1" sx={{ fontSize: 42, fontWeight: 900 }}>
-              Admin
-            </Typography>
-            <Typography sx={{ color: brandColors.green }}>
-              Manage profile content from backend APIs
-            </Typography>
-          </Box>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={load}
-            sx={{ alignSelf: { xs: "stretch", md: "center" } }}
-          >
-            Refresh
+    <div className="deco-page relative min-h-screen">
+      <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
+        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div>
+            <p className="deco-eyebrow mb-2">Bảng điều khiển</p>
+            <h1 className="deco-title text-4xl md:text-5xl text-foreground">
+              Quản trị
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Quản lý nội dung portfolio qua API backend
+            </p>
+          </div>
+          <Button variant="outline" onClick={load}>
+            <RefreshCw />
+            Làm mới
           </Button>
-        </Stack>
+        </div>
 
         {notice && (
-          <Alert
-            icon={<DoneIcon />}
-            sx={{
-              mb: 3,
-              bgcolor: alpha(brandColors.green, 0.18),
-              color: brandColors.gold,
-              border: `1px solid ${brandColors.green}`,
-            }}
-          >
-            {notice}
+          <Alert variant="success" className="mb-6">
+            <Check className="h-4 w-4" />
+            <AlertDescription>{notice}</AlertDescription>
           </Alert>
         )}
 
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12, lg: 4 }}>
-            <AdminPanel title="Profile">
-              <Stack component="form" onSubmit={saveProfile} spacing={2}>
-                <TextField
-                  label="Full name"
+        <div className="grid gap-6 lg:grid-cols-3">
+          <AdminPanel title="Hồ sơ" label="Thông tin cá nhân">
+            <form onSubmit={saveProfile} className="space-y-4">
+              <FormField label="Họ và tên">
+                <Input
                   value={profile.fullName}
                   onChange={(event) =>
                     setProfile({ ...profile, fullName: event.target.value })
                   }
                   required
                 />
-                <TextField
-                  label="Title"
+              </FormField>
+              <FormField label="Chức danh">
+                <Input
                   value={profile.title}
                   onChange={(event) =>
                     setProfile({ ...profile, title: event.target.value })
                   }
                   required
                 />
-                <TextField
-                  label="Bio"
+              </FormField>
+              <FormField label="Giới thiệu">
+                <Textarea
                   value={profile.bio}
                   onChange={(event) =>
                     setProfile({ ...profile, bio: event.target.value })
                   }
                   required
-                  multiline
-                  minRows={4}
+                  rows={4}
                 />
-                {[
-                  "avatar",
-                  "email",
-                  "phone",
-                  "location",
-                  "githubUrl",
-                  "linkedinUrl",
-                  "websiteUrl",
-                ].map((field) => (
-                  <TextField
-                    key={field}
-                    label={field}
+              </FormField>
+              {Object.keys(profileFieldLabels).map((field) => (
+                <FormField key={field} label={profileFieldLabels[field]}>
+                  <Input
                     value={String(profile[field as keyof ProfileForm] || "")}
                     onChange={(event) =>
                       setProfile({ ...profile, [field]: event.target.value })
                     }
                   />
-                ))}
-                <Button type="submit" variant="contained" startIcon={<AddIcon />}>
-                  {editingProfileId ? "Update profile" : "Create profile"}
-                </Button>
-              </Stack>
+                </FormField>
+              ))}
+              <Button type="submit" className="w-full">
+                <Plus />
+                {editingProfileId ? "Cập nhật hồ sơ" : "Tạo hồ sơ"}
+              </Button>
+            </form>
 
-              <ItemList>
-                {profiles.map((item) => (
-                  <AdminItem key={item.id}>
-                    <Box>
-                      <Typography sx={{ fontWeight: 900 }}>
-                        {item.fullName}
-                      </Typography>
-                      <Typography sx={{ color: brandColors.green }}>
-                        {item.title}
-                      </Typography>
-                    </Box>
-                    <Actions
-                      onEdit={() => {
-                        setEditingProfileId(item.id);
-                        setProfile({ ...profileForm, ...item });
-                      }}
-                      onDelete={async () => {
-                        await api.profiles.remove(item.id);
-                        await load();
-                      }}
-                    />
-                  </AdminItem>
-                ))}
-              </ItemList>
-            </AdminPanel>
-          </Grid>
+            <ItemList>
+              {profiles.map((item) => (
+                <AdminItem key={item.id}>
+                  <div>
+                    <p className="font-medium">{item.fullName}</p>
+                    <p className="text-sm text-primary">{item.title}</p>
+                  </div>
+                  <Actions
+                    onEdit={() => {
+                      setEditingProfileId(item.id);
+                      setProfile({ ...profileForm, ...item });
+                    }}
+                    onDelete={async () => {
+                      await api.profiles.remove(item.id);
+                      await load();
+                    }}
+                  />
+                </AdminItem>
+              ))}
+            </ItemList>
+          </AdminPanel>
 
-          <Grid size={{ xs: 12, lg: 4 }}>
-            <AdminPanel title="Projects">
-              <Stack component="form" onSubmit={saveProject} spacing={2}>
-                <TextField
-                  label="Title"
+          <AdminPanel title="Dự án" label="Portfolio">
+            <form onSubmit={saveProject} className="space-y-4">
+              <FormField label="Tên dự án">
+                <Input
                   value={project.title}
                   onChange={(event) =>
                     setProject({ ...project, title: event.target.value })
                   }
                   required
                 />
-                <TextField
-                  label="Description"
+              </FormField>
+              <FormField label="Mô tả">
+                <Textarea
                   value={project.description}
                   onChange={(event) =>
                     setProject({ ...project, description: event.target.value })
                   }
                   required
-                  multiline
-                  minRows={4}
+                  rows={4}
                 />
-                <TextField
-                  label="Image URL"
+              </FormField>
+              <FormField label="Ảnh (URL)">
+                <Input
                   value={project.image || ""}
                   onChange={(event) =>
                     setProject({ ...project, image: event.target.value })
                   }
                 />
-                <TextField
-                  label="Technologies, comma separated"
+              </FormField>
+              <FormField label="Công nghệ (phân cách bằng dấu phẩy)">
+                <Input
                   value={project.technologiesText}
                   onChange={(event) =>
                     setProject({
@@ -314,258 +280,248 @@ export default function AdminPage() {
                     })
                   }
                 />
-                <TextField
-                  label="Github URL"
+              </FormField>
+              <FormField label="GitHub URL">
+                <Input
                   value={project.githubUrl || ""}
                   onChange={(event) =>
                     setProject({ ...project, githubUrl: event.target.value })
                   }
                 />
-                <TextField
-                  label="Demo URL"
+              </FormField>
+              <FormField label="Demo URL">
+                <Input
                   value={project.demoUrl || ""}
                   onChange={(event) =>
                     setProject({ ...project, demoUrl: event.target.value })
                   }
                 />
-                <Button type="submit" variant="contained" startIcon={<AddIcon />}>
-                  {editingProjectId ? "Update project" : "Create project"}
-                </Button>
-              </Stack>
+              </FormField>
+              <Button type="submit" className="w-full">
+                <Plus />
+                {editingProjectId ? "Cập nhật dự án" : "Tạo dự án"}
+              </Button>
+            </form>
 
-              <ItemList>
-                {projects.map((item) => (
-                  <AdminItem key={item.id}>
-                    <Box>
-                      <Typography sx={{ fontWeight: 900 }}>
-                        {item.title}
-                      </Typography>
-                      <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1 }}>
-                        {(item.technologies || []).map((tag) => (
-                          <Chip key={tag} label={tag} size="small" />
-                        ))}
-                      </Stack>
-                    </Box>
-                    <Actions
-                      onEdit={() => {
-                        setEditingProjectId(item.id);
-                        setProject({
-                          ...projectForm,
-                          ...item,
-                          technologiesText: (item.technologies || []).join(", "),
-                        });
-                      }}
-                      onDelete={async () => {
-                        await api.projects.remove(item.id);
-                        await load();
-                      }}
-                    />
-                  </AdminItem>
-                ))}
-              </ItemList>
-            </AdminPanel>
-          </Grid>
+            <ItemList>
+              {projects.map((item) => (
+                <AdminItem key={item.id}>
+                  <div>
+                    <p className="font-medium">{item.title}</p>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {(item.technologies || []).map((tag) => (
+                        <Badge key={tag} variant="outline" size="sm">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <Actions
+                    onEdit={() => {
+                      setEditingProjectId(item.id);
+                      setProject({
+                        ...projectForm,
+                        ...item,
+                        technologiesText: (item.technologies || []).join(", "),
+                      });
+                    }}
+                    onDelete={async () => {
+                      await api.projects.remove(item.id);
+                      await load();
+                    }}
+                  />
+                </AdminItem>
+              ))}
+            </ItemList>
+          </AdminPanel>
 
-          <Grid size={{ xs: 12, lg: 4 }}>
-            <AdminPanel title="Skills">
-              <Stack component="form" onSubmit={saveSkill} spacing={2}>
-                <TextField
-                  label="Name"
+          <AdminPanel title="Kỹ năng" label="Chuyên môn">
+            <form onSubmit={saveSkill} className="space-y-4">
+              <FormField label="Tên kỹ năng">
+                <Input
                   value={skill.name}
                   onChange={(event) =>
                     setSkill({ ...skill, name: event.target.value })
                   }
                   required
                 />
-                <TextField
-                  label="Category"
+              </FormField>
+              <FormField label="Danh mục">
+                <Input
                   value={skill.category || ""}
                   onChange={(event) =>
                     setSkill({ ...skill, category: event.target.value })
                   }
                 />
-                <TextField
-                  label="Icon"
+              </FormField>
+              <FormField label="Icon">
+                <Input
                   value={skill.icon || ""}
                   onChange={(event) =>
                     setSkill({ ...skill, icon: event.target.value })
                   }
                 />
-                <TextField
-                  label="Level"
+              </FormField>
+              <FormField label="Mức độ (%)">
+                <Input
                   type="number"
                   value={skill.level || 0}
                   onChange={(event) =>
                     setSkill({ ...skill, level: Number(event.target.value) })
                   }
                 />
-                <TextField
-                  label="Order"
+              </FormField>
+              <FormField label="Thứ tự">
+                <Input
                   type="number"
                   value={skill.order || 0}
                   onChange={(event) =>
                     setSkill({ ...skill, order: Number(event.target.value) })
                   }
                 />
-                <Button type="submit" variant="contained" startIcon={<AddIcon />}>
-                  {editingSkillId ? "Update skill" : "Create skill"}
-                </Button>
-              </Stack>
+              </FormField>
+              <Button type="submit" className="w-full">
+                <Plus />
+                {editingSkillId ? "Cập nhật kỹ năng" : "Tạo kỹ năng"}
+              </Button>
+            </form>
 
-              <ItemList>
-                {skills.map((item) => (
-                  <AdminItem key={item.id}>
-                    <Box>
-                      <Typography sx={{ fontWeight: 900 }}>
-                        {item.name}
-                      </Typography>
-                      <Typography sx={{ color: brandColors.green }}>
-                        {item.category || "Skill"} {item.level || 0}%
-                      </Typography>
-                    </Box>
-                    <Actions
-                      onEdit={() => {
-                        setEditingSkillId(item.id);
-                        setSkill({ ...skillForm, ...item });
-                      }}
-                      onDelete={async () => {
-                        await api.skills.remove(item.id);
-                        await load();
-                      }}
-                    />
-                  </AdminItem>
-                ))}
-              </ItemList>
-            </AdminPanel>
-          </Grid>
+            <ItemList>
+              {skills.map((item) => (
+                <AdminItem key={item.id}>
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-sm text-primary">
+                      {item.category || "Kỹ năng"} · {item.level || 0}%
+                    </p>
+                  </div>
+                  <Actions
+                    onEdit={() => {
+                      setEditingSkillId(item.id);
+                      setSkill({ ...skillForm, ...item });
+                    }}
+                    onDelete={async () => {
+                      await api.skills.remove(item.id);
+                      await load();
+                    }}
+                  />
+                </AdminItem>
+              ))}
+            </ItemList>
+          </AdminPanel>
 
-          <Grid size={{ xs: 12 }}>
-            <AdminPanel title="Contact messages">
-              <Grid container spacing={2}>
+          <div className="lg:col-span-3">
+            <AdminPanel title="Tin nhắn liên hệ" label="Hộp thư">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {contacts.map((item) => (
-                  <Grid key={item.id} size={{ xs: 12, md: 6, lg: 4 }}>
-                    <Box
-                      sx={{
-                        p: 2,
-                        border: `1px solid ${
-                          item.isRead ? brandColors.green : brandColors.orange
-                        }`,
-                        bgcolor: alpha(brandColors.navy, 0.72),
-                      }}
-                    >
-                      <Stack spacing={1}>
-                        <Stack
-                          direction="row"
-                          sx={{ justifyContent: "space-between", gap: 1 }}
+                  <DecoFrame
+                    key={item.id}
+                    accent={!item.isRead}
+                    className="p-4"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex justify-between gap-2">
+                        <div>
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-primary">{item.email}</p>
+                        </div>
+                        <Badge
+                          variant={item.isRead ? "secondary" : "destructive"}
+                          size="sm"
                         >
-                          <Box>
-                            <Typography sx={{ fontWeight: 900 }}>
-                              {item.name}
-                            </Typography>
-                            <Typography sx={{ color: brandColors.green }}>
-                              {item.email}
-                            </Typography>
-                          </Box>
-                          <Chip
-                            label={item.isRead ? "Read" : "New"}
-                            size="small"
-                            sx={{
-                              bgcolor: item.isRead
-                                ? alpha(brandColors.green, 0.2)
-                                : alpha(brandColors.orange, 0.2),
-                              border: `1px solid ${
-                                item.isRead
-                                  ? brandColors.green
-                                  : brandColors.orange
-                              }`,
-                            }}
-                          />
-                        </Stack>
-                        <Typography sx={{ fontWeight: 800 }}>
-                          {item.subject || "No subject"}
-                        </Typography>
-                        <Typography>{item.message}</Typography>
-                        <Stack direction="row" spacing={1}>
-                          <Button
-                            startIcon={<MarkEmailReadIcon />}
-                            onClick={async () => {
-                              await api.contacts.update(item.id, {
-                                isRead: true,
-                              });
-                              await load();
-                            }}
-                          >
-                            Mark read
-                          </Button>
-                          <IconButton
-                            onClick={async () => {
-                              await api.contacts.remove(item.id);
-                              await load();
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Stack>
-                      </Stack>
-                    </Box>
-                  </Grid>
+                          {item.isRead ? "Đã đọc" : "Mới"}
+                        </Badge>
+                      </div>
+                      <Separator className="bg-primary/25" />
+                      <p className="text-sm font-medium">
+                        {item.subject || "Không có tiêu đề"}
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {item.message}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            await api.contacts.update(item.id, {
+                              isRead: true,
+                            });
+                            await load();
+                          }}
+                        >
+                          <MailCheck />
+                          Đánh dấu đã đọc
+                        </Button>
+                        <Button
+                          size="icon-sm"
+                          variant="ghost"
+                          onClick={async () => {
+                            await api.contacts.remove(item.id);
+                            await load();
+                          }}
+                          aria-label="Xóa tin nhắn"
+                        >
+                          <Trash2 />
+                        </Button>
+                      </div>
+                    </div>
+                  </DecoFrame>
                 ))}
-              </Grid>
+              </div>
             </AdminPanel>
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function AdminPanel({
   title,
+  label,
   children,
 }: {
   title: string;
+  label: string;
   children: React.ReactNode;
 }) {
   return (
-    <Box
-      sx={{
-        height: "100%",
-        p: 3,
-        border: `1px solid ${brandColors.blue}`,
-        bgcolor: alpha(brandColors.navy, 0.84),
-      }}
-    >
-      <Typography sx={{ fontSize: 24, fontWeight: 900, mb: 2 }}>
-        {title}
-      </Typography>
+    <DecoFrame className="h-full p-6">
+      <SectionHeading label={label} title={title} />
+      <div className="mt-6">{children}</div>
+    </DecoFrame>
+  );
+}
+
+function FormField({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
       {children}
-    </Box>
+    </div>
   );
 }
 
 function ItemList({ children }: { children: React.ReactNode }) {
   return (
-    <Stack spacing={1.5} sx={{ mt: 3 }}>
-      <Divider sx={{ borderColor: brandColors.blue }} />
+    <div className="mt-6 space-y-2">
+      <Separator className="bg-primary/30" />
       {children}
-    </Stack>
+    </div>
   );
 }
 
 function AdminItem({ children }: { children: React.ReactNode }) {
   return (
-    <Box
-      sx={{
-        p: 2,
-        border: `1px solid ${alpha(brandColors.gold, 0.6)}`,
-        bgcolor: alpha(brandColors.navy, 0.68),
-        display: "flex",
-        justifyContent: "space-between",
-        gap: 2,
-      }}
-    >
+    <div className="flex justify-between gap-4 border border-border bg-muted/30 p-3">
       {children}
-    </Box>
+    </div>
   );
 }
 
@@ -577,13 +533,23 @@ function Actions({
   onDelete: () => void;
 }) {
   return (
-    <Stack direction="row" spacing={1}>
-      <IconButton onClick={onEdit}>
-        <EditIcon />
-      </IconButton>
-      <IconButton onClick={onDelete}>
-        <DeleteIcon />
-      </IconButton>
-    </Stack>
+    <div className="flex shrink-0 gap-1">
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        onClick={onEdit}
+        aria-label="Chỉnh sửa"
+      >
+        <Edit />
+      </Button>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        onClick={onDelete}
+        aria-label="Xóa"
+      >
+        <Trash2 />
+      </Button>
+    </div>
   );
 }

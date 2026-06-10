@@ -1,6 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/sections/Navbar";
+import { ThemeProvider } from "@/components/theme-provider";
+
+const geistSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-heading",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://chien19.vercel.app"),
@@ -11,7 +28,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    "Frontend Developer chuyên React, Next.js, TypeScript và Material UI. Portfolio cá nhân giới thiệu dự án, kỹ năng và kinh nghiệm phát triển web hiện đại.",
+    "Frontend Developer chuyên React, Next.js, TypeScript và Modern UI. Portfolio cá nhân giới thiệu dự án, kỹ năng và kinh nghiệm phát triển web hiện đại.",
 
   keywords: [
     "Nguyễn Đình Chiến",
@@ -20,7 +37,6 @@ export const metadata: Metadata = {
     "Next.js Developer",
     "TypeScript",
     "JavaScript",
-    "Material UI",
     "Portfolio",
     "Web Developer",
     "Fullstack Developer",
@@ -78,21 +94,6 @@ export const metadata: Metadata = {
 
   category: "technology",
 };
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
-import Providers from "./providers";
-import Navbar from "@/components/Navbar";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-
 
 export default function RootLayout({
   children,
@@ -101,16 +102,20 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="vi"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable}`}
     >
-      <body className="min-h-full flex flex-col">
-        <AppRouterCacheProvider>
-          <Providers>
-            <Navbar />
-            {children}
-          </Providers>
-        </AppRouterCacheProvider>
+      <body className="min-h-full flex flex-col font-sans">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

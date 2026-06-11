@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/sections/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -115,6 +116,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <Toaster
+              richColors
+              position="top-right"
+              closeButton={true}
+              expand={false}
+            />
             <Navbar />
             {children}
           </ThemeProvider>

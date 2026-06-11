@@ -1,17 +1,17 @@
 ﻿"use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { Check, Edit, MailCheck, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Edit, MailCheck, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { api, ContactMessage, Profile, Project, Skill } from "@/lib/api";
 import { DecoFrame } from "@/components/sections/deco-frame";
 import { SectionHeading } from "@/components/sections/section-heading";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { alertSuccess, alertError } from "@/lib/alerts";
 
 type ProfileForm = Omit<Profile, "id" | "createdAt" | "updatedAt">;
 type ProjectForm = Omit<Project, "id" | "createdAt" | "updatedAt"> & {
@@ -71,7 +71,6 @@ export default function AdminPage() {
   const [editingProfileId, setEditingProfileId] = useState("");
   const [editingProjectId, setEditingProjectId] = useState("");
   const [editingSkillId, setEditingSkillId] = useState("");
-  const [notice, setNotice] = useState("");
 
   async function load() {
     const [profileData, projectData, skillData, contactData] =
@@ -94,15 +93,20 @@ export default function AdminPage() {
 
   async function saveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (editingProfileId) {
-      await api.profiles.update(editingProfileId, profile);
-    } else {
-      await api.profiles.create(profile);
+    try {
+      if (editingProfileId) {
+        await api.profiles.update(editingProfileId, profile);
+        alertSuccess("Đã cập nhật hồ sơ thành công");
+      } else {
+        await api.profiles.create(profile);
+        alertSuccess("Đã tạo hồ sơ thành công");
+      }
+      setProfile(profileForm);
+      setEditingProfileId("");
+      await load();
+    } catch (error) {
+      alertError("Có lỗi xảy ra khi lưu hồ sơ");
     }
-    setProfile(profileForm);
-    setEditingProfileId("");
-    setNotice("Đã lưu hồ sơ.");
-    await load();
   }
 
   async function saveProject(event: FormEvent<HTMLFormElement>) {
@@ -116,15 +120,20 @@ export default function AdminPage() {
     };
     delete (payload as Partial<ProjectForm>).technologiesText;
 
-    if (editingProjectId) {
-      await api.projects.update(editingProjectId, payload);
-    } else {
-      await api.projects.create(payload);
+    try {
+      if (editingProjectId) {
+        await api.projects.update(editingProjectId, payload);
+        alertSuccess("Đã cập nhật dự án thành công");
+      } else {
+        await api.projects.create(payload);
+        alertSuccess("Đã tạo dự án thành công");
+      }
+      setProject(projectForm);
+      setEditingProjectId("");
+      await load();
+    } catch (error) {
+      alertError("Có lỗi xảy ra khi lưu dự án");
     }
-    setProject(projectForm);
-    setEditingProjectId("");
-    setNotice("Đã lưu dự án.");
-    await load();
   }
 
   async function saveSkill(event: FormEvent<HTMLFormElement>) {
@@ -135,15 +144,20 @@ export default function AdminPage() {
       order: Number(skill.order || 0),
     };
 
-    if (editingSkillId) {
-      await api.skills.update(editingSkillId, payload);
-    } else {
-      await api.skills.create(payload);
+    try {
+      if (editingSkillId) {
+        await api.skills.update(editingSkillId, payload);
+        alertSuccess("Đã cập nhật kỹ năng thành công");
+      } else {
+        await api.skills.create(payload);
+        alertSuccess("Đã tạo kỹ năng thành công");
+      }
+      setSkill(skillForm);
+      setEditingSkillId("");
+      await load();
+    } catch (error) {
+      alertError("Có lỗi xảy ra khi lưu kỹ năng");
     }
-    setSkill(skillForm);
-    setEditingSkillId("");
-    setNotice("Đã lưu kỹ năng.");
-    await load();
   }
 
   return (
@@ -164,13 +178,6 @@ export default function AdminPage() {
             Làm mới
           </Button>
         </div>
-
-        {notice && (
-          <Alert variant="success" className="mb-6">
-            <Check className="h-4 w-4" />
-            <AlertDescription>{notice}</AlertDescription>
-          </Alert>
-        )}
 
         <div className="grid gap-6 lg:grid-cols-3">
           <AdminPanel title="Hồ sơ" label="Thông tin cá nhân">
@@ -232,8 +239,13 @@ export default function AdminPage() {
                       setProfile({ ...profileForm, ...item });
                     }}
                     onDelete={async () => {
-                      await api.profiles.remove(item.id);
-                      await load();
+                      try {
+                        await api.profiles.remove(item.id);
+                        alertSuccess("Đã xóa hồ sơ thành công");
+                        await load();
+                      } catch (error) {
+                        alertError("Có lỗi xảy ra khi xóa hồ sơ");
+                      }
                     }}
                   />
                 </AdminItem>
@@ -326,8 +338,13 @@ export default function AdminPage() {
                       });
                     }}
                     onDelete={async () => {
-                      await api.projects.remove(item.id);
-                      await load();
+                      try {
+                        await api.projects.remove(item.id);
+                        alertSuccess("Đã xóa dự án thành công");
+                        await load();
+                      } catch (error) {
+                        alertError("Có lỗi xảy ra khi xóa dự án");
+                      }
                     }}
                   />
                 </AdminItem>
@@ -401,8 +418,13 @@ export default function AdminPage() {
                       setSkill({ ...skillForm, ...item });
                     }}
                     onDelete={async () => {
-                      await api.skills.remove(item.id);
-                      await load();
+                      try {
+                        await api.skills.remove(item.id);
+                        alertSuccess("Đã xóa kỹ năng thành công");
+                        await load();
+                      } catch (error) {
+                        alertError("Có lỗi xảy ra khi xóa kỹ năng");
+                      }
                     }}
                   />
                 </AdminItem>
@@ -443,10 +465,15 @@ export default function AdminPage() {
                         <Button
                           size="sm"
                           onClick={async () => {
-                            await api.contacts.update(item.id, {
-                              isRead: true,
-                            });
-                            await load();
+                            try {
+                              await api.contacts.update(item.id, {
+                                isRead: true,
+                              });
+                              alertSuccess("Đã đánh dấu tin nhắn là đã đọc");
+                              await load();
+                            } catch (error) {
+                              alertError("Có lỗi xảy ra khi đánh dấu tin nhắn");
+                            }
                           }}
                         >
                           <MailCheck />
@@ -456,8 +483,13 @@ export default function AdminPage() {
                           size="icon-sm"
                           variant="ghost"
                           onClick={async () => {
-                            await api.contacts.remove(item.id);
-                            await load();
+                            try {
+                              await api.contacts.remove(item.id);
+                              alertSuccess("Đã xóa tin nhắn thành công");
+                              await load();
+                            } catch (error) {
+                              alertError("Có lỗi xảy ra khi xóa tin nhắn");
+                            }
                           }}
                           aria-label="Xóa tin nhắn"
                         >

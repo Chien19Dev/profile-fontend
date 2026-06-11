@@ -301,6 +301,7 @@ export default function Home() {
                       <Label htmlFor="contact-name">Họ tên</Label>
                       <Input
                         id="contact-name"
+                        size="lg"
                         value={contact.name}
                         onChange={(event) =>
                           setContact({ ...contact, name: event.target.value })
@@ -313,6 +314,7 @@ export default function Home() {
                       <Label htmlFor="contact-email">Email</Label>
                       <Input
                         id="contact-email"
+                        size="lg"
                         type="email"
                         value={contact.email}
                         onChange={(event) =>
@@ -326,6 +328,7 @@ export default function Home() {
                       <Label htmlFor="contact-subject">Tiêu đề</Label>
                       <Input
                         id="contact-subject"
+                        size="lg"
                         value={contact.subject}
                         onChange={(event) =>
                           setContact({
@@ -340,6 +343,7 @@ export default function Home() {
                       <Label htmlFor="contact-message">Nội dung</Label>
                       <Textarea
                         id="contact-message"
+                        size="lg"
                         value={contact.message}
                         onChange={(event) =>
                           setContact({

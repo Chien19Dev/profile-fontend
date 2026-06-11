@@ -104,7 +104,7 @@ export function ProfilesSection({
                   {item.email}
                 </p>
               </div>,
-              <Badge key="title" variant="outline" size="sm">
+              <Badge key="title" variant="success" size="lg">
                 {item.title}
               </Badge>,
             ],

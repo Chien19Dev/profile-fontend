@@ -3,9 +3,17 @@ import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
 
+function getEnv(key: string): string {
+  const value = process.env[key]
+  if (!value) {
+    throw new Error(`Missing environment variable: ${key}`)
+  }
+  return value
+}
+
 async function main() {
-  const adminEmail = "nguyendinhchien19042003@gmail.com"
-  const adminPassword = "admin123"
+  const adminEmail = getEnv("ADMIN_EMAIL")
+  const adminPassword = getEnv("ADMIN_PASSWORD")
 
   const existingUser = await prisma.user.findUnique({
     where: { email: adminEmail },
@@ -24,12 +32,11 @@ async function main() {
       name: "Nguyễn Đình Chiến",
     },
   })
-
 }
 
 main()
   .catch((e) => {
-    console.error(e)
+    console.error("Seed error:", e)
     process.exit(1)
   })
   .finally(async () => {

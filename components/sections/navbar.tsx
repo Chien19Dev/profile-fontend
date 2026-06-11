@@ -8,7 +8,7 @@ import { ModeToggle } from "./button-theme";
 import { cn } from "@/lib/utils";
 import { useSession, signOut } from "next-auth/react";
 
-const ADMIN_EMAIL = "nguyendinhchien19042003@gmail.com";
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
 const navLinks = [
   { href: "/", label: "Trang chủ", icon: Home },

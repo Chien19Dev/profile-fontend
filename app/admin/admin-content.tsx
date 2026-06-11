@@ -151,7 +151,7 @@ export default function AdminPage() {
 
   return (
     <div className="deco-page relative min-h-screen">
-      <div className="relative z-10 container mx-auto px-4 py-8 md:py-14">
+      <div className="relative z-10 container mx-auto px-4 py-4 md:py-8">
         <div className="mb-8 flex items-end justify-between">
           <div>
             <p className="deco-eyebrow mb-1.5">Bảng điều khiển</p>

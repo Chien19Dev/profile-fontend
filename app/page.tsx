@@ -104,7 +104,7 @@ export default function Home() {
 
   return (
     <div className="deco-page relative min-h-screen">
-      <div className="relative z-10 container mx-auto px-4 py-8 md:py-14">
+      <div className="relative z-10 container mx-auto px-4 py-4 md:py-8">
         {loading && (
           <div className="mb-6 h-px w-full overflow-hidden bg-border">
             <div className="h-full w-1/3 animate-pulse bg-primary" />

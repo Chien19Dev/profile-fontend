@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Eye, EyeOff, Key } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Eye, EyeOff, Key } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface PasswordInputProps {
-  id: string
-  name: string
-  placeholder?: string
-  required?: boolean
-  label?: string
+  id: string;
+  name: string;
+  placeholder?: string;
+  required?: boolean;
+  label?: string;
 }
 
 export function PasswordInput({
@@ -21,7 +21,7 @@ export function PasswordInput({
   required = false,
   label = "Mật khẩu",
 }: PasswordInputProps) {
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="space-y-2">
@@ -31,6 +31,7 @@ export function PasswordInput({
         <Input
           id={id}
           name={name}
+          size="lg"
           type={showPassword ? "text" : "password"}
           placeholder={placeholder}
           className="pl-10 pr-10"
@@ -52,5 +53,5 @@ export function PasswordInput({
         </Button>
       </div>
     </div>
-  )
+  );
 }

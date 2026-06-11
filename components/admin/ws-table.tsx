@@ -20,7 +20,7 @@ export function WsTable({ cols, rows }: { cols: string[]; rows: WsRow[] }) {
   return (
     <Table>
       <TableHeader>
-        <TableRow className="border-b border-border bg-muted">
+        <TableRow className="border-b border-border bg-muted/20 backdrop-blur-md">
           {cols.map((col) => (
             <TableHead
               key={col}
@@ -48,7 +48,7 @@ export function WsTable({ cols, rows }: { cols: string[]; rows: WsRow[] }) {
         {rows.map((row) => (
           <TableRow
             key={row.key}
-            className="group border-b border-border/50 hover:bg-muted/90 transition-colors bg-muted"
+            className="group border-b border-border/50 hover:bg-muted/90 transition-colors bg-muted/10 backdrop-blur-md"
           >
             {row.cells.map((cell, i) => (
               <TableCell key={i} className="px-5 py-3 max-w-50">

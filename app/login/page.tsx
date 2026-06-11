@@ -46,11 +46,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="deco-page relative min-h-screen flex items-center justify-center px-4">
+    <div className="deco-page relative min-h-screen flex items-start justify-center px-4">
       <div className="relative z-10 w-full max-w-md">
         <LoginFormAnimation>
-          <DecoFrame accent className="p-8 md:p-10">
-            <div className="space-y-8">
+          <DecoFrame accent className="p-4 md:p-6 lg:p-8">
+            <div className="space-y-6">
               <div className="text-center space-y-4">
                 <div className="inline-flex items-center justify-center size-16 rounded-full border border-border bg-muted/40 text-primary">
                   <Lock className="size-7" />
@@ -83,7 +83,7 @@ export default function LoginPage() {
                   </span>
                 </div>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
@@ -92,6 +92,7 @@ export default function LoginPage() {
                       id="email"
                       name="email"
                       type="email"
+                      size="lg"
                       placeholder="email@example.com"
                       className="pl-10"
                       required
@@ -104,7 +105,7 @@ export default function LoginPage() {
                 )}
                 <Button
                   type="submit"
-                  className="w-full h-12 text-base font-medium"
+                  className="w-full h-12 text-base font-medium mt-4"
                   size="lg"
                   disabled={loading}
                 >

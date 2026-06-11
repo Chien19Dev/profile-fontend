@@ -23,7 +23,7 @@ const NAV_ITEMS: {
 
 export function Sidebar({ section, onSection, counts }: SidebarProps) {
   return (
-    <aside className="w-56 shrink-0 border-r border-border bg-muted/30 flex flex-col">
+    <aside className="w-56 shrink-0 border-r border-border bg-muted/30 flex flex-col backdrop-blur-md">
       <nav className="flex-1 py-4">
         <p className="px-5 mb-2 text-[0.6rem] tracking-widest uppercase text-muted-foreground">
           Nội dung

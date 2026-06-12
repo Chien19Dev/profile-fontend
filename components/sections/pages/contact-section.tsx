@@ -15,18 +15,29 @@ const emptyForm = { name: "", email: "", subject: "", message: "" };
 
 export function ContactSection() {
   const [form, setForm] = useState(emptyForm);
+  const [honeypot, setHoneypot] = useState("");
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState("");
 
   function field(key: keyof typeof emptyForm) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      setForm((prev) => ({ ...prev, [key]: e.target.value }));
+        setForm((prev) => ({ ...prev, [key]: e.target.value }));
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSending(true);
     setNotice("");
+
+    if (honeypot) {
+      setTimeout(() => {
+        setForm(emptyForm);
+        setNotice("Tin nhắn đã được gửi thành công.");
+        setSending(false);
+      }, 1000);
+      return;
+    }
+
     try {
       await api.contacts.create(form);
       setForm(emptyForm);
@@ -41,6 +52,16 @@ export function ContactSection() {
       <SectionHeading label="Kết nối" title="Liên hệ" />
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <div className="sr-only" aria-hidden="true">
+          <input
+              type="text"
+              name="system_mail_honeypot"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+          />
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="contact-name">Họ tên</Label>

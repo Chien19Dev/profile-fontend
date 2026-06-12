@@ -48,6 +48,28 @@ export type ContactMessage = {
   isRead?: boolean;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export type Post = {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  summary?: string | null;
+  published: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type Testimonial = {
+  id: string;
+  authorName: string;
+  authorTitle: string;
+  content: string;
+  avatar?: string | null;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -89,8 +111,10 @@ export const api = {
   projects: crud<Project, Omit<Project, "id">, Partial<Project>>("/projects"),
   skills: crud<Skill, Omit<Skill, "id">, Partial<Skill>>("/skills"),
   contacts: crud<
-    ContactMessage,
-    Omit<ContactMessage, "id" | "isRead">,
-    Partial<ContactMessage>
+      ContactMessage,
+      Omit<ContactMessage, "id" | "isRead">,
+      Partial<ContactMessage>
   >("/contact"),
+  posts: crud<Post, Omit<Post, "id">, Partial<Post>>("/posts"),
+  testimonials: crud<Testimonial, Omit<Testimonial, "id">, Partial<Testimonial>>("/testimonials"),
 };

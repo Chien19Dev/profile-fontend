@@ -6,6 +6,7 @@ import Navbar from "@/components/sections/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -126,6 +127,7 @@ export default function RootLayout({
             />
             <Navbar />
             {children}
+            <Analytics />
           </ThemeProvider>
         </SessionProvider>
       </body>

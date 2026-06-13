@@ -7,6 +7,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
 import { getCvExists, getNavigationItems } from "@/lib/data";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -107,7 +109,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [cvExists, navItems] = await Promise.all([getCvExists(), getNavigationItems()]);
+  const [cvExists, navItems, session] = await Promise.all([getCvExists(), getNavigationItems(), auth()]);
+
+  // Direct DB check for admin role - most reliable method
+  let isAdmin = false;
+  if (session?.user?.id) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+    isAdmin = dbUser?.role === "ADMIN";
+  }
 
   return (
     <html
@@ -129,7 +141,7 @@ export default async function RootLayout({
               closeButton={true}
               expand={false}
             />
-            <Navbar cvExistsInitial={cvExists} navItems={navItems} />
+            <Navbar cvExistsInitial={cvExists} navItems={navItems} isAdmin={isAdmin} />
             {children}
             <Analytics />
           </ThemeProvider>

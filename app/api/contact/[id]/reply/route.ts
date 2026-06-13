@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { isAdminEmail } from "@/lib/admin";
 
 export async function POST(
   request: NextRequest,
@@ -22,8 +21,6 @@ export async function POST(
         { status: 400 },
       );
     }
-
-    // Verify contact exists
     const contact = await prisma.contactMessage.findUnique({
       where: { id },
     });
@@ -45,8 +42,6 @@ export async function POST(
         admin: { select: { name: true, email: true } },
       },
     });
-
-    // Mark contact as read
     await prisma.contactMessage.update({
       where: { id },
       data: { isRead: true },

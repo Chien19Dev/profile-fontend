@@ -3,14 +3,11 @@ import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
-const ADMIN_EMAIL =
-  process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session || session.user?.email !== ADMIN_EMAIL) {
+    if (!session || session.user?.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

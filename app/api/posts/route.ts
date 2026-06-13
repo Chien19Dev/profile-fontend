@@ -4,8 +4,7 @@ import { auth } from '@/lib/auth';
 
 async function isAdmin() {
     const session = await auth();
-    const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-    return session?.user && session.user.email === adminEmail;
+    return session?.user && session.user.role === 'ADMIN';
 }
 
 export async function GET() {

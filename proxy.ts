@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { isAdminEmail } from "@/lib/admin";
+import { isAdminRole } from "@/lib/admin";
 import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 const MUTATING_METHODS = new Set(["POST", "PATCH", "PUT", "DELETE"]);
@@ -70,7 +70,7 @@ export default auth((req) => {
     isAdminMutation(pathname, req.method) ||
     isAdminRead(pathname, req.method);
 
-  if (needsAdmin && !isAdminEmail(req.auth?.user?.email)) {
+  if (needsAdmin && !isAdminRole(req.auth?.user?.role)) {
     if (pathname.startsWith("/admin")) {
       const loginUrl = new URL("/login", req.nextUrl);
       loginUrl.searchParams.set("callbackUrl", pathname);

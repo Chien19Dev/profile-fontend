@@ -19,26 +19,24 @@ import { cn } from "@/lib/utils";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "../ui/button";
 
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-
 const defaultNavLinks = [
   { href: "/", label: "Trang chủ", icon: Home },
   { href: "/blog", label: "Blog", icon: BookOpen },
-  { href: "/admin", label: "Quản trị", icon: LayoutDashboard },
 ];
 
 interface NavbarProps {
   cvExistsInitial?: boolean;
   navItems?: { label: string; href: string; icon?: string | null }[];
+  isAdmin?: boolean;
 }
 
-export default function Navbar({ cvExistsInitial = false, navItems }: NavbarProps) {
+export default function Navbar({ cvExistsInitial = false, navItems, isAdmin: serverIsAdmin }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cvExists, setCvExists] = useState(cvExistsInitial);
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
-  const isAdmin = session?.user?.email === ADMIN_EMAIL;
+  const isAdmin = serverIsAdmin ?? session?.user?.role === "ADMIN";
 
   const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -80,23 +78,23 @@ export default function Navbar({ cvExistsInitial = false, navItems }: NavbarProp
   const [navLoaded, setNavLoaded] = useState(false);
 
   useEffect(() => {
+    let links: { href: string; label: string; icon: any }[];
     if (navItems && navItems.length > 0) {
       const iconMap: Record<string, any> = { Home, BookOpen, LayoutDashboard };
-      const links = navItems.map((item) => ({
+      links = navItems.map((item) => ({
         href: item.href,
         label: item.label,
         icon: (item.icon && iconMap[item.icon]) || Home,
       }));
-      // Always include admin link if not present
-      if (!links.find((l) => l.href === "/admin")) {
-        links.push({ href: "/admin", label: "Quản trị", icon: LayoutDashboard });
-      }
-      setDynamicNavLinks(links);
-      setNavLoaded(true);
     } else {
-      setDynamicNavLinks(defaultNavLinks);
-      setNavLoaded(true);
+      links = [...defaultNavLinks];
     }
+    // Always add admin link regardless of navItems source
+    if (!links.find((l) => l.href === "/admin")) {
+      links.push({ href: "/admin", label: "Quản trị", icon: LayoutDashboard });
+    }
+    setDynamicNavLinks(links);
+    setNavLoaded(true);
   }, [navItems]);
 
   const navLinks = navLoaded ? dynamicNavLinks : defaultNavLinks;

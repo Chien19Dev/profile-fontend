@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
-import { isAdminEmail } from "@/lib/admin";
 import bcrypt from "bcryptjs";
 
 const googleConfigured =
@@ -11,7 +10,7 @@ const googleConfigured =
 export const isGoogleAuthEnabled = googleConfigured;
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  secret: process.env.NEXTAUTH_SECRET || "your-secret-key-change-in-production",
+  secret: process.env.AUTH_SECRET,
   trustHost: true,
   debug: process.env.NODE_ENV === "development",
   pages: {
@@ -70,8 +69,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider === "google") {
-        return isAdminEmail(user.email);
+      if (account?.provider === "google" && user?.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+        if (!dbUser) return false;
       }
       return true;
     },
@@ -81,7 +83,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.email = token.email as string;
         session.user.name = token.name as string;
         session.user.image = token.picture as string;
-        session.user.role = (token.role as string) || "USER";
+        const tokenRole = token.role as string | undefined;
+        if (tokenRole) {
+          session.user.role = tokenRole;
+        } else if (token.sub) {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.sub },
+            select: { role: true },
+          });
+          session.user.role = dbUser?.role || "USER";
+        } else {
+          session.user.role = "USER";
+        }
       }
       return session;
     },
@@ -91,11 +104,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.email = user.email;
         token.name = user.name;
         token.picture = user.image;
-        token.role = (user as any).role || "USER";
-      }
-      if (account?.provider === "google" && user?.email) {
-        token.sub = user.email;
-        token.role = "ADMIN";
+        if (user.id) {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { role: true },
+          });
+          token.role = dbUser?.role || (user as any).role || "USER";
+        } else {
+          token.role = (user as any).role || "USER";
+        }
       }
       return token;
     },

@@ -7,9 +7,11 @@ async function isAdmin() {
     return session?.user && session.user.role === 'ADMIN';
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
+        const admin = await isAdmin();
         const posts = await prisma.post.findMany({
+            where: admin ? undefined : { published: true },
             orderBy: { publishedAt: 'desc' },
         });
         return NextResponse.json(posts);

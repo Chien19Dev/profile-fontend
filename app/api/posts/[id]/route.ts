@@ -13,8 +13,9 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
-        const post = await prisma.post.findUnique({
-            where: { id },
+        const admin = await isAdmin();
+        const post = await prisma.post.findFirst({
+            where: admin ? { id } : { id, published: true },
         });
         if (!post) {
             return NextResponse.json({ error: 'Post not found' }, { status: 404 });

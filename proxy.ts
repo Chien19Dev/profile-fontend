@@ -26,7 +26,6 @@ function isAdminRead(pathname: string, method: string) {
   if (method !== "GET") return false;
   return (
     pathname === "/api/contact" ||
-    pathname === "/api/posts" ||
     pathname === "/api/profile"
   );
 }

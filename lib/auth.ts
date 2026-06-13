@@ -59,6 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.name,
           image: user.image,
+          role: user.role,
         };
       },
     }),
@@ -80,6 +81,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.email = token.email as string;
         session.user.name = token.name as string;
         session.user.image = token.picture as string;
+        session.user.role = (token.role as string) || "USER";
       }
       return session;
     },
@@ -89,9 +91,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.email = user.email;
         token.name = user.name;
         token.picture = user.image;
+        token.role = (user as any).role || "USER";
       }
       if (account?.provider === "google" && user?.email) {
         token.sub = user.email;
+        token.role = "ADMIN";
       }
       return token;
     },

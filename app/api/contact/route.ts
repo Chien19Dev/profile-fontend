@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { isAdminEmail } from "@/lib/admin";
 import { getClientIp, rateLimit } from "@/lib/rate-limit";
+import { createNotification } from "@/lib/notifications";
 
 export async function GET() {
   try {
@@ -39,6 +40,14 @@ export async function POST(request: NextRequest) {
     const contact = await prisma.contactMessage.create({
       data: body,
     });
+
+    await createNotification({
+      type: "NEW_CONTACT",
+      title: "Tin nhắn liên hệ mới",
+      message: `${body.name} đã gửi tin nhắn: ${body.subject || body.message?.slice(0, 50)}`,
+      link: "/admin",
+    });
+
     return NextResponse.json(contact, { status: 201 });
   } catch (error) {
     console.error("Error creating contact:", error);

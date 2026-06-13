@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { Lock, Shield, Sparkles, Mail, Loader2 } from "lucide-react";
+import { Lock, Shield, Sparkles, Mail, Loader2, UserPlus } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -178,11 +179,20 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
                 </Button>
               </form>
 
-              <div className="pt-4 border-t border-border">
+              <div className="pt-4 border-t border-border space-y-3">
                 <p className="text-xs text-muted-foreground text-center">
                   Bằng cách đăng nhập, bạn đồng ý với điều khoản dịch vụ và
                   chính sách bảo mật của chúng tôi
                 </p>
+                <div className="text-center">
+                  <Link
+                    href="/register"
+                    className="text-sm text-primary hover:underline inline-flex items-center gap-1.5"
+                  >
+                    <UserPlus className="size-3.5" />
+                    Chưa có tài khoản? Đăng ký
+                  </Link>
+                </div>
               </div>
             </div>
           </DecoFrame>

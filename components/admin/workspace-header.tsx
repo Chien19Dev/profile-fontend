@@ -7,6 +7,11 @@ const LABELS: Record<Section, string> = {
   testimonials: "Đánh giá",
   contacts: "Tin nhắn liên hệ",
   posts: "Bài viết (Blog)",
+  analytics: "Phân tích truy cập",
+  navigation: "Điều hướng",
+  notifications: "Thông báo",
+  categories: "Danh mục dự án",
+  users: "Người dùng",
 };
 
 export function WorkspaceHeader({ section }: { section: Section }) {

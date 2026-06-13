@@ -1,11 +1,21 @@
 import type { MetadataRoute } from "next";
-import { getPublishedPosts } from "@/lib/data";
+import {
+  getPublishedPosts,
+  getPublishedProjects,
+  getPublishedSkills,
+  getPublishedTestimonials,
+} from "@/lib/data";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://chien19.vercel.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getPublishedPosts();
+  const [posts, projects, skills, testimonials] = await Promise.all([
+    getPublishedPosts(),
+    getPublishedProjects(),
+    getPublishedSkills(),
+    getPublishedTestimonials(),
+  ]);
 
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -19,6 +29,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/projects`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
     {
       url: `${BASE_URL}/login`,
@@ -35,5 +51,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...blogPages];
+  const projectPages: MetadataRoute.Sitemap = projects.map((project) => ({
+    url: `${BASE_URL}/projects/${project.id}`,
+    lastModified: project.updatedAt || project.createdAt || new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  const skillPages: MetadataRoute.Sitemap = skills.map((skill) => ({
+    url: `${BASE_URL}/skills/${skill.id}`,
+    lastModified: skill.updatedAt || new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  const testimonialPages: MetadataRoute.Sitemap = testimonials.map(
+    (testimonial) => ({
+      url: `${BASE_URL}/testimonials/${testimonial.id}`,
+      lastModified: testimonial.updatedAt || new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.4,
+    }),
+  );
+
+  return [
+    ...staticPages,
+    ...blogPages,
+    ...projectPages,
+    ...skillPages,
+    ...testimonialPages,
+  ];
 }

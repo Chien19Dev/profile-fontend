@@ -16,7 +16,8 @@
 # next.js
 /.next/
 /dist/
-/.idea
+/.idea/
+/.qoder/
 /out/
 
 # production

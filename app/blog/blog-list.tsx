@@ -1,24 +1,53 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { DecoFrame } from "@/components/sections/deco-frame";
-import { Calendar, Clock, ArrowRight, BookOpen, User, Tag } from "lucide-react";
+import { Calendar, Clock, ArrowRight, BookOpen, User, Tag, Search } from "lucide-react";
 import Image from "next/image";
+import { SearchBar } from "@/components/sections/search-bar";
+import type { Post, Project } from "@/lib/api";
 
 export const revalidate = 60;
 
-export default async function BlogListPage() {
-  let posts: Awaited<ReturnType<typeof prisma.post.findMany>> = [];
-  let isPrismaReady = false;
+export default function BlogListClient() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  if (prisma && "post" in prisma) {
-    isPrismaReady = true;
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  async function loadPosts() {
     try {
-      posts = await prisma.post.findMany({
-        where: { published: true },
-        orderBy: { publishedAt: "desc" },
-      });
+      const res = await fetch("/api/posts?published=true");
+      if (res.ok) {
+        const data = await res.json();
+        setPosts(data);
+      }
     } catch (error) {
-      console.error("Lỗi khi truy vấn bài viết từ database:", error);
+      console.error("Error loading posts:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSearch(query: string) {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      loadPosts();
+      return;
+    }
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&type=posts`);
+      if (res.ok) {
+        const data = await res.json();
+        setPosts(data.posts);
+      }
+    } catch (error) {
+      console.error("Error searching posts:", error);
     }
   }
 
@@ -39,27 +68,30 @@ export default async function BlogListPage() {
             </p>
           </div>
 
-          {!isPrismaReady && (
-            <div className="p-5 border border-destructive/30 bg-destructive/10 text-destructive text-sm rounded-lg text-center space-y-2">
-              <p className="font-semibold">Cơ sở dữ liệu chưa sẵn sàng!</p>
-              <p className="text-xs text-muted-foreground">
-                Chạy <code className="font-mono">npx prisma generate</code> và{" "}
-                <code className="font-mono">npx prisma db push</code> rồi tải
-                lại trang.
-              </p>
-            </div>
-          )}
+          <SearchBar
+            onSearch={handleSearch}
+            placeholder="Tìm kiếm bài viết..."
+            className="max-w-md mx-auto"
+          />
 
-          {isPrismaReady && posts.length === 0 ? (
+          {loading ? (
+            <div className="text-center text-muted-foreground py-12">
+              Đang tải...
+            </div>
+          ) : posts.length === 0 ? (
             <DecoFrame className="p-12 text-center text-muted-foreground">
               <BookOpen className="size-12 mx-auto text-primary/40 mb-4" />
-              <p className="text-sm">Chưa có bài viết nào được xuất bản.</p>
+              <p className="text-sm">
+                {searchQuery
+                  ? `Không tìm thấy bài viết nào cho "${searchQuery}"`
+                  : "Chưa có bài viết nào được xuất bản."}
+              </p>
             </DecoFrame>
           ) : (
             <div className="grid gap-6">
               {posts.map((post) => {
                 const formattedDate = new Date(
-                  post.publishedAt || post.createdAt,
+                  post.publishedAt || post.createdAt!,
                 ).toLocaleDateString("vi-VN", {
                   year: "numeric",
                   month: "long",

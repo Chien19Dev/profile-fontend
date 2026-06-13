@@ -18,6 +18,8 @@ interface SidebarProps {
     testimonials: number;
     unread: number;
     posts: number;
+    categories: number;
+    users: number;
   };
 }
 
@@ -32,6 +34,7 @@ const NAV_ITEMS: {
   { id: "skills", label: "Kỹ năng", countKey: "skills" },
   { id: "testimonials", label: "Đánh giá", countKey: "testimonials" },
   { id: "posts", label: "Blog", countKey: "posts", href: "/admin/blogs" },
+  { id: "categories", label: "Danh mục", countKey: "categories" },
 ];
 
 export function Sidebar({ section, onSection, counts }: SidebarProps) {
@@ -95,6 +98,31 @@ export function Sidebar({ section, onSection, counts }: SidebarProps) {
                     </motion.span>
                 ) : null
               }
+          />
+          <Label className="px-5 mt-5 mb-2 text-[0.6rem] tracking-widest uppercase text-muted-foreground">
+            Hệ thống
+          </Label>
+          <NavButton
+              active={section === "categories"}
+              onClick={() => onSection("categories")}
+              label="Danh mục"
+              count={counts.categories}
+          />
+          <NavButton
+              active={section === "navigation"}
+              onClick={() => onSection("navigation")}
+              label="Điều hướng"
+          />
+          <NavButton
+              active={section === "analytics"}
+              onClick={() => onSection("analytics")}
+              label="Phân tích"
+          />
+          <NavButton
+              active={section === "users"}
+              onClick={() => onSection("users")}
+              label="Người dùng"
+              count={counts.users}
           />
         </nav>
 

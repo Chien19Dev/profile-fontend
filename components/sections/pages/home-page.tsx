@@ -9,6 +9,7 @@ import { ContactSection } from "@/components/sections/pages/contact-section";
 import { ProjectsSection } from "@/components/sections/pages/projects-section";
 import { SkillsSection } from "@/components/sections/pages/skills-section";
 import { TestimonialsSection } from "@/components/sections/pages/testimonials-section";
+import { RegisteredUsersSection } from "@/components/sections/pages/registered-users-section";
 
 const MotionDiv = motion.div;
 
@@ -79,6 +80,14 @@ export function HomePage({
           className="mt-10 md:mt-14"
         >
           <TestimonialsSection testimonials={testimonials} loading={false} />
+        </MotionDiv>
+
+        <MotionDiv
+          {...fadeUp}
+          transition={{ ...fadeUp.transition, delay: 0.26 }}
+          className="mt-10 md:mt-14"
+        >
+          <RegisteredUsersSection />
         </MotionDiv>
       </div>
     </div>

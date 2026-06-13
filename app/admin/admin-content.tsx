@@ -9,6 +9,7 @@ import {
   Project,
   Skill,
   Testimonial,
+  User,
 } from "@/lib/api";
 import { alertSuccess, alertError } from "@/lib/alerts";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,11 @@ import { ProjectsSection } from "@/components/sections/admin/admin-projects-sect
 import { SkillsSection } from "@/components/sections/admin/admin-skills-section";
 import { ContactsSection } from "@/components/sections/admin/admin-contacts-section";
 import { AdminTestimonialsSection } from "@/components/sections/admin/admin-testimonials-section";
+import { CategoriesSection } from "@/components/admin/categories-section";
+import { NavigationSection } from "@/components/admin/navigation-section";
+import { AnalyticsDashboard } from "@/components/admin/analytics-dashboard";
+import { NotificationBell } from "@/components/admin/notification-bell";
+import { UsersSection } from "@/components/sections/admin/admin-users-section";
 import { Label } from "@/components/ui/label";
 
 type ProfileForm = Omit<Profile, "id" | "createdAt" | "updatedAt">;
@@ -73,6 +79,7 @@ export default function AdminPage() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [postCount, setPostCount] = useState(0);
 
   const [profile, setProfile] = useState<ProfileForm>(emptyProfile);
@@ -95,6 +102,7 @@ export default function AdminPage() {
       api.testimonials.list(),
       api.contacts.list(),
       api.posts.list(),
+      api.users.list(),
     ]);
     if (results[0].status === "fulfilled") setProfiles(results[0].value);
     if (results[1].status === "fulfilled") setProjects(results[1].value);
@@ -103,6 +111,7 @@ export default function AdminPage() {
     if (results[4].status === "fulfilled") setContacts(results[4].value);
     if (results[5].status === "fulfilled")
       setPostCount(results[5].value.length);
+    if (results[6].status === "fulfilled") setUsers(results[6].value);
   }
 
   useEffect(() => {
@@ -223,7 +232,8 @@ export default function AdminPage() {
               Quản trị
             </Label>
           </div>
-          <Button
+          <div className="flex items-center gap-2 flex-cols">
+            <Button
             variant="default"
             size="lg"
             onClick={load}
@@ -232,6 +242,8 @@ export default function AdminPage() {
             <RefreshCw className="size-3.5" />
             Làm mới
           </Button>
+          <NotificationBell />
+          </div>
         </div>
 
         <div
@@ -248,6 +260,8 @@ export default function AdminPage() {
               testimonials: testimonials.length,
               unread: newUnread,
               posts: postCount,
+              categories: 0,
+              users: users.length,
             }}
           />
 
@@ -327,6 +341,12 @@ export default function AdminPage() {
             )}
             {section === "contacts" && (
               <ContactsSection contacts={contacts} onReload={load} />
+            )}
+            {section === "categories" && <CategoriesSection />}
+            {section === "navigation" && <NavigationSection />}
+            {section === "analytics" && <AnalyticsDashboard />}
+            {section === "users" && (
+              <UsersSection users={users} onReload={load} />
             )}
           </div>
         </div>

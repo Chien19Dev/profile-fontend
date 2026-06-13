@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const published = searchParams.get('published');
+
+    const where = published === 'true' ? { published: true } : {};
+
     const projects = await prisma.project.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
+      include: { category: true },
     });
     return NextResponse.json(projects);
   } catch (error) {

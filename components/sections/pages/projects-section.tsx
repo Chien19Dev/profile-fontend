@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SectionHeading } from "../admin/admin-section-heading";
+import { SearchBar } from "@/components/sections/search-bar";
 
 const MotionDiv = motion.div;
 
@@ -22,6 +23,7 @@ interface ProjectsSectionProps {
 export function ProjectsSection({ projects, loading }: ProjectsSectionProps) {
   const [detailProject, setDetailProject] = useState<Project | null>(null);
   const [selectedTech, setSelectedTech] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const allTechs = useMemo(() => {
     const techs = new Set<string>();
@@ -32,15 +34,33 @@ export function ProjectsSection({ projects, loading }: ProjectsSectionProps) {
   }, [projects]);
 
   const filteredProjects = useMemo(() => {
-    if (!selectedTech) return projects;
-    return projects.filter((p) =>
-      (p.technologies || []).includes(selectedTech),
-    );
-  }, [projects, selectedTech]);
+    let result = projects;
+    if (selectedTech) {
+      result = result.filter((p) =>
+        (p.technologies || []).includes(selectedTech),
+      );
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q) ||
+          (p.technologies || []).some((t) => t.toLowerCase().includes(q)),
+      );
+    }
+    return result;
+  }, [projects, selectedTech, searchQuery]);
 
   return (
     <section id="projects">
       <SectionHeading label="Tác phẩm" title="Dự án" className="mb-4" />
+
+      <SearchBar
+        onSearch={setSearchQuery}
+        placeholder="Tìm kiếm dự án..."
+        className="mb-4 max-w-sm"
+      />
 
       {!loading && allTechs.length > 0 && (
         <div className="mb-6 flex flex-wrap gap-2">

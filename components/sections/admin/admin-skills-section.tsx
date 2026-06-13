@@ -6,6 +6,8 @@ import { WorkspaceSplit } from "@/components/admin/workspace-split";
 import { WsField } from "@/components/admin/ws-field";
 import { WsSubmit } from "@/components/admin/ws-submit";
 import { WsTable } from "@/components/admin/ws-table";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 type SkillForm = Omit<Skill, "id" | "createdAt" | "updatedAt">;
 
@@ -74,6 +76,17 @@ export function SkillsSection({
                 onChange({ ...form, order: Number(e.target.value) })
               }
             />
+          </WsField>
+          <WsField label="Xuất bản">
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={form.published !== false}
+                onCheckedChange={(checked: boolean) => onChange({ ...form, published: checked })}
+              />
+              <Label className="text-sm text-muted-foreground">
+                {form.published !== false ? "Đã xuất bản" : "Bản nháp"}
+              </Label>
+            </div>
           </WsField>
           <WsSubmit
             isEditing={!!editingId}

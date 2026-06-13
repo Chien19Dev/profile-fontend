@@ -20,18 +20,50 @@ async function main() {
   })
 
   if (existingUser) {
-    return
+    await prisma.user.update({
+      where: { email: adminEmail },
+      data: { role: "ADMIN" },
+    })
+  } else {
+    const hashedPassword = await bcrypt.hash(adminPassword, 12)
+    await prisma.user.create({
+      data: {
+        email: adminEmail,
+        password: hashedPassword,
+        name: "Nguyễn Đình Chiến",
+        role: "ADMIN",
+      },
+    })
   }
-
-  const hashedPassword = await bcrypt.hash(adminPassword, 12)
-
-  const adminUser = await prisma.user.create({
-    data: {
-      email: adminEmail,
-      password: hashedPassword,
-      name: "Nguyễn Đình Chiến",
-    },
+  const projectResult = await prisma.project.updateMany({
+    data: { published: true },
   })
+  const skillResult = await prisma.skill.updateMany({
+    data: { published: true },
+  })
+  const testimonialResult = await prisma.testimonial.updateMany({
+    data: { published: true },
+  })
+  const existingNav = await prisma.navigation.count()
+  if (existingNav === 0) {
+    await prisma.navigation.createMany({
+      data: [
+        { label: "Trang chủ", href: "/", icon: "Home", order: 0, isActive: true },
+        { label: "Blog", href: "/blog", icon: "BookOpen", order: 1, isActive: true },
+      ],
+    })
+  }
+  const existingCategories = await prisma.projectCategory.count()
+  if (existingCategories === 0) {
+    await prisma.projectCategory.createMany({
+      data: [
+        { name: "Web App", slug: "web-app", order: 0 },
+        { name: "Mobile App", slug: "mobile-app", order: 1 },
+        { name: "UI/UX", slug: "ui-ux", order: 2 },
+        { name: "Open Source", slug: "open-source", order: 3 },
+      ],
+    })
+  }
 }
 
 main()

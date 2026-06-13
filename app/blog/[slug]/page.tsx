@@ -6,6 +6,9 @@ import { DecoFrame } from "@/components/sections/deco-frame";
 import { Calendar, Clock, ChevronLeft, User, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { CommentSection } from "@/components/blog/comment-section";
+import { LikeButton } from "@/components/blog/like-button";
+import { BookmarkButton } from "@/components/blog/bookmark-button";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -193,7 +196,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               className="prose dark:prose-invert max-w-none text-foreground leading-relaxed text-sm md:text-base space-y-5"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
+
+            <div className="flex items-center gap-2 pt-4 border-t border-border">
+              <LikeButton postId={post.id} />
+              <BookmarkButton postId={post.id} />
+            </div>
           </DecoFrame>
+
+          <CommentSection postId={post.id} />
         </div>
       </div>
     </div>

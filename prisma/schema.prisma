@@ -8,13 +8,21 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String          @id @default(cuid())
+  email          String          @unique
+  password       String
+  name           String?
+  image          String?
+  bio            String?
+  role           String          @default("USER")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  comments       Comment[]
+  likes          Like[]
+  bookmarks      Bookmark[]
+  following      UserFollow[]    @relation("Following")
+  followers      UserFollow[]    @relation("Followers")
+  contactReplies ContactReply[]
 }
 
 model Profile {
@@ -35,15 +43,29 @@ model Profile {
 }
 
 model Project {
-  id           String   @id @default(cuid())
+  id           String          @id @default(cuid())
   title        String
   description  String
   technologies String[]
   githubUrl    String?
   demoUrl      String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  published    Boolean         @default(true)
+  categoryId   String?
+  category     ProjectCategory? @relation(fields: [categoryId], references: [id])
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
   images       String[]
+}
+
+model ProjectCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  projects    Project[]
 }
 
 model Skill {
@@ -53,35 +75,40 @@ model Skill {
   icon      String?
   level     Int?
   order     Int?
+  published Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model ContactMessage {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   name      String
   email     String
   subject   String?
   message   String
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isRead    Boolean        @default(false)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  replies   ContactReply[]
 }
 
 model Post {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   title       String
-  slug        String   @unique
+  slug        String     @unique
   content     String
   summary     String?
-  published   Boolean  @default(false)
+  published   Boolean    @default(false)
   coverImage  String?
   author      String?
   category    String?
   tags        String[]
-  publishedAt DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  publishedAt DateTime   @default(now())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  comments    Comment[]
+  likes       Like[]
+  bookmarks   Bookmark[]
 }
 
 model Testimonial {
@@ -91,6 +118,95 @@ model Testimonial {
   content     String
   avatar      String?
   order       Int      @default(0)
+  published   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  content   String
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model UserFollow {
+  id          String   @id @default(cuid())
+  followerId  String
+  follower    User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User     @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  userAgent String?
+  ip        String?
+  country   String?
+  createdAt DateTime @default(now())
+}
+
+model Navigation {
+  id        String   @id @default(cuid())
+  label     String
+  href      String
+  icon      String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContactReply {
+  id        String         @id @default(cuid())
+  contactId String
+  contact   ContactMessage @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  adminId   String
+  admin     User           @relation(fields: [adminId], references: [id])
+  message   String
+  createdAt DateTime       @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
 }

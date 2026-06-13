@@ -1,9 +1,11 @@
-import { MailCheck, Trash2 } from "lucide-react";
-import { api, ContactMessage } from "@/lib/api";
+import { useState } from "react";
+import { MailCheck, Trash2, Reply } from "lucide-react";
+import { api, ContactMessage, ContactReply } from "@/lib/api";
 import { alertSuccess, alertError } from "@/lib/alerts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 
 export function ContactCard({
   item,
@@ -12,6 +14,50 @@ export function ContactCard({
   item: ContactMessage;
   onReload: () => void;
 }) {
+  const [showReply, setShowReply] = useState(false);
+  const [replyMessage, setReplyMessage] = useState("");
+  const [replyLoading, setReplyLoading] = useState(false);
+  const [replies, setReplies] = useState<ContactReply[]>(
+    (item.replies as ContactReply[]) || [],
+  );
+
+  async function handleReply() {
+    if (!replyMessage.trim()) return;
+    setReplyLoading(true);
+    try {
+      const res = await fetch(`/api/contact/${item.id}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: replyMessage }),
+      });
+      if (res.ok) {
+        const reply = await res.json();
+        setReplies((prev) => [...prev, reply]);
+        setReplyMessage("");
+        setShowReply(false);
+        alertSuccess("Đã gửi phản hồi");
+        onReload();
+      } else {
+        alertError("Lỗi khi gửi phản hồi");
+      }
+    } catch {
+      alertError("Lỗi");
+    } finally {
+      setReplyLoading(false);
+    }
+  }
+
+  function formatDate(dateStr?: string) {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
   return (
     <div
       className={[
@@ -44,6 +90,54 @@ export function ContactCard({
         </p>
       </div>
 
+      {/* Replies */}
+      {replies.length > 0 && (
+        <div className="space-y-2 border-l-2 border-primary/20 pl-3">
+          {replies.map((reply) => (
+            <div key={reply.id} className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-medium text-primary">
+                  {reply.admin?.name || "Admin"}
+                </span>
+                <span className="text-[0.6rem] text-muted-foreground">
+                  {formatDate(reply.createdAt)}
+                </span>
+              </div>
+              <p className="text-xs text-foreground leading-relaxed">
+                {reply.message}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Reply form */}
+      {showReply && (
+        <div className="space-y-2 border-t border-border pt-2">
+          <Textarea
+            value={replyMessage}
+            onChange={(e) => setReplyMessage(e.target.value)}
+            placeholder="Viết phản hồi..."
+            rows={2}
+          />
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={handleReply} disabled={replyLoading}>
+              {replyLoading ? "Đang gửi..." : "Gửi phản hồi"}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setShowReply(false);
+                setReplyMessage("");
+              }}
+            >
+              Hủy
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-2 pt-1">
         <Button
           size="sm"
@@ -59,6 +153,14 @@ export function ContactCard({
         >
           <MailCheck className="size-3.5" />
           Đã đọc
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setShowReply(!showReply)}
+        >
+          <Reply className="size-3.5" />
+          Phản hồi
         </Button>
         <Button
           size="icon-sm"

@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Home,
   LayoutDashboard,
@@ -21,7 +21,7 @@ import { Button } from "../ui/button";
 
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
-const navLinks = [
+const defaultNavLinks = [
   { href: "/", label: "Trang chủ", icon: Home },
   { href: "/blog", label: "Blog", icon: BookOpen },
   { href: "/admin", label: "Quản trị", icon: LayoutDashboard },
@@ -29,9 +29,10 @@ const navLinks = [
 
 interface NavbarProps {
   cvExistsInitial?: boolean;
+  navItems?: { label: string; href: string; icon?: string | null }[];
 }
 
-export default function Navbar({ cvExistsInitial = false }: NavbarProps) {
+export default function Navbar({ cvExistsInitial = false, navItems }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cvExists, setCvExists] = useState(cvExistsInitial);
   const [uploading, setUploading] = useState(false);
@@ -72,6 +73,33 @@ export default function Navbar({ cvExistsInitial = false }: NavbarProps) {
       alert("Failed to view CV");
     }
   };
+
+  const [dynamicNavLinks, setDynamicNavLinks] = useState<
+    { href: string; label: string; icon: any }[]
+  >([]);
+  const [navLoaded, setNavLoaded] = useState(false);
+
+  useEffect(() => {
+    if (navItems && navItems.length > 0) {
+      const iconMap: Record<string, any> = { Home, BookOpen, LayoutDashboard };
+      const links = navItems.map((item) => ({
+        href: item.href,
+        label: item.label,
+        icon: (item.icon && iconMap[item.icon]) || Home,
+      }));
+      // Always include admin link if not present
+      if (!links.find((l) => l.href === "/admin")) {
+        links.push({ href: "/admin", label: "Quản trị", icon: LayoutDashboard });
+      }
+      setDynamicNavLinks(links);
+      setNavLoaded(true);
+    } else {
+      setDynamicNavLinks(defaultNavLinks);
+      setNavLoaded(true);
+    }
+  }, [navItems]);
+
+  const navLinks = navLoaded ? dynamicNavLinks : defaultNavLinks;
 
   const visibleNavLinks = navLinks.filter(
     (link) => link.href !== "/admin" || isAdmin,

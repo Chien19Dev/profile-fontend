@@ -6,7 +6,7 @@ import Navbar from "@/components/sections/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
-import { getCvExists } from "@/lib/data";
+import { getCvExists, getNavigationItems } from "@/lib/data";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -94,6 +94,9 @@ export const metadata: Metadata = {
 
   alternates: {
     canonical: "https://chien19.vercel.app",
+    types: {
+      "application/rss+xml": "https://chien19.vercel.app/feed.xml",
+    },
   },
 
   category: "technology",
@@ -104,7 +107,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cvExists = await getCvExists();
+  const [cvExists, navItems] = await Promise.all([getCvExists(), getNavigationItems()]);
 
   return (
     <html
@@ -126,7 +129,7 @@ export default async function RootLayout({
               closeButton={true}
               expand={false}
             />
-            <Navbar cvExistsInitial={cvExists} />
+            <Navbar cvExistsInitial={cvExists} navItems={navItems} />
             {children}
             <Analytics />
           </ThemeProvider>

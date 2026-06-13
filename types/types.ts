@@ -4,4 +4,9 @@ export type Section =
   | "skills"
   | "testimonials"
   | "contacts"
-  | "posts";
+  | "posts"
+  | "analytics"
+  | "navigation"
+  | "notifications"
+  | "categories"
+  | "users";

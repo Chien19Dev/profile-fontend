@@ -30,7 +30,11 @@ interface NavbarProps {
   isAdmin?: boolean;
 }
 
-export default function Navbar({ cvExistsInitial = false, navItems, isAdmin: serverIsAdmin }: NavbarProps) {
+export default function Navbar({
+  cvExistsInitial = false,
+  navItems,
+  isAdmin: serverIsAdmin,
+}: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cvExists, setCvExists] = useState(cvExistsInitial);
   const [uploading, setUploading] = useState(false);
@@ -89,7 +93,6 @@ export default function Navbar({ cvExistsInitial = false, navItems, isAdmin: ser
     } else {
       links = [...defaultNavLinks];
     }
-    // Always add admin link regardless of navItems source
     if (!links.find((l) => l.href === "/admin")) {
       links.push({ href: "/admin", label: "Quản trị", icon: LayoutDashboard });
     }
@@ -106,7 +109,7 @@ export default function Navbar({ cvExistsInitial = false, navItems, isAdmin: ser
   return (
     <header className="sticky top-0 z-50 w-full bg-background/92 backdrop-blur-md supports-backdrop-filter:bg-background/75">
       <div className="deco-nav-line" />
-      <nav className="container mx-auto px-4">
+      <nav className="container mx-auto px-4 max-w-330">
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"

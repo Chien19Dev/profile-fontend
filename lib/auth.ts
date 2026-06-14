@@ -1,8 +1,8 @@
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 
 const googleConfigured =
   !!process.env.AUTH_GOOGLE_ID && !!process.env.AUTH_GOOGLE_SECRET;

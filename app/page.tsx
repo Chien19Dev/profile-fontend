@@ -1,5 +1,5 @@
-﻿import { getHomePageData } from "@/lib/data";
-import { HomePage } from "@/components/sections/pages/home-page";
+﻿import { HomePage } from "@/components/sections/pages/home-page";
+import { getHomePageData } from "@/lib/data";
 
 export const revalidate = 60;
 

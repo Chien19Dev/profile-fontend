@@ -1,6 +1,6 @@
-import React from "react";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import React from "react";
 
 export default async function AdminLayout({
   children,

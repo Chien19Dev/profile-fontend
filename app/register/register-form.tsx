@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { signIn } from "next-auth/react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { DecoFrame } from "@/components/sections/deco-frame";
-import { Mail, Lock, User, ArrowLeft } from "lucide-react";
-import { alertSuccess, alertError } from "@/lib/alerts";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { alertError, alertSuccess } from "@/lib/alerts";
+import { ArrowLeft, Lock, Mail, User } from "lucide-react";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function RegisterForm() {
   const [name, setName] = useState("");

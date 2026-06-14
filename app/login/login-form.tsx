@@ -1,18 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { signIn } from "next-auth/react";
-import { Lock, Shield, Sparkles, Mail, Loader2, UserPlus } from "lucide-react";
-import { FaGoogle } from "react-icons/fa";
+import { DecoFrame } from "@/components/sections/deco-frame";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { DecoFrame } from "@/components/sections/deco-frame";
-import { LoginFormAnimation } from "./login-form-animation";
 import { PasswordInput } from "@/components/ui/password-input";
+import { Separator } from "@/components/ui/separator";
+import { Loader2, Lock, Mail, Shield, Sparkles, UserPlus } from "lucide-react";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { FaGoogle } from "react-icons/fa";
+import { LoginFormAnimation } from "./login-form-animation";
 
 interface LoginFormProps {
   googleEnabled: boolean;

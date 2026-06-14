@@ -1,15 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
-import { motion } from "framer-motion";
-import type { Profile, Project, Skill, Testimonial } from "@/lib/api";
-import { fadeUp } from "@/lib/motion";
-import { ProfileCard } from "@/components/sections/pages/profile-card";
 import { ContactSection } from "@/components/sections/pages/contact-section";
+import { ProfileCard } from "@/components/sections/pages/profile-card";
 import { ProjectsSection } from "@/components/sections/pages/projects-section";
+import { RegisteredUsersSection } from "@/components/sections/pages/registered-users-section";
 import { SkillsSection } from "@/components/sections/pages/skills-section";
 import { TestimonialsSection } from "@/components/sections/pages/testimonials-section";
-import { RegisteredUsersSection } from "@/components/sections/pages/registered-users-section";
+import type { Profile, Project, Skill, Testimonial } from "@/lib/api";
+import { fadeUp } from "@/lib/motion";
+import { motion } from "framer-motion";
+import { useMemo } from "react";
 
 const MotionDiv = motion.div;
 

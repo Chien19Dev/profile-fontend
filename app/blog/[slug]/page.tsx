@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import { DecoFrame } from "@/components/sections/deco-frame";
-import { Calendar, Clock, ChevronLeft, User, Tag } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import { BookmarkButton } from "@/components/blog/bookmark-button";
 import { CommentSection } from "@/components/blog/comment-section";
 import { LikeButton } from "@/components/blog/like-button";
-import { BookmarkButton } from "@/components/blog/bookmark-button";
+import { DecoFrame } from "@/components/sections/deco-frame";
+import { Button } from "@/components/ui/button";
+import { prisma } from "@/lib/prisma";
+import { Calendar, ChevronLeft, Clock, Tag, User } from "lucide-react";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;

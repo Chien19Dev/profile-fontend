@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { DecoFrame } from "@/components/sections/deco-frame";
 import { Button } from "@/components/ui/button";
-import { UserPlus, UserMinus, Calendar } from "lucide-react";
-import { alertSuccess, alertError } from "@/lib/alerts";
-import type { Post, Comment } from "@/lib/api";
+import { alertError, alertSuccess } from "@/lib/alerts";
+import type { Post } from "@/lib/api";
+import { Calendar, UserMinus, UserPlus } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function UserProfilePage() {
   const params = useParams();

@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 import { DecoFrame } from "@/components/sections/deco-frame";
-import { Calendar, Clock, ArrowRight, BookOpen, User, Tag, Search } from "lucide-react";
-import Image from "next/image";
 import { SearchBar } from "@/components/sections/search-bar";
-import type { Post, Project } from "@/lib/api";
+import type { Post } from "@/lib/api";
+import { ArrowRight, BookOpen, Calendar, Clock, Tag, User } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export const revalidate = 60;
 

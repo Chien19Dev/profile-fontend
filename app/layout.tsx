@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
 import Navbar from "@/components/sections/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
-import { SessionProvider } from "next-auth/react";
-import { Toaster } from "sonner";
-import { getCvExists, getNavigationItems } from "@/lib/data";
 import { auth } from "@/lib/auth";
+import { getCvExists, getNavigationItems } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
+import { Analytics } from "@vercel/analytics/next";
+import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Toaster } from "sonner";
+import "./globals.css";
 
 const geistSans = Geist({
   subsets: ["latin"],

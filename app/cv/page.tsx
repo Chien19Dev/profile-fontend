@@ -1,7 +1,7 @@
+import { Button } from "@/components/ui/button";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { Button } from "@/components/ui/button";
 
 export default async function CvPage() {
   const profile = await prisma.profile.findFirst({

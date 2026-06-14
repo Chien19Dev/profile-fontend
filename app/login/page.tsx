@@ -1,6 +1,6 @@
+import { isGoogleAuthEnabled } from "@/lib/auth";
 import { Suspense } from "react";
 import { LoginForm } from "./login-form";
-import { isGoogleAuthEnabled } from "@/lib/auth";
 
 export default function LoginPage() {
   return (

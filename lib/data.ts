@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
 import type { Profile, Project, Skill, Testimonial } from "@/lib/api";
+import { prisma } from "@/lib/prisma";
 
 const profileSelect = {
   id: true,

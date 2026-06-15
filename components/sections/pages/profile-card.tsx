@@ -1,7 +1,7 @@
 "use client";
 
 import { Globe, Mail, MapPin, Phone } from "lucide-react";
-import { FaGithub, FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
+import { FaFacebook, FaGithub, FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import { Profile } from "@/lib/api";
 import { DecoFrame } from "@/components/sections/deco-frame";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { ProfileSkeleton } from "./profile-skeleton";
 import { ProfileContactItem } from "./profile-contact-item";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 
 interface ProfileCardProps {
   profile: Profile | null;
@@ -82,7 +83,7 @@ export function ProfileCard({ profile, initials, loading }: ProfileCardProps) {
                 variant="outline"
                 size="icon"
                 render={
-                  <a
+                  <Link
                     href={profile.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -98,7 +99,7 @@ export function ProfileCard({ profile, initials, loading }: ProfileCardProps) {
                 variant="outline"
                 size="icon"
                 render={
-                  <a
+                  <Link
                     href={profile.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -114,7 +115,7 @@ export function ProfileCard({ profile, initials, loading }: ProfileCardProps) {
                 variant="outline"
                 size="icon"
                 render={
-                  <a
+                  <Link
                     href={profile.twitterUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -130,7 +131,7 @@ export function ProfileCard({ profile, initials, loading }: ProfileCardProps) {
                 variant="outline"
                 size="icon"
                 render={
-                  <a
+                  <Link
                     href={profile.instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -141,12 +142,28 @@ export function ProfileCard({ profile, initials, loading }: ProfileCardProps) {
                 <FaInstagram />
               </Button>
             )}
+            {profile?.facebookUrl && (
+              <Button
+                variant="outline"
+                size="icon"
+                render={
+                  <Link
+                    href={profile.facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Facebook"
+                  />
+                }
+              >
+                <FaFacebook />
+              </Button>
+            )}
             {profile?.websiteUrl && (
               <Button
                 variant="outline"
                 size="icon"
                 render={
-                  <a
+                  <Link
                     href={profile.websiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"

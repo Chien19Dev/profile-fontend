@@ -48,6 +48,7 @@ const emptyProfile: ProfileForm = {
   linkedinUrl: "",
   twitterUrl: "",
   instagramUrl: "",
+  facebookUrl: "",
   websiteUrl: "",
 };
 const emptyProject: ProjectForm = {

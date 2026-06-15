@@ -38,6 +38,7 @@ model Profile {
   linkedinUrl  String?
   twitterUrl   String?
   instagramUrl String?
+  facebookUrl  String?
   websiteUrl   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

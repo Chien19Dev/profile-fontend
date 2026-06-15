@@ -20,6 +20,7 @@ const EXTRA_FIELDS: Record<string, string> = {
   linkedinUrl: "LinkedIn URL",
   twitterUrl: "Twitter / X URL",
   instagramUrl: "Instagram URL",
+  facebookUrl: "Facebook URL",
   websiteUrl: "Website URL",
 };
 

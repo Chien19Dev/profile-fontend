@@ -7,6 +7,7 @@ import { DecoFrame as DecoFrameComp } from "@/components/sections/deco-frame";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Reply, Trash2 } from "lucide-react";
 import { alertSuccess, alertError } from "@/lib/alerts";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Comment as CommentType } from "@/lib/api";
 
 interface CommentSectionProps {
@@ -104,17 +105,24 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   </div>
                   <div className="flex items-center gap-1">
                     {session && (
-                      <Button
-                        size="icon-sm"
-                        variant="ghost"
-                        onClick={() =>
-                          setReplyingTo(
-                            replyingTo === comment.id ? null : comment.id,
-                          )
-                        }
-                      >
-                        <Reply className="size-3.5" />
-                      </Button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Button
+                              size="icon-sm"
+                              variant="ghost"
+                              onClick={() =>
+                                setReplyingTo(
+                                  replyingTo === comment.id ? null : comment.id,
+                                )
+                              }
+                            >
+                              <Reply className="size-3.5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Phản hồi</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     )}
                     {(session?.user?.id === comment.userId ||
                       session?.user?.role === "ADMIN") && (

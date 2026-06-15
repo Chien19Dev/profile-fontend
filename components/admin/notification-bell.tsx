@@ -138,7 +138,7 @@ export function NotificationBell() {
                 Không có thông báo
               </div>
             ) : (
-              <div className="divide-y divide-border">
+              <div className="divide-y divide-border bg-muted/30 backdrop-blur-md">
                 {notifications.slice(0, 10).map((notif) => (
                   <div
                     key={notif.id}

@@ -1,5 +1,6 @@
-import { BookmarkButton } from "@/components/blog/bookmark-button";
 import { BlogComments } from "@/components/blog/blog-comments";
+import { BlogTableOfContents } from "@/components/blog/blog-table-of-contents";
+import { BookmarkButton } from "@/components/blog/bookmark-button";
 import { LikeButton } from "@/components/blog/like-button";
 import { ShareButton } from "@/components/blog/share-button";
 import { DecoFrame } from "@/components/sections/deco-frame";
@@ -132,98 +133,108 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
-        <div className="max-w-3xl mx-auto space-y-6">
+      <div className="relative z-10 container mx-auto px-4 py-3 md:py-6">
+        <div className="max-w-6xl mx-auto">
           <Button
             render={<Link href="/blog" />}
             variant="ghost"
             size="sm"
-            className="-ms-3 text-muted-foreground hover:text-foreground"
+            className="-ms-3 text-muted-foreground hover:text-foreground mb-6"
           >
             <ChevronLeft className="size-4" />
             Quay lại Blog
           </Button>
 
-          <DecoFrame className="p-6 md:p-10 lg:p-12 space-y-6 md:space-y-8 overflow-hidden">
-            <div className="space-y-4 border-b border-border pb-6 md:pb-8">
-              <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-primary font-medium">
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="size-3.5" />
-                  {formattedDate}
-                </span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="size-3.5" />
-                  {readTime} phút đọc
-                </span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="flex items-center gap-1.5">
-                  <Tag className="size-3.5" />
-                  {post.category || "General"}
-                </span>
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10">
+            <div className="min-w-0 max-w-4xl space-y-6">
+              <DecoFrame className="p-6 md:p-10 lg:p-12 space-y-6 md:space-y-8 overflow-hidden">
+                <div className="space-y-4 border-b border-border pb-6 md:pb-8">
+                  <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-primary font-medium">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="size-3.5" />
+                      {formattedDate}
+                    </span>
+                    <span className="text-muted-foreground/30">•</span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="size-3.5" />
+                      {readTime} phút đọc
+                    </span>
+                    <span className="text-muted-foreground/30">•</span>
+                    <span className="flex items-center gap-1.5">
+                      <Tag className="size-3.5" />
+                      {post.category || "General"}
+                    </span>
+                  </div>
 
-              <h1 className="deco-title text-3xl md:text-4xl lg:text-5xl text-foreground leading-tight">
-                {post.title}
-              </h1>
+                  <h1 className="deco-title text-3xl md:text-4xl lg:text-5xl text-foreground leading-tight">
+                    {post.title}
+                  </h1>
 
-              <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-1">
-                <span className="flex items-center gap-1.5">
-                  <User className="size-3.5 text-primary" />
-                  {post.author || "Chiến Nguyễn"}
-                </span>
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {post.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-0.5 rounded-full border border-border bg-muted/40"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-1">
+                    <span className="flex items-center gap-1.5">
+                      <User className="size-3.5 text-primary" />
+                      {post.author || "Chiến Nguyễn"}
+                    </span>
+                    {post.tags && post.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {post.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-0.5 rounded-full border border-border bg-muted/40"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {post.coverImage && (
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border bg-muted">
+                    <Image
+                      src={post.coverImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
                   </div>
                 )}
-              </div>
-            </div>
 
-            {post.coverImage && (
-              <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border bg-muted">
-                <Image
-                  src={post.coverImage}
-                  alt={post.title}
-                  fill
-                  className="object-cover"
-                  priority
+                <article
+                  className="prose dark:prose-invert max-w-none text-foreground leading-relaxed text-sm md:text-base space-y-5"
+                  data-blog-content
+                  dangerouslySetInnerHTML={{ __html: post.content }}
                 />
-              </div>
-            )}
 
-            <article
-              className="prose dark:prose-invert max-w-none text-foreground leading-relaxed text-sm md:text-base space-y-5"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+                <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-border">
+                  <LikeButton
+                    postId={post.id}
+                    initialCount={post._count.likes}
+                  />
+                  <ShareButton
+                    title={post.title}
+                    url={`${SITE_URL}/blog/${slug}`}
+                    text={post.summary || post.title}
+                  />
+                  <BookmarkButton postId={post.id} />
+                </div>
+              </DecoFrame>
 
-            <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-border">
-              <LikeButton
+              <BlogComments
                 postId={post.id}
-                initialCount={post._count.likes}
-              />
-              <ShareButton
+                slug={slug}
                 title={post.title}
                 url={`${SITE_URL}/blog/${slug}`}
-                text={post.summary || post.title}
               />
-              <BookmarkButton postId={post.id} />
             </div>
-          </DecoFrame>
-
-          <BlogComments
-            postId={post.id}
-            slug={slug}
-            title={post.title}
-            url={`${SITE_URL}/blog/${slug}`}
-          />
+            <aside className="hidden lg:block">
+              <div className="sticky top-24">
+                <BlogTableOfContents />
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </div>

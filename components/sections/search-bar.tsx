@@ -44,7 +44,8 @@ export function SearchBar({
     <div className={`relative ${className}`}>
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
       <Input
-        type="text"
+        type="search"
+        size="lg"
         value={query}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}

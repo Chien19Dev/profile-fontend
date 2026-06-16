@@ -1,5 +1,6 @@
 import { Skill } from "@/lib/api";
 import { DecoFrame } from "@/components/sections/deco-frame";
+import {Fragment} from "react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SectionHeading } from "../admin/admin-section-heading";
@@ -34,19 +35,19 @@ export function SkillsSection({ skills, loading }: Props) {
                 {skill.name}
               </span>
               {skill.level ? (
-                <>
+                <Fragment>
                   <span className="text-muted-foreground/50 text-xs">·</span>
                   <span className="text-xs text-primary tabular-nums font-medium">
                     {skill.level}%
                   </span>
-                </>
+                </Fragment>
               ) : skill.category ? (
-                <>
+                <Fragment>
                   <span className="text-muted-foreground/50 text-xs">·</span>
                   <span className="text-xs text-muted-foreground">
                     {skill.category}
                   </span>
-                </>
+                </Fragment>
               ) : null}
             </div>
           ))}

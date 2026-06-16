@@ -1,7 +1,9 @@
+import { Fragment } from "react/jsx-runtime";
+
 export default function BlogAdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <Fragment>{children}</Fragment>;
 }

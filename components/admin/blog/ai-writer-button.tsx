@@ -6,7 +6,7 @@ import {
   DialogBackdrop,
   DialogPortal,
   DialogPrimitive,
-  DialogViewport
+  DialogViewport,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
@@ -29,7 +29,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
 interface OutlineItem {
@@ -72,7 +72,10 @@ const LENGTH_OPTIONS = [
   { value: "2000-3000", label: "Từ 2000 - 3000 từ" },
 ];
 
-export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) {
+export function AiWriterButton({
+  onApply,
+  existingTitle,
+}: AiWriterButtonProps) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<View>("config");
 
@@ -90,7 +93,8 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
   });
 
   const [outline, setOutline] = useState<OutlineItem[]>([]);
-  const [generatedContent, setGeneratedContent] = useState<AiWriterResult | null>(null);
+  const [generatedContent, setGeneratedContent] =
+    useState<AiWriterResult | null>(null);
   const generatedContentRef = useRef<AiWriterResult | null>(null);
   const applyingRef = useRef(false);
   const [notes, setNotes] = useState("");
@@ -196,7 +200,7 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
   const isContent = view === "content";
 
   return (
-    <>
+    <Fragment>
       <Button
         type="button"
         variant="default"
@@ -210,32 +214,33 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
         Viết bài bằng AI
       </Button>
 
-      <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
+      <Dialog
+        open={open}
+        onOpenChange={(o) => {
+          if (!o) handleClose();
+        }}
+      >
         <DialogPortal>
           <DialogBackdrop />
-          <DialogViewport
-            className={cn(isContent && "p-2 sm:p-4")}
-          >
+          <DialogViewport className={cn(isContent && "p-2 sm:p-4")}>
             <DialogPrimitive.Popup
               className={cn(
                 "relative row-start-2 flex max-h-full min-h-0 w-full origin-center flex-col rounded-2xl border bg-background text-foreground shadow-2xl outline-none",
                 "transition-[scale,opacity,translate] duration-200 ease-in-out will-change-transform",
                 "data-ending-style:opacity-0 data-starting-style:opacity-0",
-                isContent
-                  ? "max-w-6xl"
-                  : "max-w-lg",
+                isContent ? "max-w-6xl" : "max-w-lg",
               )}
               data-slot="dialog-popup"
             >
               <DialogPrimitive.Close
                 aria-label="Close"
-                className="absolute end-3 top-3 z-10 rounded-full p-1 text-white/80 hover:text-white transition"
+                className="absolute inset-e-3 top-3 z-10 rounded-full p-1 text-white/80 hover:text-white transition"
                 render={<Button size="icon" variant="ghost" />}
               >
                 <X className="size-5" />
               </DialogPrimitive.Close>
               {view === "config" && (
-                <>
+                <Fragment>
                   <div className="bg-primary rounded-t-2xl px-6 py-4 shrink-0">
                     <h2 className="text-white font-bold text-lg tracking-wide">
                       CẤU HÌNH THÔNG TIN
@@ -251,11 +256,14 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
 
                     <div>
                       <label className="block text-sm font-semibold text-foreground mb-2">
-                        Từ khóa mục tiêu <span className="text-destructive">*</span>
+                        Từ khóa mục tiêu{" "}
+                        <span className="text-destructive">*</span>
                       </label>
                       <Input
                         value={config.keyword}
-                        onChange={(e) => setConfig((c) => ({ ...c, keyword: e.target.value }))}
+                        onChange={(e) =>
+                          setConfig((c) => ({ ...c, keyword: e.target.value }))
+                        }
                         placeholder="Từ khóa mục tiêu"
                         className="blog-luxury-input"
                       />
@@ -263,11 +271,14 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
 
                     <div>
                       <label className="block text-sm font-semibold text-foreground mb-2">
-                        Tiêu đề bài viết <span className="text-destructive">*</span>
+                        Tiêu đề bài viết{" "}
+                        <span className="text-destructive">*</span>
                       </label>
                       <Input
                         value={config.title}
-                        onChange={(e) => setConfig((c) => ({ ...c, title: e.target.value }))}
+                        onChange={(e) =>
+                          setConfig((c) => ({ ...c, title: e.target.value }))
+                        }
                         placeholder="Tiêu đề bài viết"
                         className="blog-luxury-input"
                       />
@@ -279,7 +290,9 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
                       </label>
                       <Select
                         value={config.style}
-                        onValueChange={(v) => setConfig((c) => ({ ...c, style: String(v) }))}
+                        onValueChange={(v) =>
+                          setConfig((c) => ({ ...c, style: String(v) }))
+                        }
                       >
                         <SelectButton className="w-full">
                           <SelectValue placeholder="Chọn phong cách" />
@@ -300,7 +313,9 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
                       </label>
                       <Select
                         value={config.length}
-                        onValueChange={(v) => setConfig((c) => ({ ...c, length: String(v) }))}
+                        onValueChange={(v) =>
+                          setConfig((c) => ({ ...c, length: String(v) }))
+                        }
                       >
                         <SelectButton className="w-full">
                           <SelectValue placeholder="Chọn độ dài" />
@@ -333,7 +348,7 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
                       Tạo dàn ý
                     </Button>
                   </div>
-                </>
+                </Fragment>
               )}
               {view === "content" && (
                 <div className="flex flex-col max-h-[90vh] overflow-hidden rounded-2xl">
@@ -358,8 +373,7 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
                   )}
 
                   <div className="flex flex-1 min-h-0 overflow-hidden">
-                    {/* Left: Outline */}
-                    <div className="w-[340px] shrink-0 border-r border-border flex flex-col overflow-hidden bg-muted">
+                    <div className="w-85 shrink-0 border-r border-border flex flex-col overflow-hidden bg-muted">
                       <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
                         <span className="font-bold text-sm tracking-wide text-foreground">
                           DÀN Ý BÀI VIẾT
@@ -368,7 +382,10 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
                           <span className="text-xs text-muted-foreground">
                             Chỉnh sửa dàn ý
                           </span>
-                          <Switch checked={editOutline} onCheckedChange={setEditOutline} />
+                          <Switch
+                            checked={editOutline}
+                            onCheckedChange={setEditOutline}
+                          />
                         </div>
                       </div>
 
@@ -390,7 +407,9 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
                               <span
                                 className={cn(
                                   "text-xs font-bold shrink-0",
-                                  item.level === "H2" ? "text-red-600" : "text-blue-600",
+                                  item.level === "H2"
+                                    ? "text-red-600"
+                                    : "text-blue-600",
                                 )}
                               >
                                 {item.level}
@@ -400,13 +419,16 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
                                   value={item.title}
                                   onChange={(e) => {
                                     const next = [...outline];
-                                    next[idx] = { ...item, title: e.target.value };
+                                    next[idx] = {
+                                      ...item,
+                                      title: e.target.value,
+                                    };
                                     setOutline(next);
                                   }}
                                   className="flex-1 min-w-0 text-sm bg-transparent border-b border-border outline-none focus:border-destructive"
                                 />
                               ) : (
-                                <span className="text-sm text-foreground break-words min-w-0">
+                                <span className="text-sm text-foreground wrap-break-word min-w-0">
                                   {item.title}
                                 </span>
                               )}
@@ -484,7 +506,9 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
                         {generatedContent && (
                           <div
                             className="ai-content-preview prose prose-sm max-w-none"
-                            dangerouslySetInnerHTML={{ __html: generatedContent.content }}
+                            dangerouslySetInnerHTML={{
+                              __html: generatedContent.content,
+                            }}
                           />
                         )}
                       </div>
@@ -515,6 +539,6 @@ export function AiWriterButton({ onApply, existingTitle }: AiWriterButtonProps) 
           </DialogViewport>
         </DialogPortal>
       </Dialog>
-    </>
+    </Fragment>
   );
 }

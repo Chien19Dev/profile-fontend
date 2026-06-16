@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +47,7 @@ export function ProjectsSection({
   const [detailProject, setDetailProject] = useState<Project | null>(null);
 
   return (
-    <>
+    <Fragment>
       <WorkspaceSplit
         form={
           <form onSubmit={onSubmit} className="space-y-2">
@@ -172,6 +172,6 @@ export function ProjectsSection({
           if (!open) setDetailProject(null);
         }}
       />
-    </>
+    </Fragment>
   );
 }

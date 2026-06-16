@@ -3,6 +3,7 @@
 import { Globe, Mail, MapPin, Phone } from "lucide-react";
 import { FaFacebook, FaGithub, FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import { Profile } from "@/lib/api";
+import {Fragment} from "react";
 import { DecoFrame } from "@/components/sections/deco-frame";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -48,7 +49,7 @@ export function ProfileCard({ profile, initials, loading }: ProfileCardProps) {
               "Tạo hồ sơ trong trang Quản trị để hiển thị giới thiệu tại đây."}
           </p>
           {(profile?.email || profile?.phone || profile?.location) && (
-            <>
+            <Fragment>
               <Separator className="bg-primary/20" />
               <ul className="space-y-3">
                 {profile.email && (
@@ -75,7 +76,7 @@ export function ProfileCard({ profile, initials, loading }: ProfileCardProps) {
                   </ProfileContactItem>
                 )}
               </ul>
-            </>
+            </Fragment>
           )}
           <div className="flex flex-wrap gap-2">
             {profile?.githubUrl && (

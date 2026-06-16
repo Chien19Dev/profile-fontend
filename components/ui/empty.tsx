@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import type React from "react";
 import { cn } from "@/lib/utils";
+import { Fragment } from "react";
 
 const emptyMediaVariants = cva(
   "flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -63,7 +64,7 @@ export function EmptyMedia({
       {...props}
     >
       {variant === "icon" && (
-        <>
+        <Fragment>
           <div
             aria-hidden="true"
             className={cn(
@@ -78,7 +79,7 @@ export function EmptyMedia({
               "pointer-events-none absolute bottom-px origin-bottom-right translate-x-0.5 rotate-10 scale-84 shadow-none",
             )}
           />
-        </>
+        </Fragment>
       )}
       <div
         className={cn(emptyMediaVariants({ className, variant }))}

@@ -8,7 +8,7 @@ import {
   Link,
   ZoomIn,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import type { Project } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,7 +65,7 @@ export function ProjectDetailDialog({
   }, [previewIndex, images.length]);
 
   return (
-    <>
+    <Fragment>
       <Dialog
         open={open}
         onOpenChange={(next) => {
@@ -75,7 +75,7 @@ export function ProjectDetailDialog({
       >
         <DialogPopup className="max-w-3xl">
           {project && (
-            <>
+            <Fragment>
               <DialogHeader>
                 <DialogTitle>{project.title}</DialogTitle>
                 <DialogDescription className="sr-only">
@@ -153,7 +153,7 @@ export function ProjectDetailDialog({
                   )}
                 </div>
               </DialogPanel>
-            </>
+            </Fragment>
           )}
         </DialogPopup>
       </Dialog>
@@ -178,7 +178,7 @@ export function ProjectDetailDialog({
               />
 
               {images.length > 1 && (
-                <>
+                <Fragment>
                   <Button
                     type="button"
                     size="icon"
@@ -210,12 +210,12 @@ export function ProjectDetailDialog({
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
                     {previewIndex + 1} / {images.length}
                   </span>
-                </>
+                </Fragment>
               )}
             </div>
           )}
         </DialogPopup>
       </Dialog>
-    </>
+    </Fragment>
   );
 }

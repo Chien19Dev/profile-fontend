@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import {
   Home,
   LayoutDashboard,
@@ -144,7 +144,7 @@ export default function Navbar({
                 <span>Xem CV</span>
               </Button>
             ) : isAdmin ? (
-              <>
+              <Fragment>
                 <input
                   type="file"
                   id="cv-upload-desktop"
@@ -165,7 +165,7 @@ export default function Navbar({
                   <Upload className="h-4 w-4" />
                   <span>{uploading ? "Đang tải..." : "Tải CV lên"}</span>
                 </Button>
-              </>
+              </Fragment>
             ) : null}
             {status === "loading" ? null : session ? (
               <Button
@@ -237,7 +237,7 @@ export default function Navbar({
                 <span>Xem CV</span>
               </Button>
             ) : isAdmin ? (
-              <>
+              <Fragment>
                 <input
                   type="file"
                   id="cv-upload-mobile"
@@ -261,7 +261,7 @@ export default function Navbar({
                   <Upload className="h-4 w-4" />
                   <span>{uploading ? "Đang tải..." : "Tải CV lên"}</span>
                 </Button>
-              </>
+              </Fragment>
             ) : null}
             {status === "loading" ? null : session ? (
               <Button

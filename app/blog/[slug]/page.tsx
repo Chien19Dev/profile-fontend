@@ -147,7 +147,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10">
             <div className="min-w-0 max-w-4xl space-y-6">
-              <DecoFrame className="p-6 md:p-10 lg:p-12 space-y-6 md:space-y-8 overflow-hidden">
+              <DecoFrame className="px-3 py-3 md:p-4 lg:px-6 lg:py-6 space-y-6 md:space-y-8 overflow-hidden">
                 <div className="space-y-4 border-b border-border pb-6 md:pb-8">
                   <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-primary font-medium">
                     <span className="flex items-center gap-1.5">

@@ -4,6 +4,7 @@ import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import { ChevronRightIcon } from "lucide-react";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
+import { Fragment } from "react";
 
 export const MenuCreateHandle: typeof MenuPrimitive.createHandle =
   MenuPrimitive.createHandle;
@@ -126,7 +127,7 @@ export function MenuCheckboxItem({
       {...props}
     >
       {variant === "switch" ? (
-        <>
+        <Fragment>
           <span className="col-start-1">{children}</span>
           <MenuPrimitive.CheckboxItemIndicator
             className="inset-shadow-[0_1px_--theme(--color-black/4%)] inline-flex h-[calc(var(--thumb-size)+2px)] w-[calc(var(--thumb-size)*2-2px)] shrink-0 items-center rounded-full p-px outline-none transition-[background-color,box-shadow] duration-200 [--thumb-size:--spacing(4)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background data-checked:bg-primary data-unchecked:bg-input data-disabled:opacity-64 sm:[--thumb-size:--spacing(3)]"
@@ -134,9 +135,9 @@ export function MenuCheckboxItem({
           >
             <span className="pointer-events-none block aspect-square h-full in-[[data-slot=menu-checkbox-item][data-checked]]:origin-[var(--thumb-size)_50%] origin-left in-[[data-slot=menu-checkbox-item][data-checked]]:translate-x-[calc(var(--thumb-size)-4px)] in-[[data-slot=menu-checkbox-item]:active]:not-data-disabled:scale-x-110 in-[[data-slot=menu-checkbox-item]:active]:rounded-[var(--thumb-size)/calc(var(--thumb-size)*1.10)] rounded-(--thumb-size) bg-background shadow-sm/5 will-change-transform [transition:translate_.15s,border-radius_.15s,scale_.1s_.1s,transform-origin_.15s]" />
           </MenuPrimitive.CheckboxItemIndicator>
-        </>
+        </Fragment>
       ) : (
-        <>
+        <Fragment>
           <MenuPrimitive.CheckboxItemIndicator className="col-start-1 -ms-0.5">
             <svg
               aria-hidden="true"
@@ -154,7 +155,7 @@ export function MenuCheckboxItem({
             </svg>
           </MenuPrimitive.CheckboxItemIndicator>
           <span className="col-start-2">{children}</span>
-        </>
+        </Fragment>
       )}
     </MenuPrimitive.CheckboxItem>
   );

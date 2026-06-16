@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useSession } from "next-auth/react";
 import { Bell, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -117,7 +117,7 @@ export function NotificationBell() {
       </Button>
 
       {isOpen && (
-        <>
+        <Fragment>
           <div
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
@@ -168,7 +168,7 @@ export function NotificationBell() {
               </div>
             )}
           </div>
-        </>
+        </Fragment>
       )}
     </div>
   );

@@ -10,7 +10,7 @@ import { Loader2, Lock, Mail, Shield, Sparkles, UserPlus } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { LoginFormAnimation } from "./login-form-animation";
 
@@ -112,7 +112,7 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
               </div>
 
               {googleEnabled && (
-                <>
+                <Fragment>
                   <Button
                     type="button"
                     variant="outline"
@@ -124,10 +124,10 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
                     {googleLoading ? (
                       <Loader2 className="size-5 animate-spin" />
                     ) : (
-                      <>
+                      <Fragment>
                         <FaGoogle className="size-4" />
                         Đăng nhập với Google
-                      </>
+                      </Fragment>
                     )}
                   </Button>
                   <div className="flex items-center gap-3">
@@ -137,7 +137,7 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
                     </span>
                     <Separator className="flex-1" />
                   </div>
-                </>
+                </Fragment>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-3">
@@ -169,10 +169,10 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
                   disabled={loading || googleLoading}
                 >
                   {loading ? (
-                    <>
+                    <Fragment>
                       <Loader2 className="mr-2 size-5 animate-spin" />
                       Đang đăng nhập...
-                    </>
+                    </Fragment>
                   ) : (
                     "Đăng nhập"
                   )}

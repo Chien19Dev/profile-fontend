@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
+import { Fragment } from "react";
 
 export const Select: typeof SelectPrimitive.Root = SelectPrimitive.Root;
 
@@ -48,12 +49,12 @@ export function SelectButton({
 
   const defaultProps = {
     children: (
-      <>
+      <Fragment>
         <span className="flex-1 truncate in-data-placeholder:text-muted-foreground/72">
           {children}
         </span>
         <ChevronsUpDownIcon className={selectTriggerIconClassName} />
-      </>
+      </Fragment>
     ),
     className: cn(selectTriggerVariants({ size }), "min-w-0", className),
     "data-slot": "select-button",

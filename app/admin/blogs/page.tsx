@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { api, Post } from "@/lib/api";
 import { PenLine, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 
 export default function BlogAdminPage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -32,16 +32,25 @@ export default function BlogAdminPage() {
       subtitle="Blog Studio"
       title="Quản lý bài viết"
       actions={
-        <>
-          <Button variant="outline" size="sm" onClick={load} className="rounded-sm">
+        <Fragment>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={load}
+            className="rounded-sm"
+          >
             <RefreshCw className="size-3.5" />
             Làm mới
           </Button>
-          <Button size="sm" className="rounded-sm" render={<Link href="/admin/blogs/new" />}>
+          <Button
+            size="sm"
+            className="rounded-sm"
+            render={<Link href="/admin/blogs/new" />}
+          >
             <PenLine className="size-3.5" />
             Viết bài mới
           </Button>
-        </>
+        </Fragment>
       }
     >
       {loading ? (

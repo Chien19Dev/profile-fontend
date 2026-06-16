@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import {
   formatBytes,
   useFileUpload,
@@ -236,7 +236,7 @@ export function Pattern({
               {fileItem.file instanceof File &&
               isImage(fileItem.file) &&
               fileItem.preview ? (
-                <>
+                <Fragment>
                   {loadingImages[fileItem.id] !== false && (
                     <div className="bg-muted/50 rounded-lg absolute inset-0 flex items-center justify-center border">
                       <Spinner className="text-muted-foreground size-6" />
@@ -258,7 +258,7 @@ export function Pattern({
                         : "opacity-100",
                     )}
                   />
-                </>
+                </Fragment>
               ) : (
                 <div className="bg-muted rounded-lg flex h-full w-full items-center justify-center border">
                   <ImageIcon className="text-muted-foreground h-8 w-8" />
@@ -322,7 +322,7 @@ export function Pattern({
           </DialogHeader>
           <div className="flex items-center justify-center">
             {selectedImage && (
-              <>
+              <Fragment>
                 {isPreviewLoading && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Spinner className="size-8 text-white" />
@@ -337,7 +337,7 @@ export function Pattern({
                     isPreviewLoading ? "opacity-0" : "opacity-100",
                   )}
                 />
-              </>
+              </Fragment>
             )}
           </div>
         </DialogContent>

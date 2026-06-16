@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ComponentType } from "react";
+import { Fragment, type ComponentType } from "react";
 
 interface ProfileContactItemProps {
   icon: ComponentType<{ className?: string }>;
@@ -15,7 +15,7 @@ export function ProfileContactItem({
   children,
 }: ProfileContactItemProps) {
   const content = (
-    <>
+    <Fragment>
       <span className="flex size-8 shrink-0 items-center justify-center border border-border bg-muted/40 text-primary">
         <Icon className="size-4" />
       </span>
@@ -25,7 +25,7 @@ export function ProfileContactItem({
           {children}
         </span>
       </span>
-    </>
+    </Fragment>
   );
 
   if (href) {

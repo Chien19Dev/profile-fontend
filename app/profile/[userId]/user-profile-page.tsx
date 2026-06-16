@@ -7,7 +7,7 @@ import type { Post } from "@/lib/api";
 import { Calendar, UserMinus, UserPlus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -122,13 +122,13 @@ export default function UserProfilePage() {
                   onClick={handleFollowToggle}
                 >
                   {isFollowing ? (
-                    <>
+                    <Fragment>
                       <UserMinus className="size-3.5" /> Bỏ theo dõi
-                    </>
+                    </Fragment>
                   ) : (
-                    <>
+                    <Fragment>
                       <UserPlus className="size-3.5" /> Theo dõi
-                    </>
+                    </Fragment>
                   )}
                 </Button>
               )}

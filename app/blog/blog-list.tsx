@@ -40,7 +40,9 @@ export default function BlogListClient() {
       return;
     }
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&type=posts`);
+      const res = await fetch(
+        `/api/search?q=${encodeURIComponent(query)}&type=posts`,
+      );
       if (res.ok) {
         const data = await res.json();
         setPosts(data.posts);
@@ -70,7 +72,7 @@ export default function BlogListClient() {
           <SearchBar
             onSearch={handleSearch}
             placeholder="Tìm kiếm bài viết..."
-            className="max-w-md mx-auto"
+            className="max-w-full mx-0 flex lg:flex-start items-start gap-4"
           />
 
           {loading ? (

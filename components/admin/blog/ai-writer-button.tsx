@@ -2,32 +2,32 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPortal,
-  DialogPrimitive,
-  DialogViewport,
+    Dialog,
+    DialogBackdrop,
+    DialogPortal,
+    DialogPrimitive,
+    DialogViewport,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectButton,
-  SelectItem,
-  SelectPopup,
-  SelectValue,
+    Select,
+    SelectButton,
+    SelectItem,
+    SelectPopup,
+    SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  ClipboardList,
-  GripVertical,
-  Loader2,
-  PenLine,
-  RotateCcw,
-  Sparkles,
-  X,
+    ArrowLeft,
+    ClipboardList,
+    GripVertical,
+    Loader2,
+    PenLine,
+    RotateCcw,
+    Sparkles,
+    X,
 } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
@@ -50,6 +50,7 @@ export interface AiWriterResult {
   slug: string;
   summary: string;
   content: string;
+  tags: string[];
 }
 
 interface AiWriterButtonProps {
@@ -161,12 +162,14 @@ export function AiWriterButton({
         slug: data.slug || "",
         summary: data.summary || "",
         content: data.content || "",
+        tags: data.tags || [],
       });
       generatedContentRef.current = {
         title: data.title || config.title,
         slug: data.slug || "",
         summary: data.summary || "",
         content: data.content || "",
+        tags: data.tags || [],
       };
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Đã xảy ra lỗi");
@@ -505,7 +508,7 @@ export function AiWriterButton({
 
                         {generatedContent && (
                           <div
-                            className="ai-content-preview prose prose-sm max-w-none"
+                            className="ai-content-preview blog-content"
                             dangerouslySetInnerHTML={{
                               __html: generatedContent.content,
                             }}

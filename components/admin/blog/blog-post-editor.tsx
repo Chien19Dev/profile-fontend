@@ -155,6 +155,7 @@ export function BlogPostEditor({
                     slug: result.slug || slugify(result.title),
                     summary: result.summary || form.summary,
                     content: result.content,
+                    tagsText: result.tags?.join(", ") || form.tagsText,
                   });
                 }}
               />

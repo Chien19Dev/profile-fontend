@@ -203,7 +203,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 )}
 
                 <article
-                  className="prose dark:prose-invert max-w-none text-foreground leading-relaxed text-sm md:text-base space-y-5"
+                  className="blog-content"
                   data-blog-content
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />

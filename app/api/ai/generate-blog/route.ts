@@ -6,6 +6,10 @@ const MODELS = [
   "gemini-2.5-flash-lite",
   "gemini-2.5-flash",
   "gemini-2.5-pro",
+  "gemini-3-flash",
+  "gemini-3.1-flash-lite",
+  "gemini-3.1-flash",
+  "gemini-3-pro",
 ] as const;
 
 const MAX_RETRIES = 2;
@@ -180,13 +184,15 @@ Yêu cầu:
 - Mở bài hấp dẫn, kết bài có CTA (call to action)
 - Không dùng markdown, chỉ dùng HTML tags
 - Không bao gồm thẻ <html>, <head>, <body>
+- Tạo 5-8 tags/keywords liên quan đến nội dung bài viết, bằng tiếng Việt, ngăn cách bởi dấu phẩy
 
 Trả về JSON với format:
 {
   "title": "Tiêu đề bài viết (có thể cải thiện SEO hơn)",
   "slug": "duong-dan-bai-viet",
   "summary": "Tóm tắt 150-160 ký tự cho SEO",
-  "content": "Nội dung HTML đầy đủ"
+  "content": "Nội dung HTML đầy đủ",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
 }`;
 
   try {

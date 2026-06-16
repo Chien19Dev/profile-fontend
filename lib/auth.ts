@@ -74,6 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { email: user.email },
         });
         if (!dbUser) return false;
+        user.id = dbUser.id;
       }
       return true;
     },
@@ -109,7 +110,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             where: { id: user.id },
             select: { role: true },
           });
-          token.role = dbUser?.role || (user as any).role || "USER";
+          if (dbUser) {
+            token.role = dbUser.role;
+          } else if (user.email) {
+            const dbUserByEmail = await prisma.user.findUnique({
+              where: { email: user.email },
+              select: { role: true },
+            });
+            token.role = dbUserByEmail?.role || (user as any).role || "USER";
+          } else {
+            token.role = (user as any).role || "USER";
+          }
         } else {
           token.role = (user as any).role || "USER";
         }

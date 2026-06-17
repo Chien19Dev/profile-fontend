@@ -62,6 +62,7 @@ export function AdminPostsSection({
         <form onSubmit={onSubmit} className="space-y-4">
           <WsField label="Tiêu đề bài viết">
             <Input
+              size="lg"
               value={form.title}
               onChange={(e) => {
                 const title = e.target.value;
@@ -77,6 +78,7 @@ export function AdminPostsSection({
 
           <WsField label="Slug (Đường dẫn tĩnh)">
             <Input
+              size="lg"
               value={form.slug}
               onChange={(e) =>
                 onChange({ ...form, slug: slugify(e.target.value) })
@@ -87,6 +89,7 @@ export function AdminPostsSection({
 
           <WsField label="Tóm tắt ngắn">
             <Textarea
+              size="lg"
               value={form.summary || ""}
               onChange={(e) => onChange({ ...form, summary: e.target.value })}
               rows={2}
@@ -108,6 +111,7 @@ export function AdminPostsSection({
 
           <WsField label="Tác giả">
             <Input
+              size="lg"
               value={form.author || ""}
               onChange={(e) => onChange({ ...form, author: e.target.value })}
             />
@@ -115,6 +119,7 @@ export function AdminPostsSection({
 
           <WsField label="Danh mục">
             <Input
+              size="lg"
               value={form.category || ""}
               onChange={(e) => onChange({ ...form, category: e.target.value })}
             />
@@ -122,6 +127,7 @@ export function AdminPostsSection({
 
           <WsField label="Tags (phân cách bằng dấu phẩy)">
             <Input
+              size="lg"
               value={form.tagsText}
               onChange={(e) => onChange({ ...form, tagsText: e.target.value })}
             />
@@ -129,6 +135,7 @@ export function AdminPostsSection({
 
           <WsField label="Ngày giờ đăng bài">
             <Input
+              size="lg"
               type="datetime-local"
               value={form.publishedAt ? form.publishedAt.slice(0, 16) : ""}
               onChange={(e) => {

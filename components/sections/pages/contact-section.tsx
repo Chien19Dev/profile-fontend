@@ -53,7 +53,8 @@ export function ContactSection() {
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div className="sr-only" aria-hidden="true">
-          <input
+          <Input
+            size="lg"
             type="text"
             name="system_mail_honeypot"
             value={honeypot}

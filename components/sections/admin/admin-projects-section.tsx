@@ -53,6 +53,7 @@ export function ProjectsSection({
           <form onSubmit={onSubmit} className="space-y-2">
             <WsField label="Tên dự án">
               <Input
+                size="lg"
                 value={form.title}
                 onChange={(e) => onChange({ ...form, title: e.target.value })}
                 required
@@ -60,6 +61,7 @@ export function ProjectsSection({
             </WsField>
             <WsField label="Mô tả">
               <Textarea
+                size="lg"
                 value={form.description}
                 onChange={(e) =>
                   onChange({ ...form, description: e.target.value })
@@ -80,6 +82,7 @@ export function ProjectsSection({
             </WsField>
             <WsField label="Công nghệ (phân cách bằng dấu phẩy)">
               <Input
+                size="lg"
                 value={form.technologiesText}
                 onChange={(e) =>
                   onChange({ ...form, technologiesText: e.target.value })
@@ -88,6 +91,7 @@ export function ProjectsSection({
             </WsField>
             <WsField label="GitHub URL (tùy chọn)">
               <Input
+                size="lg"
                 value={form.githubUrl || ""}
                 onChange={(e) =>
                   onChange({ ...form, githubUrl: e.target.value })
@@ -97,6 +101,7 @@ export function ProjectsSection({
             </WsField>
             <WsField label="Demo URL (tùy chọn)">
               <Input
+                size="lg"
                 value={form.demoUrl || ""}
                 onChange={(e) => onChange({ ...form, demoUrl: e.target.value })}
                 placeholder="https://your-project-demo.com"
@@ -106,7 +111,9 @@ export function ProjectsSection({
               <div className="flex items-center gap-2">
                 <Switch
                   checked={form.published !== false}
-                  onCheckedChange={(checked: boolean) => onChange({ ...form, published: checked })}
+                  onCheckedChange={(checked: boolean) =>
+                    onChange({ ...form, published: checked })
+                  }
                 />
                 <Label className="text-sm text-muted-foreground">
                   {form.published !== false ? "Đã xuất bản" : "Bản nháp"}

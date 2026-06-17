@@ -2,9 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { alertError, alertSuccess } from "@/lib/alerts";
-import { ArrowLeft, Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User, UserPlus } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  MessageSquare,
+  User,
+  UserPlus,
+} from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,7 +26,9 @@ interface RegisterFormProps {
   googleEnabled?: boolean;
 }
 
-export default function RegisterForm({ googleEnabled = false }: RegisterFormProps) {
+export default function RegisterForm({
+  googleEnabled = false,
+}: RegisterFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,41 +46,32 @@ export default function RegisterForm({ googleEnabled = false }: RegisterFormProp
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     if (password !== confirmPassword) {
       alertError("Mật khẩu không khớp");
       return;
     }
-
     if (password.length < 6) {
       alertError("Mật khẩu phải có ít nhất 6 ký tự");
       return;
     }
-
     setLoading(true);
-
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, name }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         alertError(data.error || "Đăng ký thất bại");
         return;
       }
-
       alertSuccess("Đăng ký thành công! Đang đăng nhập...");
-
       const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
-
       if (result?.ok) {
         router.push("/");
       }
@@ -90,7 +94,8 @@ export default function RegisterForm({ googleEnabled = false }: RegisterFormProp
             <h1 className="deco-title text-4xl text-foreground">Đăng ký</h1>
           </div>
           <p className="text-muted-foreground leading-relaxed">
-            Tạo tài khoản để bình luận, theo dõi bài viết và tương tác với nội dung trên trang cá nhân.
+            Tạo tài khoản để bình luận, theo dõi bài viết và tương tác với nội
+            dung trên trang cá nhân.
           </p>
           <div className="space-y-4">
             <div className="flex items-start gap-3 text-sm">
@@ -131,7 +136,7 @@ export default function RegisterForm({ googleEnabled = false }: RegisterFormProp
             <Fragment>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 size="lg"
                 className="w-full h-12"
                 disabled={googleLoading || loading}
@@ -142,7 +147,7 @@ export default function RegisterForm({ googleEnabled = false }: RegisterFormProp
                 ) : (
                   <Fragment>
                     <FaGoogle className="size-4" />
-                    Đăng ký với Google
+                    Đăng nhập với Google
                   </Fragment>
                 )}
               </Button>
@@ -158,9 +163,9 @@ export default function RegisterForm({ googleEnabled = false }: RegisterFormProp
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
+              <Label className="text-sm font-medium text-muted-foreground">
                 Họ tên (tùy chọn)
-              </label>
+              </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
@@ -175,9 +180,9 @@ export default function RegisterForm({ googleEnabled = false }: RegisterFormProp
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
+              <Label className="text-sm font-medium text-muted-foreground">
                 Email *
-              </label>
+              </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
@@ -193,9 +198,9 @@ export default function RegisterForm({ googleEnabled = false }: RegisterFormProp
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
+              <Label className="text-sm font-medium text-muted-foreground">
                 Mật khẩu *
-              </label>
+              </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
@@ -207,21 +212,26 @@ export default function RegisterForm({ googleEnabled = false }: RegisterFormProp
                   className="pl-10 pr-10"
                   required
                 />
-                <button
+                <Button
+                  variant="ghost"
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground hover:bg-transparent transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
+                  {showPassword ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </Button>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
+              <Label className="text-sm font-medium text-muted-foreground">
                 Xác nhận mật khẩu *
-              </label>
+              </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
@@ -233,18 +243,28 @@ export default function RegisterForm({ googleEnabled = false }: RegisterFormProp
                   className="pl-10 pr-10"
                   required
                 />
-                <button
+                <Button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  variant="ghost"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground hover:bg-transparent transition-colors"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   tabIndex={-1}
                 >
-                  {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
+                  {showConfirmPassword ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </Button>
               </div>
             </div>
 
-            <Button type="submit" size="lg" className="w-full h-12 text-base font-medium" disabled={loading || googleLoading}>
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full h-12 text-base font-medium"
+              disabled={loading || googleLoading}
+            >
               {loading ? (
                 <Fragment>
                   <Loader2 className="mr-2 size-5 animate-spin" />

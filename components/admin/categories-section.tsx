@@ -66,13 +66,19 @@ export function CategoriesSection() {
         <form onSubmit={handleSubmit} className="space-y-2">
           <WsField label="Tên danh mục">
             <Input
+              size="lg"
               value={form.name}
               onChange={(e) => {
                 const name = e.target.value;
                 setForm({
                   ...form,
                   name,
-                  slug: form.slug || name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                  slug:
+                    form.slug ||
+                    name
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")
+                      .replace(/[^a-z0-9-]/g, ""),
                 });
               }}
               required
@@ -80,6 +86,7 @@ export function CategoriesSection() {
           </WsField>
           <WsField label="Slug">
             <Input
+              size="lg"
               value={form.slug}
               onChange={(e) => setForm({ ...form, slug: e.target.value })}
               required
@@ -88,15 +95,20 @@ export function CategoriesSection() {
           <WsField label="Mô tả">
             <Textarea
               value={form.description || ""}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
               rows={2}
             />
           </WsField>
           <WsField label="Thứ tự">
             <Input
+              size="lg"
               type="number"
               value={form.order || 0}
-              onChange={(e) => setForm({ ...form, order: Number(e.target.value) })}
+              onChange={(e) =>
+                setForm({ ...form, order: Number(e.target.value) })
+              }
             />
           </WsField>
           <WsSubmit
@@ -122,10 +134,16 @@ export function CategoriesSection() {
               <p key="name" className="text-sm font-medium">
                 {item.name}
               </p>,
-              <span key="slug" className="text-xs text-muted-foreground font-mono">
+              <span
+                key="slug"
+                className="text-xs text-muted-foreground font-mono"
+              >
                 {item.slug}
               </span>,
-              <span key="count" className="text-xs tabular-nums text-primary font-medium">
+              <span
+                key="count"
+                className="text-xs tabular-nums text-primary font-medium"
+              >
                 {item._count?.projects ?? 0}
               </span>,
             ],

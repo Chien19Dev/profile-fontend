@@ -47,32 +47,32 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
           <div className="inline-flex items-center justify-center size-20 rounded-full border border-border bg-muted/40 text-primary">
             <Lock className="size-9" />
           </div>
-          <div>
-            <p className="deco-eyebrow mb-2">Xác thực</p>
-            <h1 className="deco-title text-4xl text-foreground">
+          <div className="flex flex-col items-start gap-2">
+            <Label className="deco-eyebrow">Xác thực</Label>
+            <Label className="font-medium tracking-[0.06em] leading-[1.15] font-heading lg:text-4xl text-foreground">
               Đăng nhập
-            </h1>
+            </Label>
           </div>
           <p className="text-muted-foreground leading-relaxed">
-            Đăng nhập để truy cập trang quản trị và quản lý hồ sơ của bạn.
-            Theo dõi bài viết, để lại bình luận và tương tác với nội dung.
+            Đăng nhập để truy cập trang quản trị và quản lý hồ sơ của bạn. Theo
+            dõi bài viết, để lại bình luận và tương tác với nội dung.
           </p>
           <div className="space-y-4">
-            <div className="flex items-start gap-3 text-sm">
+            <div className="flex items-center gap-3 text-sm">
               <div className="flex size-8 shrink-0 items-center justify-center border border-border bg-primary/10 text-primary">
                 <Shield className="size-4" />
               </div>
-              <span className="text-muted-foreground">
+              <Label className="text-muted-foreground">
                 Bảo mật với mật khẩu mã hóa hoặc Google OAuth
-              </span>
+              </Label>
             </div>
-            <div className="flex items-start gap-3 text-sm">
+            <div className="flex items-center gap-3 text-sm">
               <div className="flex size-8 shrink-0 items-center justify-center border border-border bg-primary/10 text-primary">
                 <Sparkles className="size-4" />
               </div>
-              <span className="text-muted-foreground">
+              <Label className="text-muted-foreground">
                 Chỉ email admin được ủy quyền truy cập quản trị
-              </span>
+              </Label>
             </div>
           </div>
         </div>
@@ -96,7 +96,7 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
             <Fragment>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 size="lg"
                 className="w-full h-12"
                 disabled={googleLoading || isPending}
@@ -163,8 +163,8 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
 
           <div className="space-y-3">
             <p className="text-xs text-muted-foreground text-center">
-              Bằng cách đăng nhập, bạn đồng ý với điều khoản dịch vụ và
-              chính sách bảo mật của chúng tôi
+              Bằng cách đăng nhập, bạn đồng ý với điều khoản dịch vụ và chính
+              sách bảo mật của chúng tôi
             </p>
             <div className="text-center">
               <Link

@@ -53,6 +53,7 @@ export function ProfilesSection({
         <form onSubmit={onSubmit} className="space-y-2">
           <WsField label="Họ và tên">
             <Input
+              size="lg"
               value={form.fullName}
               onChange={(e) => onChange({ ...form, fullName: e.target.value })}
               required
@@ -60,6 +61,7 @@ export function ProfilesSection({
           </WsField>
           <WsField label="Chức danh">
             <Input
+              size="lg"
               value={form.title}
               onChange={(e) => onChange({ ...form, title: e.target.value })}
               required
@@ -67,6 +69,7 @@ export function ProfilesSection({
           </WsField>
           <WsField label="Giới thiệu">
             <Textarea
+              size="lg"
               value={form.bio}
               onChange={(e) => onChange({ ...form, bio: e.target.value })}
               required
@@ -76,6 +79,7 @@ export function ProfilesSection({
           {Object.entries(EXTRA_FIELDS).map(([f, lbl]) => (
             <WsField key={f} label={lbl}>
               <Input
+                size="lg"
                 value={String(form[f as keyof ProfileForm] || "")}
                 onChange={(e) => onChange({ ...form, [f]: e.target.value })}
               />

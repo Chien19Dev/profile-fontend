@@ -90,6 +90,7 @@ export function NavigationSection() {
         <form onSubmit={handleSubmit} className="space-y-2">
           <WsField label="Nhãn">
             <Input
+              size="lg"
               value={form.label}
               onChange={(e) => setForm({ ...form, label: e.target.value })}
               required
@@ -97,6 +98,7 @@ export function NavigationSection() {
           </WsField>
           <WsField label="Đường dẫn (href)">
             <Input
+              size="lg"
               value={form.href}
               onChange={(e) => setForm({ ...form, href: e.target.value })}
               placeholder="/blog"
@@ -105,6 +107,7 @@ export function NavigationSection() {
           </WsField>
           <WsField label="Icon (tên Lucide)">
             <Input
+              size="lg"
               value={form.icon || ""}
               onChange={(e) => setForm({ ...form, icon: e.target.value })}
               placeholder="BookOpen"
@@ -112,16 +115,21 @@ export function NavigationSection() {
           </WsField>
           <WsField label="Thứ tự">
             <Input
+              size="lg"
               type="number"
               value={form.order || 0}
-              onChange={(e) => setForm({ ...form, order: Number(e.target.value) })}
+              onChange={(e) =>
+                setForm({ ...form, order: Number(e.target.value) })
+              }
             />
           </WsField>
           <WsField label="Hiển thị">
             <div className="flex items-center gap-2">
               <Switch
                 checked={form.isActive !== false}
-                onCheckedChange={(checked: boolean) => setForm({ ...form, isActive: checked })}
+                onCheckedChange={(checked: boolean) =>
+                  setForm({ ...form, isActive: checked })
+                }
               />
               <Label className="text-sm text-muted-foreground">
                 {form.isActive !== false ? "Hiện" : "Ẩn"}
@@ -154,7 +162,10 @@ export function NavigationSection() {
                 />
                 <p className="text-sm font-medium">{item.label}</p>
               </div>,
-              <span key="href" className="text-xs text-muted-foreground font-mono">
+              <span
+                key="href"
+                className="text-xs text-muted-foreground font-mono"
+              >
                 {item.href}
               </span>,
               <div key="order" className="flex items-center gap-1">

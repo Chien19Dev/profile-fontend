@@ -44,6 +44,7 @@ export function AdminTestimonialsSection({
         <form onSubmit={onSubmit} className="space-y-3">
           <WsField label="Tên người đánh giá">
             <Input
+              size="lg"
               value={form.authorName}
               onChange={(e) =>
                 onChange({ ...form, authorName: e.target.value })
@@ -53,6 +54,7 @@ export function AdminTestimonialsSection({
           </WsField>
           <WsField label="Chức danh / Công ty">
             <Input
+              size="lg"
               value={form.authorTitle}
               onChange={(e) =>
                 onChange({ ...form, authorTitle: e.target.value })
@@ -62,6 +64,7 @@ export function AdminTestimonialsSection({
           </WsField>
           <WsField label="Nội dung đánh giá">
             <Textarea
+              size="lg"
               value={form.content}
               onChange={(e) => onChange({ ...form, content: e.target.value })}
               rows={4}
@@ -70,6 +73,7 @@ export function AdminTestimonialsSection({
           </WsField>
           <WsField label="Ảnh đại diện (URL hoặc upload)">
             <Input
+              size="lg"
               value={form.avatar || ""}
               onChange={(e) => onChange({ ...form, avatar: e.target.value })}
               placeholder="https://..."
@@ -88,6 +92,7 @@ export function AdminTestimonialsSection({
           </WsField>
           <WsField label="Thứ tự hiển thị">
             <Input
+              size="lg"
               type="number"
               value={form.order || 0}
               onChange={(e) =>
@@ -99,7 +104,9 @@ export function AdminTestimonialsSection({
             <div className="flex items-center gap-2">
               <Switch
                 checked={form.published !== false}
-                onCheckedChange={(checked: boolean) => onChange({ ...form, published: checked })}
+                onCheckedChange={(checked: boolean) =>
+                  onChange({ ...form, published: checked })
+                }
               />
               <Label className="text-sm text-muted-foreground">
                 {form.published !== false ? "Đã xuất bản" : "Bản nháp"}

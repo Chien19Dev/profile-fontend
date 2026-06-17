@@ -89,8 +89,6 @@ export function ContactCard({
           {item.message}
         </p>
       </div>
-
-      {/* Replies */}
       {replies.length > 0 && (
         <div className="space-y-2 border-l-2 border-primary/20 pl-3">
           {replies.map((reply) => (
@@ -110,8 +108,6 @@ export function ContactCard({
           ))}
         </div>
       )}
-
-      {/* Reply form */}
       {showReply && (
         <div className="space-y-2 border-t border-border pt-2">
           <Textarea

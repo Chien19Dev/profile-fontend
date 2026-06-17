@@ -48,7 +48,6 @@ export function UsersSection({
 
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-5">
-      {/* Summary bar */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/8 border border-primary/15">
           <Users2 className="h-4 w-4 text-primary" />
@@ -138,12 +137,9 @@ function UserCard({ user, onReload }: { user: User; onReload: () => void }) {
     <div
       className={[
         "relative border p-5 flex flex-col gap-4 transition-colors",
-        isAdmin
-          ? "border-info/20 bg-info/3"
-          : "border-border bg-background/50",
+        isAdmin ? "border-info/20 bg-info/3" : "border-border bg-background/50",
       ].join(" ")}
     >
-      {/* Top: avatar + info + role */}
       <div className="flex items-start gap-3">
         <Avatar className="h-11 w-11 shrink-0 ring-1 ring-border">
           <AvatarImage src={user.image || undefined} alt={user.name || ""} />
@@ -178,29 +174,25 @@ function UserCard({ user, onReload }: { user: User; onReload: () => void }) {
           </div>
         </div>
       </div>
-
-      {/* Bio */}
       {user.bio && (
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 -mt-1">
           {user.bio}
         </p>
       )}
-
-      {/* Join date */}
       <div className="flex items-center gap-1.5 text-[0.7rem] text-muted-foreground">
         <Calendar className="h-3 w-3" />
         <span>Tham gia {joinDate}</span>
       </div>
-
-      {/* Stats row */}
       <div className="grid grid-cols-4 gap-1 pt-3 border-t border-border/40">
-        <StatItem icon={MessageSquare} value={stats.comments ?? 0} label="bình luận" />
+        <StatItem
+          icon={MessageSquare}
+          value={stats.comments ?? 0}
+          label="bình luận"
+        />
         <StatItem icon={Heart} value={stats.likes ?? 0} label="thích" />
         <StatItem icon={Bookmark} value={stats.bookmarks ?? 0} label="lưu" />
         <StatItem icon={Users2} value={stats.followers ?? 0} label="theo dõi" />
       </div>
-
-      {/* Actions row */}
       <div className="flex items-center justify-between pt-2 border-t border-border/40">
         <div className="flex items-center gap-2">
           <span className="text-[0.65rem] text-muted-foreground uppercase tracking-wider">
@@ -211,7 +203,7 @@ function UserCard({ user, onReload }: { user: User; onReload: () => void }) {
             onValueChange={handleRoleChange}
             disabled={loading}
           >
-            <SelectTrigger className="h-7 w-[5.5rem] text-xs">
+            <SelectTrigger className="h-7 w-22 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

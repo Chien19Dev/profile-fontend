@@ -40,6 +40,7 @@ export function SkillsSection({
         <form onSubmit={onSubmit} className="space-y-2">
           <WsField label="Tên kỹ năng">
             <Input
+              size="lg"
               value={form.name}
               onChange={(e) => onChange({ ...form, name: e.target.value })}
               required
@@ -47,18 +48,21 @@ export function SkillsSection({
           </WsField>
           <WsField label="Danh mục">
             <Input
+              size="lg"
               value={form.category || ""}
               onChange={(e) => onChange({ ...form, category: e.target.value })}
             />
           </WsField>
           <WsField label="Icon">
             <Input
+              size="lg"
               value={form.icon || ""}
               onChange={(e) => onChange({ ...form, icon: e.target.value })}
             />
           </WsField>
           <WsField label="Mức độ (%)">
             <Input
+              size="lg"
               type="number"
               min={0}
               max={100}
@@ -70,6 +74,7 @@ export function SkillsSection({
           </WsField>
           <WsField label="Thứ tự">
             <Input
+              size="lg"
               type="number"
               value={form.order || 0}
               onChange={(e) =>
@@ -81,7 +86,9 @@ export function SkillsSection({
             <div className="flex items-center gap-2">
               <Switch
                 checked={form.published !== false}
-                onCheckedChange={(checked: boolean) => onChange({ ...form, published: checked })}
+                onCheckedChange={(checked: boolean) =>
+                  onChange({ ...form, published: checked })
+                }
               />
               <Label className="text-sm text-muted-foreground">
                 {form.published !== false ? "Đã xuất bản" : "Bản nháp"}

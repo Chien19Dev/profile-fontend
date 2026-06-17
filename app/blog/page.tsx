@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/banner.png",
+        url: "/blog.png",
         width: 1200,
         height: 630,
         alt: "Blog Nguyễn Đình Chiến",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "Blog & Kiến thức | Nguyễn Đình Chiến",
     description:
       "Bài viết chia sẻ kinh nghiệm lập trình, React, Next.js và TypeScript.",
-    images: ["/banner.png"],
+    images: ["/blog.png"],
   },
   alternates: {
     canonical: "https://chien19.vercel.app/blog",

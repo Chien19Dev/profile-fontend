@@ -2,12 +2,16 @@ import { cn } from "@/lib/utils";
 
 type DecoFrameProps = React.HTMLAttributes<HTMLDivElement> & {
   accent?: boolean;
+  bottomLeftClassName?: string;
+  bottomRightClassName?: string;
 };
 
 export function DecoFrame({
   children,
   className,
   accent = false,
+  bottomLeftClassName,
+  bottomRightClassName,
   ...rest
 }: DecoFrameProps) {
   return (
@@ -21,8 +25,14 @@ export function DecoFrame({
     >
       <span className="deco-corner deco-corner-tl" aria-hidden />
       <span className="deco-corner deco-corner-tr" aria-hidden />
-      <span className="deco-corner deco-corner-bl" aria-hidden />
-      <span className="deco-corner deco-corner-br" aria-hidden />
+      <span
+        className={cn("deco-corner deco-corner-bl", bottomLeftClassName)}
+        aria-hidden
+      />
+      <span
+        className={cn("deco-corner deco-corner-br", bottomRightClassName)}
+        aria-hidden
+      />
       {children}
     </div>
   );

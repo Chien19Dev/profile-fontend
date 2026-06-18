@@ -105,7 +105,11 @@ export default function UserProfilePage() {
     <div className="deco-page relative min-h-screen">
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-2xl mx-auto">
-          <DecoFrame className="p-8 space-y-6">
+          <DecoFrame
+            className="p-8 space-y-6"
+            bottomRightClassName="!-bottom-3"
+            bottomLeftClassName="!-bottom-3"
+          >
             <div className="flex items-center gap-4">
               <div className="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-medium">
                 {user.name?.[0]?.toUpperCase() || "?"}

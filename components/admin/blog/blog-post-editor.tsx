@@ -10,15 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Pattern } from "@/components/upload-file";
 import type { Post } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import {
-  Calendar,
-  Eye,
-  Loader2,
-  Save,
-  Send,
-  Tag,
-  User,
-} from "lucide-react";
+import { Calendar, Eye, Loader2, Save, Send, Tag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { FormEvent } from "react";
@@ -96,11 +88,14 @@ export function BlogPostEditor({
     .filter(Boolean).length;
 
   return (
-    <div
-      className="grid gap-8 lg:grid-cols-[1fr_320px]"
-    >
+    <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6 min-w-0">
-        <DecoFrame accent className="p-6 md:p-8 space-y-5">
+        <DecoFrame
+          accent
+          className="p-6 md:p-8 space-y-5"
+          bottomRightClassName="!bottom-[-12px]"
+          bottomLeftClassName="!bottom-[-12px]"
+        >
           <FieldLabel hint="Tiêu đề hiển thị trên trang blog">
             Tiêu đề bài viết
           </FieldLabel>
@@ -124,7 +119,9 @@ export function BlogPostEditor({
           </FieldLabel>
           <Input
             value={form.slug}
-            onChange={(e) => onChange({ ...form, slug: slugify(e.target.value) })}
+            onChange={(e) =>
+              onChange({ ...form, slug: slugify(e.target.value) })
+            }
             placeholder="duong-dan-bai-viet"
             className="blog-luxury-input font-mono text-sm"
             required
@@ -174,7 +171,12 @@ export function BlogPostEditor({
       </div>
 
       <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
-        <DecoFrame accent className="p-5 space-y-5">
+        <DecoFrame
+          accent
+          className="p-5 space-y-5"
+          bottomRightClassName="!bottom-[-12px]"
+          bottomLeftClassName="!bottom-[-12px]"
+        >
           <div className="flex items-center justify-between">
             <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Xuất bản
@@ -220,7 +222,9 @@ export function BlogPostEditor({
               size="lg"
               disabled={saving}
               className="w-full rounded-sm"
-              onClick={(e) => onSubmit(e as unknown as FormEvent, { published: true })}
+              onClick={(e) =>
+                onSubmit(e as unknown as FormEvent, { published: true })
+              }
             >
               {saving ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -235,7 +239,9 @@ export function BlogPostEditor({
               size="lg"
               disabled={saving}
               className="w-full rounded-sm"
-              onClick={(e) => onSubmit(e as unknown as FormEvent, { published: false })}
+              onClick={(e) =>
+                onSubmit(e as unknown as FormEvent, { published: false })
+              }
             >
               <Save className="size-4" />
               Lưu nháp
@@ -254,7 +260,11 @@ export function BlogPostEditor({
           </div>
         </DecoFrame>
 
-        <DecoFrame className="p-5 space-y-4">
+        <DecoFrame
+          className="p-5 space-y-4"
+          bottomRightClassName="!bottom-[-8px]"
+          bottomLeftClassName="!bottom-[-8px]"
+        >
           <FieldLabel>Ảnh bìa</FieldLabel>
           {form.coverImage ? (
             <div className="relative aspect-video overflow-hidden border border-border/50">
@@ -283,7 +293,11 @@ export function BlogPostEditor({
           />
         </DecoFrame>
 
-        <DecoFrame className="p-5 space-y-4">
+        <DecoFrame
+          className="p-5 space-y-4"
+          bottomRightClassName="!bottom-[-8px]"
+          bottomLeftClassName="!bottom-[-8px]"
+        >
           <div>
             <FieldLabel>
               <span className="inline-flex items-center gap-1.5">
@@ -311,7 +325,10 @@ export function BlogPostEditor({
             <FieldLabel>
               <span className="inline-flex items-center gap-1.5">
                 <Tag className="size-3" />
-                Tags <span className="text-xs text-muted-foreground lowercase">keywords của thẻ metadata</span>
+                Tags{" "}
+                <span className="text-xs text-muted-foreground lowercase">
+                  keywords của thẻ metadata
+                </span>
               </span>
             </FieldLabel>
             <Input
@@ -346,7 +363,7 @@ export function BlogPostEditor({
             </div>
             <div className={cn("space-y-2", !form.coverImage && "pt-1")}>
               {form.coverImage && (
-                <div className="relative aspect-[16/9] overflow-hidden">
+                <div className="relative aspect-video overflow-hidden">
                   <Image
                     src={form.coverImage}
                     alt=""

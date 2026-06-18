@@ -13,6 +13,7 @@ interface CommentFormProps {
   parentId?: string | null;
   replyToName?: string | null;
   onCommentAdded?: () => void;
+  onOptimistic?: (content: string) => void;
   onCancel?: () => void;
 }
 
@@ -21,6 +22,7 @@ export function CommentForm({
   parentId,
   replyToName,
   onCommentAdded,
+  onOptimistic,
   onCancel,
 }: CommentFormProps) {
   const [content, setContent] = useState("");
@@ -32,6 +34,10 @@ export function CommentForm({
     if (!content.trim()) return;
 
     const finalContent = replyToName ? `@${replyToName} ${content}` : content;
+
+    if (!parentId) {
+      onOptimistic?.(finalContent);
+    }
 
     setLoading(true);
     try {

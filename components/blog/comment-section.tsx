@@ -6,7 +6,7 @@ import { alertError, alertSuccess } from "@/lib/alerts";
 import type { Comment as CommentType } from "@/lib/api";
 import { ChevronDown, ChevronUp, MessageSquare, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CommentForm } from "./comment-form";
 
 interface CommentSectionProps {
@@ -18,24 +18,55 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [collapsedReplies, setCollapsedReplies] = useState<Set<string>>(new Set());
+  const [optimisticComments, setOptimisticComments] = useState<CommentType[]>([]);
   const { data: session } = useSession();
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     loadComments();
   }, [postId]);
 
-  async function loadComments() {
+  // Background polling every 8 seconds
+  useEffect(() => {
+    pollingRef.current = setInterval(() => {
+      loadComments(true);
+    }, 8000);
+
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [postId]);
+
+  async function loadComments(silent = false) {
     try {
       const res = await fetch(`/api/comments?postId=${postId}`);
       if (res.ok) {
-        const data = await res.json();
+        const data: CommentType[] = await res.json();
         setComments(data);
+        // Clear optimistic comments that are now confirmed in the real data
+        const realIds = new Set(data.map((c: CommentType) => c.id));
+        setOptimisticComments((prev) =>
+          prev.filter((c) => !realIds.has(c.id))
+        );
       }
     } catch (error) {
       console.error("Error loading comments:", error);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
+  }
+
+  function addOptimisticComment(content: string) {
+    const optimistic: CommentType = {
+      id: `optimistic-${Date.now()}`,
+      content,
+      postId,
+      userId: session?.user?.id || "",
+      user: { name: session?.user?.name || "Bạn" },
+      createdAt: new Date().toISOString(),
+      replies: [],
+    };
+    setOptimisticComments((prev) => [optimistic, ...prev]);
   }
 
   async function handleDelete(commentId: string) {
@@ -88,16 +119,48 @@ export function CommentSection({ postId }: CommentSectionProps) {
         </h3>
       </div>
 
-      <CommentForm postId={postId} onCommentAdded={loadComments} />
+      <CommentForm
+        postId={postId}
+        onCommentAdded={loadComments}
+        onOptimistic={addOptimisticComment}
+      />
 
       {loading ? (
         <p className="text-sm text-muted-foreground">Đang tải bình luận...</p>
-      ) : comments.length === 0 ? (
+      ) : comments.length === 0 && optimisticComments.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           Chưa có bình luận nào. Hãy là người đầu tiên bình luận!
         </p>
       ) : (
         <div className="space-y-4">
+          {optimisticComments.map((comment) => (
+            <div key={comment.id} className="space-y-3 animate-pulse">
+              <DecoFrameComp
+                className="p-4 space-y-2"
+                bottomRightClassName="-bottom-0.5!"
+                bottomLeftClassName="-bottom-0.5!"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">
+                      {comment.user?.name?.[0]?.toUpperCase() || "?"}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">
+                        {comment.user?.name || "Ẩn danh"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Đang gửi...
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-foreground leading-relaxed">
+                  {comment.content}
+                </p>
+              </DecoFrameComp>
+            </div>
+          ))}
           {comments.map((comment) => (
             <div key={comment.id} className="space-y-3">
               <DecoFrameComp
@@ -227,7 +290,6 @@ export function CommentSection({ postId }: CommentSectionProps) {
                             Phản hồi
                           </button>
                         )}
-
                         {replyingTo === reply.id && (
                           <div className="pt-2">
                             <CommentForm

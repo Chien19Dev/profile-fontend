@@ -19,7 +19,6 @@ export function RegisteredUsersSection() {
         const data = await api.publicUsers.list();
         setUsers(data);
       } catch {
-        // Silently fail on public page
       } finally {
         setLoading(false);
       }

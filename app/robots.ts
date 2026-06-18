@@ -5,11 +5,28 @@ const BASE_URL =
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-      disallow: ["/admin/", "/api/", "/login"],
-    },
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/admin/", "/api/", "/login", "/register"],
+      },
+      {
+        userAgent: [
+          "GPTBot",
+          "ChatGPT-User",
+          "Google-Extended",
+          "PerplexityBot",
+          "ClaudeBot",
+          "anthropic-ai",
+          "Bytespider",
+          "cohere-ai",
+        ],
+        allow: "/",
+        disallow: ["/admin/", "/api/", "/login", "/register"],
+      },
+    ],
     sitemap: `${BASE_URL}/sitemap.xml`,
+    host: BASE_URL,
   };
 }

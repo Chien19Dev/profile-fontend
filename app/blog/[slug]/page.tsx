@@ -48,7 +48,7 @@ export async function generateMetadata({
   const url = `${SITE_URL}/blog/${slug}`;
   const images = post.coverImage
     ? [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }]
-    : [{ url: "/banner.png", width: 1200, height: 630, alt: post.title }];
+    : [{ url: "/blog.png", width: 1200, height: 630, alt: post.title }];
 
   return {
     title: post.title,
@@ -113,13 +113,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     image: post.coverImage || undefined,
     datePublished: post.publishedAt?.toISOString(),
     dateModified: post.updatedAt?.toISOString(),
+    wordCount,
+    keywords: post.tags?.join(", ") || undefined,
+    articleSection: post.category || undefined,
+    inLanguage: "vi-VN",
     author: {
       "@type": "Person",
       name: post.author || "Nguyễn Đình Chiến",
+      url: SITE_URL,
     },
     publisher: {
       "@type": "Person",
       name: "Nguyễn Đình Chiến",
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/banner.png`,
+      },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -127,11 +136,40 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     },
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Trang chủ",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${SITE_URL}/blog`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: `${SITE_URL}/blog/${slug}`,
+      },
+    ],
+  };
+
   return (
     <div className="deco-page relative min-h-screen pb-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <div className="relative z-10 container mx-auto px-4 py-3 md:py-6">
         <div className="max-w-6xl mx-auto">

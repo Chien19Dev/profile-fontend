@@ -85,7 +85,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://chien19.vercel.app",
-    types: { "application/rss+xml": "https://chien19.vercel.app/feed.xml" },
+    types: {
+      "application/rss+xml": "https://chien19.vercel.app/feed.xml",
+      "text/plain": "https://chien19.vercel.app/llms.txt",
+    },
   },
   category: "technology",
 };

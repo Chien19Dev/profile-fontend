@@ -1,8 +1,8 @@
 import {
-  getPublishedPosts,
-  getPublishedProjects,
-  getPublishedSkills,
-  getPublishedTestimonials,
+    getPublishedPosts,
+    getPublishedProjects,
+    getPublishedSkills,
+    getPublishedTestimonials,
 } from "@/lib/data";
 import type { MetadataRoute } from "next";
 
@@ -31,16 +31,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/projects`,
+      url: `${BASE_URL}/cv`,
       lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/login`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.2,
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
   ];
 

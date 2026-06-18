@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { alertError, alertSuccess } from "@/lib/alerts";
+import { Send } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { alertSuccess, alertError } from "@/lib/alerts";
-import { Send } from "lucide-react";
+import { useState } from "react";
 
 interface CommentFormProps {
   postId: string;
   parentId?: string | null;
+  replyToName?: string | null;
   onCommentAdded?: () => void;
   onCancel?: () => void;
 }
@@ -18,6 +19,7 @@ interface CommentFormProps {
 export function CommentForm({
   postId,
   parentId,
+  replyToName,
   onCommentAdded,
   onCancel,
 }: CommentFormProps) {
@@ -29,12 +31,14 @@ export function CommentForm({
     e.preventDefault();
     if (!content.trim()) return;
 
+    const finalContent = replyToName ? `@${replyToName} ${content}` : content;
+
     setLoading(true);
     try {
       const res = await fetch("/api/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, postId, parentId }),
+        body: JSON.stringify({ content: finalContent, postId, parentId }),
       });
 
       if (!res.ok) {
@@ -70,7 +74,13 @@ export function CommentForm({
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder={parentId ? "Viết phản hồi..." : "Viết bình luận..."}
+        placeholder={
+          replyToName
+            ? `Phản hồi @${replyToName}...`
+            : parentId
+              ? "Viết phản hồi..."
+              : "Viết bình luận..."
+        }
         rows={3}
         required
       />

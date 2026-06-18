@@ -1,19 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { CommentForm } from "./comment-form";
 import { DecoFrame as DecoFrameComp } from "@/components/sections/deco-frame";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Reply, Trash2 } from "lucide-react";
-import { alertSuccess, alertError } from "@/lib/alerts";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { alertError, alertSuccess } from "@/lib/alerts";
 import type { Comment as CommentType } from "@/lib/api";
+import { ChevronDown, ChevronUp, MessageSquare, Trash2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { CommentForm } from "./comment-form";
 
 interface CommentSectionProps {
   postId: string;
@@ -23,6 +17,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [collapsedReplies, setCollapsedReplies] = useState<Set<string>>(new Set());
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -65,6 +60,18 @@ export function CommentSection({ postId }: CommentSectionProps) {
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+    });
+  }
+
+  function toggleReplies(commentId: string) {
+    setCollapsedReplies((prev) => {
+      const next = new Set(prev);
+      if (next.has(commentId)) {
+        next.delete(commentId);
+      } else {
+        next.add(commentId);
+      }
+      return next;
     });
   }
 
@@ -112,42 +119,54 @@ export function CommentSection({ postId }: CommentSectionProps) {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    {session && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Button
-                              size="icon-sm"
-                              variant="ghost"
-                              onClick={() =>
-                                setReplyingTo(
-                                  replyingTo === comment.id ? null : comment.id,
-                                )
-                              }
-                            >
-                              <Reply className="size-3.5" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Phản hồi</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                    {(session?.user?.id === comment.userId ||
-                      session?.user?.role === "ADMIN") && (
-                      <Button
-                        size="icon-sm"
-                        variant="ghost"
-                        onClick={() => handleDelete(comment.id)}
-                      >
-                        <Trash2 className="size-3.5 text-destructive" />
-                      </Button>
-                    )}
-                  </div>
+                  {(session?.user?.id === comment.userId ||
+                    session?.user?.role === "ADMIN") && (
+                    <Button
+                      size="icon-sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(comment.id)}
+                    >
+                      <Trash2 className="size-3.5 text-destructive" />
+                    </Button>
+                  )}
                 </div>
                 <p className="text-sm text-foreground leading-relaxed">
                   {comment.content}
                 </p>
+
+                <div className="flex items-center gap-3 pt-0.5">
+                  {session && (
+                    <button
+                      onClick={() =>
+                        setReplyingTo(
+                          replyingTo === comment.id ? null : comment.id,
+                        )
+                      }
+                      className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                    >
+                      Phản hồi
+                    </button>
+                  )}
+
+                  {comment.replies && comment.replies.length > 0 && (
+                    <button
+                      onClick={() => toggleReplies(comment.id)}
+                      className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                    >
+                      {collapsedReplies.has(comment.id) ? (
+                        <>
+                          <ChevronDown className="size-3.5" />
+                          Xem {comment.replies.length} phản hồi
+                        </>
+                      ) : (
+                        <>
+                          <ChevronUp className="size-3.5" />
+                          Ẩn phản hồi
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
 
                 {replyingTo === comment.id && (
                   <div className="pt-2 border-t border-border">
@@ -163,7 +182,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   </div>
                 )}
 
-                {comment.replies && comment.replies.length > 0 && (
+                {comment.replies && comment.replies.length > 0 && !collapsedReplies.has(comment.id) && (
                   <div className="ml-6 space-y-3 border-l-2 border-primary/20 pl-4 pt-2">
                     {comment.replies.map((reply) => (
                       <div key={reply.id} className="space-y-1">
@@ -195,6 +214,34 @@ export function CommentSection({ postId }: CommentSectionProps) {
                         <p className="text-sm text-foreground leading-relaxed">
                           {reply.content}
                         </p>
+
+                        {session && (
+                          <button
+                            onClick={() =>
+                              setReplyingTo(
+                                replyingTo === reply.id ? null : reply.id,
+                              )
+                            }
+                            className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                          >
+                            Phản hồi
+                          </button>
+                        )}
+
+                        {replyingTo === reply.id && (
+                          <div className="pt-2">
+                            <CommentForm
+                              postId={postId}
+                              parentId={comment.id}
+                              replyToName={reply.user?.name || "Ẩn danh"}
+                              onCommentAdded={() => {
+                                loadComments();
+                                setReplyingTo(null);
+                              }}
+                              onCancel={() => setReplyingTo(null)}
+                            />
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

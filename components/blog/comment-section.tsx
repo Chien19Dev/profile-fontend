@@ -7,7 +7,12 @@ import { DecoFrame as DecoFrameComp } from "@/components/sections/deco-frame";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Reply, Trash2 } from "lucide-react";
 import { alertSuccess, alertError } from "@/lib/alerts";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Comment as CommentType } from "@/lib/api";
 
 interface CommentSectionProps {
@@ -88,7 +93,11 @@ export function CommentSection({ postId }: CommentSectionProps) {
         <div className="space-y-4">
           {comments.map((comment) => (
             <div key={comment.id} className="space-y-3">
-              <DecoFrameComp className="p-4 space-y-2">
+              <DecoFrameComp
+                className="p-4 space-y-2"
+                bottomRightClassName="-bottom-0.5!"
+                bottomLeftClassName="-bottom-0.5!"
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <div className="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">

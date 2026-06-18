@@ -37,6 +37,19 @@ export default function UserProfilePage() {
     if (userId) loadUser();
   }, [userId]);
 
+  useEffect(() => {
+    if (session?.user?.id && userId && session.user.id !== userId) {
+      fetch(`/api/follows?userId=${session.user.id}&type=following`)
+        .then((res) => res.json())
+        .then((data: { followingId: string }[]) => {
+          if (Array.isArray(data)) {
+            setIsFollowing(data.some((f) => f.followingId === userId));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [session?.user?.id, userId]);
+
   async function loadUser() {
     try {
       const res = await fetch(`/api/users/${userId}`);
@@ -63,6 +76,7 @@ export default function UserProfilePage() {
         const data = await res.json();
         setIsFollowing(data.following);
         alertSuccess(data.following ? "Đã theo dõi" : "Đã bỏ theo dõi");
+        loadUser();
       }
     } catch {
       alertError("Lỗi");

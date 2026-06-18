@@ -1,6 +1,7 @@
 "use client";
 
 import { DecoFrame as DecoFrameComp } from "@/components/sections/deco-frame";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { alertError, alertSuccess } from "@/lib/alerts";
 import type { Comment as CommentType } from "@/lib/api";
@@ -17,7 +18,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [collapsedReplies, setCollapsedReplies] = useState<Set<string>>(new Set());
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
   const [optimisticComments, setOptimisticComments] = useState<CommentType[]>([]);
   const { data: session } = useSession();
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -26,7 +27,6 @@ export function CommentSection({ postId }: CommentSectionProps) {
     loadComments();
   }, [postId]);
 
-  // Background polling every 8 seconds
   useEffect(() => {
     pollingRef.current = setInterval(() => {
       loadComments(true);
@@ -43,7 +43,6 @@ export function CommentSection({ postId }: CommentSectionProps) {
       if (res.ok) {
         const data: CommentType[] = await res.json();
         setComments(data);
-        // Clear optimistic comments that are now confirmed in the real data
         const realIds = new Set(data.map((c: CommentType) => c.id));
         setOptimisticComments((prev) =>
           prev.filter((c) => !realIds.has(c.id))
@@ -62,7 +61,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
       content,
       postId,
       userId: session?.user?.id || "",
-      user: { name: session?.user?.name || "Bạn" },
+      user: { name: session?.user?.name || "Bạn", image: session?.user?.image || null },
       createdAt: new Date().toISOString(),
       replies: [],
     };
@@ -95,7 +94,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
   }
 
   function toggleReplies(commentId: string) {
-    setCollapsedReplies((prev) => {
+    setExpandedReplies((prev) => {
       const next = new Set(prev);
       if (next.has(commentId)) {
         next.delete(commentId);
@@ -104,6 +103,27 @@ export function CommentSection({ postId }: CommentSectionProps) {
       }
       return next;
     });
+  }
+
+  function AvatarCircle({
+    name,
+    image,
+    size = "md",
+  }: {
+    name?: string | null;
+    image?: string | null;
+    size?: "sm" | "md";
+  }) {
+    const isSm = size === "sm";
+    const sizeClass = isSm ? "size-6 text-[0.6rem]" : "size-8 text-xs";
+    return (
+      <Avatar className={sizeClass}>
+        {image && <AvatarImage src={image} alt={name || ""} />}
+        <AvatarFallback className="bg-primary/10 text-primary font-medium">
+          {name?.[0]?.toUpperCase() || "?"}
+        </AvatarFallback>
+      </Avatar>
+    );
   }
 
   const totalComments =
@@ -142,9 +162,10 @@ export function CommentSection({ postId }: CommentSectionProps) {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">
-                      {comment.user?.name?.[0]?.toUpperCase() || "?"}
-                    </div>
+                    <AvatarCircle
+                      name={comment.user?.name}
+                      image={comment.user?.image}
+                    />
                     <div>
                       <p className="text-sm font-medium">
                         {comment.user?.name || "Ẩn danh"}
@@ -170,9 +191,10 @@ export function CommentSection({ postId }: CommentSectionProps) {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">
-                      {comment.user?.name?.[0]?.toUpperCase() || "?"}
-                    </div>
+                    <AvatarCircle
+                      name={comment.user?.name}
+                      image={comment.user?.image}
+                    />
                     <div>
                       <p className="text-sm font-medium">
                         {comment.user?.name || "Ẩn danh"}
@@ -199,24 +221,28 @@ export function CommentSection({ postId }: CommentSectionProps) {
 
                 <div className="flex items-center gap-3 pt-0.5">
                   {session && (
-                    <button
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-muted-foreground"
                       onClick={() =>
                         setReplyingTo(
                           replyingTo === comment.id ? null : comment.id,
                         )
                       }
-                      className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                     >
                       Phản hồi
-                    </button>
+                    </Button>
                   )}
 
                   {comment.replies && comment.replies.length > 0 && (
-                    <button
+                    <Button
+                      size="sm"
+                      variant="ghost"
                       onClick={() => toggleReplies(comment.id)}
                       className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors cursor-pointer"
                     >
-                      {collapsedReplies.has(comment.id) ? (
+                      {!expandedReplies.has(comment.id) ? (
                         <>
                           <ChevronDown className="size-3.5" />
                           Xem {comment.replies.length} phản hồi
@@ -227,7 +253,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
                           Ẩn phản hồi
                         </>
                       )}
-                    </button>
+                    </Button>
                   )}
                 </div>
 
@@ -245,15 +271,17 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   </div>
                 )}
 
-                {comment.replies && comment.replies.length > 0 && !collapsedReplies.has(comment.id) && (
+                {comment.replies && comment.replies.length > 0 && expandedReplies.has(comment.id) && (
                   <div className="ml-6 space-y-3 border-l-2 border-primary/20 pl-4 pt-2">
                     {comment.replies.map((reply) => (
                       <div key={reply.id} className="space-y-1">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-2">
-                            <div className="size-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[0.6rem] font-medium">
-                              {reply.user?.name?.[0]?.toUpperCase() || "?"}
-                            </div>
+                            <AvatarCircle
+                              name={reply.user?.name}
+                              image={reply.user?.image}
+                              size="sm"
+                            />
                             <div>
                               <span className="text-xs font-medium">
                                 {reply.user?.name || "Ẩn danh"}
@@ -279,16 +307,18 @@ export function CommentSection({ postId }: CommentSectionProps) {
                         </p>
 
                         {session && (
-                          <button
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-muted-foreground"
                             onClick={() =>
                               setReplyingTo(
                                 replyingTo === reply.id ? null : reply.id,
                               )
                             }
-                            className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                           >
                             Phản hồi
-                          </button>
+                          </Button>
                         )}
                         {replyingTo === reply.id && (
                           <div className="pt-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import { DecoFrame } from "@/components/sections/deco-frame";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { alertError, alertSuccess } from "@/lib/alerts";
 import type { Post } from "@/lib/api";
@@ -111,9 +112,12 @@ export default function UserProfilePage() {
             bottomLeftClassName="!-bottom-3"
           >
             <div className="flex items-center gap-4">
-              <div className="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-medium">
-                {user.name?.[0]?.toUpperCase() || "?"}
-              </div>
+              <Avatar className="size-16 text-2xl">
+                <AvatarImage src={user.image || undefined} alt={user.name || "Avatar"} />
+                <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                  {user.name?.[0]?.toUpperCase() || "?"}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1">
                 <h1 className="deco-title text-2xl text-foreground">
                   {user.name || "Ẩn danh"}
@@ -152,7 +156,7 @@ export default function UserProfilePage() {
               )}
             </div>
 
-            <div className="grid grid-cols-4 gap-3 border-t border-border pt-4">
+            <div className="grid grid-cols-5 gap-3 border-t border-border pt-4">
               {[
                 {
                   label: "Bình luận",
@@ -169,6 +173,10 @@ export default function UserProfilePage() {
                 {
                   label: "Đang theo dõi",
                   count: user._count?.following || 0,
+                },
+                {
+                  label: "Người theo dõi",
+                  count: user._count?.followers || 0,
                 },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">

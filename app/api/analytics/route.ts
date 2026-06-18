@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -8,7 +8,6 @@ export async function GET() {
     if (session?.user?.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
     const now = new Date();
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -37,13 +36,11 @@ export async function GET() {
       select: { createdAt: true },
       orderBy: { createdAt: "asc" },
     });
-
     const viewsByDay: Record<string, number> = {};
     viewsRaw.forEach((v) => {
       const day = new Date(v.createdAt).toISOString().split("T")[0];
       viewsByDay[day] = (viewsByDay[day] || 0) + 1;
     });
-
     const viewsOverTime = Object.entries(viewsByDay)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, count]) => ({ date, count }));
@@ -75,6 +72,32 @@ export async function GET() {
       country: c.country || "Unknown",
       count: c._count.country,
     }));
+    const devicesRaw = await prisma.pageView.groupBy({
+      by: ["device"],
+      where: {
+        createdAt: { gte: thirtyDaysAgo },
+        device: { not: null },
+      },
+      _count: { device: true },
+      orderBy: { _count: { device: "desc" } },
+    });
+    const devices = devicesRaw.map((d) => ({
+      device: d.device || "Unknown",
+      count: d._count.device,
+    }));
+    const browsersRaw = await prisma.pageView.groupBy({
+      by: ["browser"],
+      where: {
+        createdAt: { gte: thirtyDaysAgo },
+        browser: { not: null },
+      },
+      _count: { browser: true },
+      orderBy: { _count: { browser: "desc" } },
+    });
+    const browsers = browsersRaw.map((b) => ({
+      browser: b.browser || "Unknown",
+      count: b._count.browser,
+    }));
 
     return NextResponse.json({
       totalViews,
@@ -83,6 +106,8 @@ export async function GET() {
       viewsOverTime,
       referrers,
       countries,
+      devices,
+      browsers,
     });
   } catch (error) {
     console.error("Error fetching analytics:", error);

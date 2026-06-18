@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
+import { Fragment } from "react";
+
 import BlogListPage from "./blog-list";
 
 const SITE_URL =
@@ -78,12 +80,12 @@ export default async function BlogPage() {
   };
 
   return (
-    <>
+    <Fragment>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}
       />
       <BlogListPage />
-    </>
+    </Fragment>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Eye, Users, Globe, TrendingUp } from "lucide-react";
-import type { AnalyticsData } from "@/lib/api";
 import { DecoFrame } from "@/components/sections/deco-frame";
+import type { AnalyticsData } from "@/lib/api";
+import { Compass, Eye, Globe, Monitor, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function AnalyticsDashboard() {
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -44,6 +44,8 @@ export function AnalyticsDashboard() {
   }
 
   const maxViews = Math.max(...data.viewsOverTime.map((d) => d.count), 1);
+  const topDevice = data.devices?.[0];
+  const topBrowser = data.browsers?.[0];
 
   return (
     <div className="p-6 space-y-6">
@@ -59,15 +61,15 @@ export function AnalyticsDashboard() {
           value={data.uniqueVisitors.toLocaleString()}
         />
         <StatCard
-          icon={<TrendingUp className="size-4" />}
-          label="Trang phổ biến nhất"
-          value={data.topPages[0]?.path || "—"}
+          icon={<Monitor className="size-4" />}
+          label="Thiết bị phổ biến"
+          value={topDevice ? `${topDevice.device} (${topDevice.count})` : "—"}
           small
         />
         <StatCard
-          icon={<Globe className="size-4" />}
-          label="Quốc gia hàng đầu"
-          value={data.countries[0]?.country || "—"}
+          icon={<Compass className="size-4" />}
+          label="Trình duyệt phổ biến"
+          value={topBrowser ? `${topBrowser.browser} (${topBrowser.count})` : "—"}
           small
         />
       </div>
@@ -140,6 +142,81 @@ export function AnalyticsDashboard() {
               </div>
             ))}
             {data.referrers.length === 0 && (
+              <p className="text-xs text-muted-foreground">Chưa có dữ liệu</p>
+            )}
+          </div>
+        </DecoFrame>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-4">
+        <DecoFrame className="p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+            <Globe className="size-3.5" />
+            Quốc gia
+          </h3>
+          <div className="space-y-2">
+            {data.countries.map((c, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between text-xs"
+              >
+                <span className="text-muted-foreground truncate mr-2">
+                  {c.country}
+                </span>
+                <span className="tabular-nums text-primary font-medium shrink-0">
+                  {c.count}
+                </span>
+              </div>
+            ))}
+            {data.countries.length === 0 && (
+              <p className="text-xs text-muted-foreground">Chưa có dữ liệu</p>
+            )}
+          </div>
+        </DecoFrame>
+        <DecoFrame className="p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+            <Monitor className="size-3.5" />
+            Thiết bị
+          </h3>
+          <div className="space-y-2">
+            {(data.devices || []).map((d, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between text-xs"
+              >
+                <span className="text-muted-foreground truncate mr-2">
+                  {d.device}
+                </span>
+                <span className="tabular-nums text-primary font-medium shrink-0">
+                  {d.count}
+                </span>
+              </div>
+            ))}
+            {(!data.devices || data.devices.length === 0) && (
+              <p className="text-xs text-muted-foreground">Chưa có dữ liệu</p>
+            )}
+          </div>
+        </DecoFrame>
+        <DecoFrame className="p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+            <Compass className="size-3.5" />
+            Trình duyệt
+          </h3>
+          <div className="space-y-2">
+            {(data.browsers || []).map((b, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between text-xs"
+              >
+                <span className="text-muted-foreground truncate mr-2">
+                  {b.browser}
+                </span>
+                <span className="tabular-nums text-primary font-medium shrink-0">
+                  {b.count}
+                </span>
+              </div>
+            ))}
+            {(!data.browsers || data.browsers.length === 0) && (
               <p className="text-xs text-muted-foreground">Chưa có dữ liệu</p>
             )}
           </div>

@@ -213,4 +213,6 @@ export type AnalyticsData = {
   viewsOverTime: { date: string; count: number }[];
   referrers: { referrer: string; count: number }[];
   countries: { country: string; count: number }[];
+  devices: { device: string; count: number }[];
+  browsers: { browser: string; count: number }[];
 };

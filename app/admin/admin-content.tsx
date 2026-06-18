@@ -238,9 +238,9 @@ export default function AdminPage() {
           <div className="flex items-center gap-2 flex-cols">
             <Button
               variant="default"
-              size="lg"
+              size="default"
               onClick={load}
-              className="rounded-xs"
+              className="rounded-sm"
             >
               <RefreshCw className="size-3.5" />
               Làm mới

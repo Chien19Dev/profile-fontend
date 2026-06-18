@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
@@ -54,9 +54,15 @@ export async function PATCH(
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
     const { userId } = await params;
     const body = await request.json();
+    const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    if (targetUser?.role === "ADMIN") {
+      return NextResponse.json(
+        { error: "Cannot change role of an Admin user" },
+        { status: 403 },
+      );
+    }
 
     const user = await prisma.user.update({
       where: { id: userId },
@@ -100,17 +106,20 @@ export async function DELETE(
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
     const { userId } = await params;
-
-    // Prevent deleting yourself
     if (session.user.id === userId) {
       return NextResponse.json(
         { error: "Cannot delete your own account" },
         { status: 400 },
       );
     }
-
+    const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    if (targetUser?.role === "ADMIN") {
+      return NextResponse.json(
+        { error: "Cannot delete an Admin user" },
+        { status: 403 },
+      );
+    }
     await prisma.user.delete({ where: { id: userId } });
     return NextResponse.json({ success: true });
   } catch (error) {

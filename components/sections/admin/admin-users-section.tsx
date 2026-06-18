@@ -1,40 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import { api, User } from "@/lib/api";
-import { alertSuccess, alertError } from "@/lib/alerts";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
 import {
   AlertDialog,
-  AlertDialogTrigger,
+  AlertDialogClose,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogClose,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
-  Trash2,
-  Mail,
-  Calendar,
-  MessageSquare,
-  Heart,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { alertError, alertSuccess } from "@/lib/alerts";
+import { api, User } from "@/lib/api";
+import {
   Bookmark,
-  Users2,
+  Calendar,
+  Heart,
+  Mail,
+  MessageSquare,
   Shield,
   ShieldCheck,
+  Trash2,
+  Users2,
 } from "lucide-react";
+import { useState } from "react";
 
 export function UsersSection({
   users,
@@ -201,7 +201,7 @@ function UserCard({ user, onReload }: { user: User; onReload: () => void }) {
           <Select
             value={role}
             onValueChange={handleRoleChange}
-            disabled={loading}
+            disabled={loading || isAdmin}
           >
             <SelectTrigger className="h-7 w-22 text-xs">
               <SelectValue />
@@ -213,36 +213,38 @@ function UserCard({ user, onReload }: { user: User; onReload: () => void }) {
           </Select>
         </div>
 
-        <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-          <AlertDialogTrigger
-            className="inline-flex items-center justify-center h-7 w-7 rounded-sm text-muted-foreground/50 hover:text-destructive hover:bg-destructive/8 transition-colors cursor-pointer"
-            onClick={() => setDeleteOpen(true)}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Xóa người dùng?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Bạn có chắc muốn xóa người dùng &quot;{user.name || user.email}
-                &quot;? Hành động này không thể hoàn tác.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogClose className="px-4 py-2 text-sm rounded-sm border border-border hover:bg-accent cursor-pointer">
-                Hủy
-              </AlertDialogClose>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                Xóa
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        {!isAdmin && (
+          <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+            <AlertDialogTrigger
+              className="inline-flex items-center justify-center h-7 w-7 rounded-sm text-muted-foreground/50 hover:text-destructive hover:bg-destructive/8 transition-colors cursor-pointer"
+              onClick={() => setDeleteOpen(true)}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Xóa người dùng?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Bạn có chắc muốn xóa người dùng &quot;{user.name || user.email}
+                  &quot;? Hành động này không thể hoàn tác.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogClose className="px-4 py-2 text-sm rounded-sm border border-border hover:bg-accent cursor-pointer">
+                  Hủy
+                </AlertDialogClose>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleDelete}
+                  disabled={loading}
+                >
+                  Xóa
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     </div>
   );

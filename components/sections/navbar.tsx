@@ -1,23 +1,24 @@
 ﻿"use client";
 
-import { useState, useEffect, Fragment } from "react";
+import { cn } from "@/lib/utils";
 import {
+  BookOpen,
+  FileText,
   Home,
   LayoutDashboard,
-  Menu,
-  X,
   LogIn,
   LogOut,
-  FileText,
+  Menu,
   Upload,
-  BookOpen,
+  User,
+  X,
 } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ModeToggle } from "./button-theme";
-import { cn } from "@/lib/utils";
-import { useSession, signOut } from "next-auth/react";
+import { Fragment, useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { ModeToggle } from "./button-theme";
 
 const defaultNavLinks = [
   { href: "/", label: "Trang chủ", icon: Home },
@@ -168,15 +169,24 @@ export default function Navbar({
               </Fragment>
             ) : null}
             {status === "loading" ? null : session ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Đăng xuất</span>
-              </Button>
+              <Fragment>
+                <Link
+                  href={`/profile/${session.user?.id}`}
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                >
+                  <User className="h-4 w-4" />
+                  <span>{session.user?.name || "Hồ sơ"}</span>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Đăng xuất</span>
+                </Button>
+              </Fragment>
             ) : (
               <Link
                 href="/login"
@@ -264,18 +274,28 @@ export default function Navbar({
               </Fragment>
             ) : null}
             {status === "loading" ? null : session ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  signOut({ callbackUrl: "/" });
-                  setMobileMenuOpen(false);
-                }}
-                className="flex items-center justify-start gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary px-0 py-1 h-auto"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Đăng xuất</span>
-              </Button>
+              <Fragment>
+                <Link
+                  href={`/profile/${session.user?.id}`}
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary py-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <User className="h-4 w-4" />
+                  <span>{session.user?.name || "Hồ sơ"}</span>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    signOut({ callbackUrl: "/" });
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center justify-start gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary px-0 py-1 h-auto"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Đăng xuất</span>
+                </Button>
+              </Fragment>
             ) : (
               <Link
                 href="/login"

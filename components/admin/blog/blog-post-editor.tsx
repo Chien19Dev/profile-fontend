@@ -5,6 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CKEditor } from "@/components/ui/ckeditor";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Pattern } from "@/components/upload-file";
@@ -14,6 +21,7 @@ import { Calendar, Eye, Loader2, Save, Send, Tag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { AiWriterButton, type AiWriterResult } from "./ai-writer-button";
 
 export type BlogPostForm = Omit<Post, "id" | "createdAt" | "updatedAt"> & {
@@ -81,6 +89,21 @@ export function BlogPostEditor({
   onSubmit,
   onImageUploadingChange,
 }: BlogPostEditorProps) {
+  const [adminUsers, setAdminUsers] = useState<
+    { id: string; name: string | null; email: string }[]
+  >([]);
+
+  useEffect(() => {
+    fetch("/api/users")
+      .then((res) => res.json())
+      .then((users: { id: string; name: string | null; email: string; role: string }[]) => {
+        if (Array.isArray(users)) {
+          setAdminUsers(users.filter((u) => u.role === "ADMIN"));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const wordCount = form.content
     .replace(/<[^>]*>/g, " ")
     .trim()
@@ -305,11 +328,21 @@ export function BlogPostEditor({
                 Tác giả
               </span>
             </FieldLabel>
-            <Input
+            <Select
               value={form.author || ""}
-              onChange={(e) => onChange({ ...form, author: e.target.value })}
-              className="blog-luxury-input"
-            />
+              onValueChange={(val: string | null) => val && onChange({ ...form, author: val })}
+            >
+              <SelectTrigger className="blog-luxury-input">
+                <SelectValue placeholder="Chọn tác giả" />
+              </SelectTrigger>
+              <SelectContent>
+                {adminUsers.map((u) => (
+                  <SelectItem key={u.id} value={u.name || u.email}>
+                    {u.name || u.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

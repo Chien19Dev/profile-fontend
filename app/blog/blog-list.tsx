@@ -2,43 +2,65 @@
 
 import { DecoFrame } from "@/components/sections/deco-frame";
 import { SearchBar } from "@/components/sections/search-bar";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import type { Post } from "@/lib/api";
 import { ArrowRight, BookOpen, Calendar, Clock, Tag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const revalidate = 60;
+const POSTS_PER_PAGE = 9;
 
 export default function BlogListClient() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const topRef = useRef<HTMLDivElement>(null);
+
+  const loadPosts = useCallback(
+    async (p: number) => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `/api/posts?published=true&page=${p}&limit=${POSTS_PER_PAGE}`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setPosts(data.posts);
+          setTotalPages(data.totalPages);
+          setPage(data.page);
+        }
+      } catch (error) {
+        console.error("Error loading posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
-    loadPosts();
-  }, []);
-
-  async function loadPosts() {
-    try {
-      const res = await fetch("/api/posts?published=true");
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(data);
-      }
-    } catch (error) {
-      console.error("Error loading posts:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+    loadPosts(1);
+  }, [loadPosts]);
 
   async function handleSearch(query: string) {
     setSearchQuery(query);
     if (!query.trim()) {
-      loadPosts();
+      loadPosts(1);
       return;
     }
+    setLoading(true);
     try {
       const res = await fetch(
         `/api/search?q=${encodeURIComponent(query)}&type=posts`,
@@ -46,14 +68,24 @@ export default function BlogListClient() {
       if (res.ok) {
         const data = await res.json();
         setPosts(data.posts);
+        setTotalPages(1);
+        setPage(1);
       }
     } catch (error) {
       console.error("Error searching posts:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
+  function handlePageChange(newPage: number) {
+    if (newPage < 1 || newPage > totalPages) return;
+    loadPosts(newPage);
+    topRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
-    <div className="deco-page relative min-h-screen">
+    <div ref={topRef} className="deco-page relative min-h-screen">
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-4xl mx-auto space-y-10">
           <div className="text-center space-y-3">
@@ -174,6 +206,54 @@ export default function BlogListClient() {
                 );
               })}
             </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && !searchQuery && totalPages > 1 && (
+            <Pagination className="pt-4">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => handlePageChange(page - 1)}
+                    aria-disabled={page <= 1}
+                    className={page <= 1 ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                  .reduce<number[]>((acc, p, i, arr) => {
+                    if (i > 0 && p - (arr[i - 1] ?? 0) > 1) acc.push(-1);
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, i) =>
+                    p === -1 ? (
+                      <PaginationItem key={`ellipsis-${i}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(p)}
+                          isActive={p === page}
+                          className="cursor-pointer"
+                        >
+                          {p}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ),
+                  )}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => handlePageChange(page + 1)}
+                    aria-disabled={page >= totalPages}
+                    className={page >= totalPages ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           )}
         </div>
       </div>

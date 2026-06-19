@@ -5,10 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { alertError, alertSuccess } from "@/lib/alerts";
 import type { Post } from "@/lib/api";
-import { Calendar, UserMinus, UserPlus } from "lucide-react";
+import { BookOpen, Calendar, Pencil, UserMinus, UserPlus } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
+import { FollowListDialog } from "./follow-list-dialog";
+import { UserSettingsDialog } from "./user-settings-dialog";
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -33,9 +36,25 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
+  const [followDialog, setFollowDialog] = useState<{
+    open: boolean;
+    type: "followers" | "following";
+  }>({ open: false, type: "followers" });
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     if (userId) loadUser();
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      fetch(`/api/posts?authorId=${userId}&published=true&page=1&limit=6`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.posts) setUserPosts(data.posts);
+        })
+        .catch(() => {});
+    }
   }, [userId]);
 
   useEffect(() => {
@@ -154,33 +173,40 @@ export default function UserProfilePage() {
                   )}
                 </Button>
               )}
+              {isOwnProfile && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSettingsOpen(true)}
+                >
+                  <Pencil className="size-3.5" /> Chỉnh sửa
+                </Button>
+              )}
             </div>
 
             <div className="grid grid-cols-5 gap-3 border-t border-border pt-4">
               {[
-                {
-                  label: "Bình luận",
-                  count: user._count?.comments || 0,
-                },
-                {
-                  label: "Thích",
-                  count: user._count?.likes || 0,
-                },
-                {
-                  label: "Đã lưu",
-                  count: user._count?.bookmarks || 0,
-                },
-                {
-                  label: "Đang theo dõi",
-                  count: user._count?.following || 0,
-                },
-                {
-                  label: "Người theo dõi",
-                  count: user._count?.followers || 0,
-                },
+                { label: "Bình luận", count: user._count?.comments || 0 },
+                { label: "Thích", count: user._count?.likes || 0 },
+                { label: "Đã lưu", count: user._count?.bookmarks || 0 },
+                { label: "Đang theo dõi", count: user._count?.following || 0, followType: "following" as const },
+                { label: "Người theo dõi", count: user._count?.followers || 0, followType: "followers" as const },
               ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <p className="text-lg font-medium tabular-nums">
+                <div
+                  key={stat.label}
+                  className={
+                    "text-center" +
+                    (stat.followType && stat.count > 0
+                      ? " cursor-pointer hover:bg-muted/60 rounded-md transition-colors py-1 -my-1"
+                      : "")
+                  }
+                  onClick={
+                    stat.followType && stat.count > 0
+                      ? () => setFollowDialog({ open: true, type: stat.followType! })
+                      : undefined
+                  }
+                >
+                  <p className={"text-lg font-medium tabular-nums" + (stat.followType && stat.count > 0 ? " text-primary" : "")}>
                     {stat.count}
                   </p>
                   <p className="text-xs text-muted-foreground">{stat.label}</p>
@@ -188,8 +214,66 @@ export default function UserProfilePage() {
               ))}
             </div>
           </DecoFrame>
+          <div className="mt-6">
+            <h2 className="deco-title text-xl text-foreground mb-4 flex items-center gap-2">
+              <BookOpen className="size-4 text-primary" />
+              Bài viết
+            </h2>
+            {userPosts.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Chưa có bài viết nào.</p>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {userPosts.map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/blog/${post.slug}`}
+                    className="group block rounded-lg border border-border p-4 transition-colors hover:border-primary/50 hover:bg-muted/40"
+                  >
+                    <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                      {post.title}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
+                      <Calendar className="size-3" />
+                      <span>
+                        {new Date(
+                          post.publishedAt || post.createdAt!,
+                        ).toLocaleDateString("vi-VN", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                      {post.category && (
+                        <>
+                          <span className="text-border">•</span>
+                          <span>{post.category}</span>
+                        </>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      <FollowListDialog
+        open={followDialog.open}
+        onOpenChange={(open) => setFollowDialog((prev) => ({ ...prev, open }))}
+        userId={userId}
+        type={followDialog.type}
+      />
+
+      <UserSettingsDialog
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        userId={userId}
+        initialName={user.name}
+        initialBio={user.bio}
+        initialImage={user.image}
+        onSaved={() => loadUser()}
+      />
     </div>
   );
 }

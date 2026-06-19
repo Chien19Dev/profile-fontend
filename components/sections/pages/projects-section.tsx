@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { ExternalLink, Eye, Link } from "lucide-react";
-import { Project } from "@/lib/api";
-import { ProjectDetailDialog } from "@/components/sections/pages/project-detail-dialog";
-import { fadeEase } from "@/lib/motion";
 import { DecoFrame } from "@/components/sections/deco-frame";
+import { ProjectDetailDialog } from "@/components/sections/pages/project-detail-dialog";
+import { SearchBar } from "@/components/sections/search-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Project } from "@/lib/api";
+import { fadeEase } from "@/lib/motion";
+import { motion } from "framer-motion";
+import { ExternalLink, Eye, Images, Link } from "lucide-react";
+import { useMemo, useState } from "react";
 import { SectionHeading } from "../admin/admin-section-heading";
-import { SearchBar } from "@/components/sections/search-bar";
+import { ImageLightbox } from "./image-lightbox";
 
 const MotionDiv = motion.div;
 
@@ -24,6 +25,7 @@ export function ProjectsSection({ projects, loading }: ProjectsSectionProps) {
   const [detailProject, setDetailProject] = useState<Project | null>(null);
   const [selectedTech, setSelectedTech] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
 
   const allTechs = useMemo(() => {
     const techs = new Set<string>();
@@ -133,6 +135,15 @@ export function ProjectsSection({ projects, loading }: ProjectsSectionProps) {
                       >
                         Chi tiết <Eye />
                       </Button>
+                      {project.images && project.images.length > 0 && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setLightbox({ images: project.images!, index: 0 })}
+                        >
+                          Hình ảnh <Images />
+                        </Button>
+                      )}
                       {project.demoUrl && (
                         <Button
                           size="sm"
@@ -176,6 +187,15 @@ export function ProjectsSection({ projects, loading }: ProjectsSectionProps) {
           if (!open) setDetailProject(null);
         }}
       />
+
+      {lightbox && (
+        <ImageLightbox
+          images={lightbox.images}
+          openIndex={lightbox.index}
+          onClose={() => setLightbox(null)}
+          onNavigate={(i) => setLightbox((prev) => prev ? { ...prev, index: i } : null)}
+        />
+      )}
     </section>
   );
 }

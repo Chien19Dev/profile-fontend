@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -51,25 +52,58 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { userId } = await params;
+    const isSelf = session.user.id === userId;
+    const isAdmin = session.user.role === "ADMIN";
+
+    if (!isSelf && !isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
-    const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true, password: true } });
+    if (!targetUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Role change: ADMIN only, cannot change ADMIN role
     if (body.role !== undefined) {
-      if (targetUser?.role === "ADMIN") {
+      if (!isAdmin) {
+        return NextResponse.json({ error: "Only admin can change roles" }, { status: 403 });
+      }
+      if (targetUser.role === "ADMIN") {
         return NextResponse.json(
           { error: "Cannot change role of an Admin user" },
           { status: 403 },
         );
       }
     }
+
+    // Password change: self only
+    if (body.newPassword !== undefined) {
+      if (!isSelf) {
+        return NextResponse.json({ error: "Cannot change another user's password" }, { status: 403 });
+      }
+      if (!body.currentPassword) {
+        return NextResponse.json({ error: "Current password required" }, { status: 400 });
+      }
+      const isValid = await bcrypt.compare(body.currentPassword, targetUser.password);
+      if (!isValid) {
+        return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
+      }
+    }
+
     const updateData: Record<string, unknown> = {};
-    if (body.role !== undefined) updateData.role = body.role;
     if (body.name !== undefined) updateData.name = body.name;
     if (body.bio !== undefined) updateData.bio = body.bio;
     if (body.image !== undefined) updateData.image = body.image;
+    if (body.role !== undefined && isAdmin) updateData.role = body.role;
+    if (body.newPassword !== undefined && isSelf) {
+      updateData.password = await bcrypt.hash(body.newPassword, 12);
+    }
 
     const user = await prisma.user.update({
       where: { id: userId },

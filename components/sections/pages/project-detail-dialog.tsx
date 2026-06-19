@@ -1,25 +1,24 @@
 "use client";
 
-import Image from "next/image";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  Link,
-  ZoomIn,
-} from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
-import type { Project } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogDescription,
-  DialogHeader,
-  DialogPanel,
-  DialogPopup,
-  DialogTitle,
+    Dialog,
+    DialogDescription,
+    DialogHeader,
+    DialogPanel,
+    DialogPopup,
+    DialogTitle,
 } from "@/components/ui/dialog";
+import type { Project } from "@/lib/api";
+import {
+    ExternalLink,
+    Link,
+    ZoomIn,
+} from "lucide-react";
+import Image from "next/image";
+import { Fragment, useState } from "react";
+import { ImageLightbox } from "./image-lightbox";
 
 interface ProjectDetailDialogProps {
   project: Project | null;
@@ -34,35 +33,6 @@ export function ProjectDetailDialog({
 }: ProjectDetailDialogProps) {
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const images = project?.images ?? [];
-
-  const showPrevImage = () => {
-    if (previewIndex === null || images.length <= 1) return;
-    setPreviewIndex((previewIndex - 1 + images.length) % images.length);
-  };
-
-  const showNextImage = () => {
-    if (previewIndex === null || images.length <= 1) return;
-    setPreviewIndex((previewIndex + 1) % images.length);
-  };
-
-  useEffect(() => {
-    if (previewIndex === null) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (images.length <= 1) return;
-      if (e.key === "ArrowLeft") {
-        setPreviewIndex((i) =>
-          i === null ? null : (i - 1 + images.length) % images.length,
-        );
-      }
-      if (e.key === "ArrowRight") {
-        setPreviewIndex((i) => (i === null ? null : (i + 1) % images.length));
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [previewIndex, images.length]);
 
   return (
     <Fragment>
@@ -158,64 +128,13 @@ export function ProjectDetailDialog({
         </DialogPopup>
       </Dialog>
 
-      <Dialog
-        open={previewIndex !== null}
-        onOpenChange={(next) => {
-          if (!next) setPreviewIndex(null);
-        }}
-      >
-        <DialogPopup
-          className="max-w-4xl border-0 bg-transparent p-2 shadow-none sm:max-w-4xl"
-          bottomStickOnMobile={false}
-        >
-          {previewIndex !== null && images[previewIndex] && (
-            <div className="relative mx-auto aspect-square w-full max-h-[min(85vh,768px)]">
-              <Image
-                src={images[previewIndex]}
-                alt={`${project?.title ?? "Dự án"} - ảnh ${previewIndex + 1}`}
-                fill
-                className="rounded-lg object-contain"
-              />
-
-              {images.length > 1 && (
-                <Fragment>
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-black/50 text-white hover:bg-black/70"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showPrevImage();
-                    }}
-                    aria-label="Ảnh trước"
-                  >
-                    <ChevronLeft className="size-5" />
-                  </Button>
-
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-black/50 text-white hover:bg-black/70"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showNextImage();
-                    }}
-                    aria-label="Ảnh sau"
-                  >
-                    <ChevronRight className="size-5" />
-                  </Button>
-
-                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
-                    {previewIndex + 1} / {images.length}
-                  </span>
-                </Fragment>
-              )}
-            </div>
-          )}
-        </DialogPopup>
-      </Dialog>
+      <ImageLightbox
+        images={images}
+        openIndex={previewIndex}
+        onClose={() => setPreviewIndex(null)}
+        onNavigate={(i) => setPreviewIndex(i)}
+        title={project?.title}
+      />
     </Fragment>
   );
 }

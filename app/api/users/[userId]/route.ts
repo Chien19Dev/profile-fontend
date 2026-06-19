@@ -57,16 +57,23 @@ export async function PATCH(
     const { userId } = await params;
     const body = await request.json();
     const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
-    if (targetUser?.role === "ADMIN") {
-      return NextResponse.json(
-        { error: "Cannot change role of an Admin user" },
-        { status: 403 },
-      );
+    if (body.role !== undefined) {
+      if (targetUser?.role === "ADMIN") {
+        return NextResponse.json(
+          { error: "Cannot change role of an Admin user" },
+          { status: 403 },
+        );
+      }
     }
+    const updateData: Record<string, unknown> = {};
+    if (body.role !== undefined) updateData.role = body.role;
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.bio !== undefined) updateData.bio = body.bio;
+    if (body.image !== undefined) updateData.image = body.image;
 
     const user = await prisma.user.update({
       where: { id: userId },
-      data: { role: body.role },
+      data: updateData,
       select: {
         id: true,
         name: true,

@@ -10,6 +10,11 @@ export const usersApi = {
       method: "PATCH",
       body: JSON.stringify({ role }),
     }),
+  updateProfile: (id: string, data: { name?: string; bio?: string; image?: string }) =>
+    request<User>(`/users/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
 };
 
 export const publicUsersApi = {

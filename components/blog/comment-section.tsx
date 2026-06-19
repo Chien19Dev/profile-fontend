@@ -7,7 +7,7 @@ import { alertError, alertSuccess } from "@/lib/alerts";
 import type { Comment as CommentType } from "@/lib/api";
 import { ChevronDown, ChevronUp, MessageSquare, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { CommentForm } from "./comment-form";
 
 interface CommentSectionProps {
@@ -18,8 +18,12 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
-  const [optimisticComments, setOptimisticComments] = useState<CommentType[]>([]);
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(
+    new Set(),
+  );
+  const [optimisticComments, setOptimisticComments] = useState<CommentType[]>(
+    [],
+  );
   const { data: session } = useSession();
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -44,9 +48,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
         const data: CommentType[] = await res.json();
         setComments(data);
         const realIds = new Set(data.map((c: CommentType) => c.id));
-        setOptimisticComments((prev) =>
-          prev.filter((c) => !realIds.has(c.id))
-        );
+        setOptimisticComments((prev) => prev.filter((c) => !realIds.has(c.id)));
       }
     } catch (error) {
       console.error("Error loading comments:", error);
@@ -61,7 +63,10 @@ export function CommentSection({ postId }: CommentSectionProps) {
       content,
       postId,
       userId: session?.user?.id || "",
-      user: { name: session?.user?.name || "Bạn", image: session?.user?.image || null },
+      user: {
+        name: session?.user?.name || "Bạn",
+        image: session?.user?.image || null,
+      },
       createdAt: new Date().toISOString(),
       replies: [],
     };
@@ -243,15 +248,15 @@ export function CommentSection({ postId }: CommentSectionProps) {
                       className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors cursor-pointer"
                     >
                       {!expandedReplies.has(comment.id) ? (
-                        <>
+                        <Fragment>
                           <ChevronDown className="size-3.5" />
                           Xem {comment.replies.length} phản hồi
-                        </>
+                        </Fragment>
                       ) : (
-                        <>
+                        <Fragment>
                           <ChevronUp className="size-3.5" />
                           Ẩn phản hồi
-                        </>
+                        </Fragment>
                       )}
                     </Button>
                   )}
@@ -271,73 +276,75 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   </div>
                 )}
 
-                {comment.replies && comment.replies.length > 0 && expandedReplies.has(comment.id) && (
-                  <div className="ml-6 space-y-3 border-l-2 border-primary/20 pl-4 pt-2">
-                    {comment.replies.map((reply) => (
-                      <div key={reply.id} className="space-y-1">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-2">
-                            <AvatarCircle
-                              name={reply.user?.name}
-                              image={reply.user?.image}
-                              size="sm"
-                            />
-                            <div>
-                              <span className="text-xs font-medium">
-                                {reply.user?.name || "Ẩn danh"}
-                              </span>
-                              <span className="text-xs text-muted-foreground ml-2">
-                                {formatDate(reply.createdAt)}
-                              </span>
+                {comment.replies &&
+                  comment.replies.length > 0 &&
+                  expandedReplies.has(comment.id) && (
+                    <div className="ml-6 space-y-3 border-l-2 border-primary/20 pl-4 pt-2">
+                      {comment.replies.map((reply) => (
+                        <div key={reply.id} className="space-y-1">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-2">
+                              <AvatarCircle
+                                name={reply.user?.name}
+                                image={reply.user?.image}
+                                size="sm"
+                              />
+                              <div>
+                                <span className="text-xs font-medium">
+                                  {reply.user?.name || "Ẩn danh"}
+                                </span>
+                                <span className="text-xs text-muted-foreground ml-2">
+                                  {formatDate(reply.createdAt)}
+                                </span>
+                              </div>
                             </div>
+                            {(session?.user?.id === reply.userId ||
+                              session?.user?.role === "ADMIN") && (
+                              <Button
+                                size="icon-sm"
+                                variant="ghost"
+                                onClick={() => handleDelete(reply.id)}
+                              >
+                                <Trash2 className="size-3 text-destructive" />
+                              </Button>
+                            )}
                           </div>
-                          {(session?.user?.id === reply.userId ||
-                            session?.user?.role === "ADMIN") && (
+                          <p className="text-sm text-foreground leading-relaxed">
+                            {reply.content}
+                          </p>
+
+                          {session && (
                             <Button
-                              size="icon-sm"
+                              size="sm"
                               variant="ghost"
-                              onClick={() => handleDelete(reply.id)}
+                              className="text-muted-foreground"
+                              onClick={() =>
+                                setReplyingTo(
+                                  replyingTo === reply.id ? null : reply.id,
+                                )
+                              }
                             >
-                              <Trash2 className="size-3 text-destructive" />
+                              Phản hồi
                             </Button>
                           )}
+                          {replyingTo === reply.id && (
+                            <div className="pt-2">
+                              <CommentForm
+                                postId={postId}
+                                parentId={comment.id}
+                                replyToName={reply.user?.name || "Ẩn danh"}
+                                onCommentAdded={() => {
+                                  loadComments();
+                                  setReplyingTo(null);
+                                }}
+                                onCancel={() => setReplyingTo(null)}
+                              />
+                            </div>
+                          )}
                         </div>
-                        <p className="text-sm text-foreground leading-relaxed">
-                          {reply.content}
-                        </p>
-
-                        {session && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-muted-foreground"
-                            onClick={() =>
-                              setReplyingTo(
-                                replyingTo === reply.id ? null : reply.id,
-                              )
-                            }
-                          >
-                            Phản hồi
-                          </Button>
-                        )}
-                        {replyingTo === reply.id && (
-                          <div className="pt-2">
-                            <CommentForm
-                              postId={postId}
-                              parentId={comment.id}
-                              replyToName={reply.user?.name || "Ẩn danh"}
-                              onCommentAdded={() => {
-                                loadComments();
-                                setReplyingTo(null);
-                              }}
-                              onCancel={() => setReplyingTo(null)}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
               </DecoFrameComp>
             </div>
           ))}

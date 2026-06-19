@@ -1,5 +1,6 @@
 ﻿import { HomePage } from "@/components/sections/pages/home-page";
 import { getHomePageData } from "@/lib/data";
+import { Fragment } from "react";
 
 export const revalidate = 60;
 
@@ -21,7 +22,8 @@ export default async function Page() {
     "@type": "Person",
     name: profile?.fullName || "Nguyễn Đình Chiến",
     jobTitle: profile?.title || "Frontend Developer",
-    description: profile?.bio || "Frontend Developer chuyên React, Next.js, TypeScript.",
+    description:
+      profile?.bio || "Frontend Developer chuyên React, Next.js, TypeScript.",
     email: profile?.email || undefined,
     url: SITE_URL,
     image: profile?.avatar || `${SITE_URL}/banner.png`,
@@ -54,7 +56,7 @@ export default async function Page() {
   };
 
   return (
-    <>
+    <Fragment>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
@@ -69,6 +71,6 @@ export default async function Page() {
         skills={skills}
         testimonials={testimonials}
       />
-    </>
+    </Fragment>
   );
 }

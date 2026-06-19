@@ -35,6 +35,7 @@ import {
 import { useState } from "react";
 import { StatItem } from "./stat-item";
 import { UserEditDialog } from "./user-edit-dialog";
+import { Label } from "@/components/ui/label";
 
 export function UserCard({
   user,
@@ -164,7 +165,7 @@ export function UserCard({
           </div>
           <div className="flex items-center gap-1.5 mt-1 text-[0.7rem] text-muted-foreground/80">
             <Mail className="h-3 w-3 shrink-0 opacity-50" />
-            <span className="truncate">{user.email}</span>
+            <Label className="text-[11px]!">{user.email}</Label>
           </div>
         </div>
 

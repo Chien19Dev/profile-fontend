@@ -138,6 +138,7 @@ export function UserEditDialog({
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Nhập tên hiển thị"
+                className="pl-6"
               />
             </div>
           </div>

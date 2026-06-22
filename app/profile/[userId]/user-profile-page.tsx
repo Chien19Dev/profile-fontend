@@ -10,8 +10,18 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FollowListDialog } from "./follow-list-dialog";
 import { UserSettingsDialog } from "./user-settings-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -41,21 +51,42 @@ export default function UserProfilePage() {
     type: "followers" | "following";
   }>({ open: false, type: "followers" });
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const limit = 6;
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const navigateToPage = (newPage: number) => {
+    setPage(newPage);
+    router.push(`?page=${newPage}`, { scroll: false });
+  };
+
+  useEffect(() => {
+    const p = searchParams?.get("page");
+    const pageNum = p ? parseInt(p, 10) : 1;
+    if (!isNaN(pageNum) && pageNum !== page) {
+      setPage(pageNum);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (userId) loadUser();
   }, [userId]);
 
   useEffect(() => {
-    if (userId) {
-      fetch(`/api/posts?authorId=${userId}&published=true&page=1&limit=6`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.posts) setUserPosts(data.posts);
-        })
-        .catch(() => {});
-    }
-  }, [userId]);
+    if (!userId) return;
+    const currentPage = page;
+    fetch(`/api/posts?authorId=${userId}&published=true&page=${currentPage}&limit=${limit}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (currentPage !== page) return;
+        if (data.posts) setUserPosts(data.posts);
+        if (typeof data.totalPages === "number") setTotalPages(data.totalPages);
+      })
+      .catch(() => { });
+  }, [userId, page]);
 
   useEffect(() => {
     if (session?.user?.id && userId && session.user.id !== userId) {
@@ -66,7 +97,7 @@ export default function UserProfilePage() {
             setIsFollowing(data.some((f) => f.followingId === userId));
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [session?.user?.id, userId]);
 
@@ -132,7 +163,10 @@ export default function UserProfilePage() {
           >
             <div className="flex items-center gap-4">
               <Avatar className="size-16 text-2xl">
-                <AvatarImage src={user.image || undefined} alt={user.name || "Avatar"} />
+                <AvatarImage
+                  src={user.image || undefined}
+                  alt={user.name || "Avatar"}
+                />
                 <AvatarFallback className="bg-primary/10 text-primary font-medium">
                   {user.name?.[0]?.toUpperCase() || "?"}
                 </AvatarFallback>
@@ -189,8 +223,16 @@ export default function UserProfilePage() {
                 { label: "Bình luận", count: user._count?.comments || 0 },
                 { label: "Thích", count: user._count?.likes || 0 },
                 { label: "Đã lưu", count: user._count?.bookmarks || 0 },
-                { label: "Đang theo dõi", count: user._count?.following || 0, followType: "following" as const },
-                { label: "Người theo dõi", count: user._count?.followers || 0, followType: "followers" as const },
+                {
+                  label: "Đang theo dõi",
+                  count: user._count?.following || 0,
+                  followType: "following" as const,
+                },
+                {
+                  label: "Người theo dõi",
+                  count: user._count?.followers || 0,
+                  followType: "followers" as const,
+                },
               ].map((stat) => (
                 <div
                   key={stat.label}
@@ -202,11 +244,20 @@ export default function UserProfilePage() {
                   }
                   onClick={
                     stat.followType && stat.count > 0
-                      ? () => setFollowDialog({ open: true, type: stat.followType! })
+                      ? () =>
+                        setFollowDialog({
+                          open: true,
+                          type: stat.followType!,
+                        })
                       : undefined
                   }
                 >
-                  <p className={"text-lg font-medium tabular-nums" + (stat.followType && stat.count > 0 ? " text-primary" : "")}>
+                  <p
+                    className={
+                      "text-lg font-medium tabular-nums" +
+                      (stat.followType && stat.count > 0 ? " text-primary" : "")
+                    }
+                  >
                     {stat.count}
                   </p>
                   <p className="text-xs text-muted-foreground">{stat.label}</p>
@@ -220,7 +271,9 @@ export default function UserProfilePage() {
               Bài viết
             </h2>
             {userPosts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Chưa có bài viết nào.</p>
+              <p className="text-sm text-muted-foreground">
+                Chưa có bài viết nào.
+              </p>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 {userPosts.map((post) => (
@@ -253,6 +306,40 @@ export default function UserProfilePage() {
                   </Link>
                 ))}
               </div>
+            )}
+
+            {totalPages > 1 && (
+              <Pagination className="pt-4">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href={page > 1 ? `?page=${page - 1}` : undefined}
+                      onClick={() => {
+                        if (page > 1) navigateToPage(page - 1);
+                      }}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (p) => (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          isActive={p === page}
+                          onClick={() => navigateToPage(p)}
+                        >
+                          {p}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ),
+                  )}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => {
+                        if (page < totalPages) navigateToPage(page + 1);
+                      }}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             )}
           </div>
         </div>

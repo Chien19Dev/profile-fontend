@@ -9,9 +9,8 @@ import { Loader2, Lock, Mail, Shield, Sparkles, UserPlus } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Fragment, useActionState, useState } from "react";
+import { FormEvent, Fragment, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
-import { signInWithCredentials } from "./actions";
 
 interface LoginFormProps {
   googleEnabled: boolean;
@@ -19,13 +18,10 @@ interface LoginFormProps {
 
 export function LoginForm({ googleEnabled }: LoginFormProps) {
   const searchParams = useSearchParams();
-  const [state, formAction, isPending] = useActionState(
-    signInWithCredentials,
-    null,
-  );
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const authError = searchParams.get("error");
 
   const initialError =
@@ -37,7 +33,34 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
-    await signIn("google", { callbackUrl });
+    await signIn("google", { callbackUrl: "/" });
+  }
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (res?.error) {
+        setError("Email hoặc mật khẩu không đúng");
+      } else {
+        window.location.href = "/";
+      }
+    } catch {
+      setError("Có lỗi xảy ra, vui lòng thử lại");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -99,7 +122,7 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
                 variant="secondary"
                 size="lg"
                 className="w-full h-12"
-                disabled={googleLoading || isPending}
+                disabled={googleLoading || loading}
                 onClick={handleGoogleSignIn}
               >
                 {googleLoading ? (
@@ -121,8 +144,7 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
             </Fragment>
           )}
 
-          <form action={formAction} className="space-y-5">
-            <input type="hidden" name="callbackUrl" value={callbackUrl} />
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -139,18 +161,18 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
               </div>
             </div>
             <PasswordInput id="password" name="password" required />
-            {(state?.error || initialError) && (
+            {(error || initialError) && (
               <div className="text-sm text-destructive">
-                {state?.error || initialError}
+                {error || initialError}
               </div>
             )}
             <Button
               type="submit"
               className="w-full h-12 text-base font-medium"
               size="lg"
-              disabled={isPending || googleLoading}
+              disabled={loading || googleLoading}
             >
-              {isPending ? (
+              {loading ? (
                 <Fragment>
                   <Loader2 className="mr-2 size-5 animate-spin" />
                   Đang đăng nhập...

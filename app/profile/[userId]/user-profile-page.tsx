@@ -3,6 +3,7 @@
 import { DecoFrame } from "@/components/sections/deco-frame";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { alertError, alertSuccess } from "@/lib/alerts";
 import type { Post } from "@/lib/api";
 import { BookOpen, Calendar, Pencil, UserMinus, UserPlus } from "lucide-react";
@@ -46,6 +47,7 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
   const [followDialog, setFollowDialog] = useState<{
     open: boolean;
     type: "followers" | "following";
@@ -78,6 +80,7 @@ export default function UserProfilePage() {
   useEffect(() => {
     if (!userId) return;
     const currentPage = page;
+    setPostsLoading(true);
     fetch(`/api/posts?authorId=${userId}&published=true&page=${currentPage}&limit=${limit}`)
       .then((res) => res.json())
       .then((data) => {
@@ -85,7 +88,8 @@ export default function UserProfilePage() {
         if (data.posts) setUserPosts(data.posts);
         if (typeof data.totalPages === "number") setTotalPages(data.totalPages);
       })
-      .catch(() => { });
+      .catch(() => { })
+      .finally(() => setPostsLoading(false));
   }, [userId, page]);
 
   useEffect(() => {
@@ -270,7 +274,16 @@ export default function UserProfilePage() {
               <BookOpen className="size-4 text-primary" />
               Bài viết
             </h2>
-            {userPosts.length === 0 ? (
+            {postsLoading ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {Array.from({ length: limit }).map((_, i) => (
+                  <div key={i} className="rounded-lg border border-border p-4">
+                    <Skeleton className="h-5 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ) : userPosts.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 Chưa có bài viết nào.
               </p>

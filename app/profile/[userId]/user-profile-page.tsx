@@ -53,12 +53,14 @@ export default function UserProfilePage() {
     type: "followers" | "following";
   }>({ open: false, type: "followers" });
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const limit = 6;
 
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const initialPage = searchParams?.get("page");
+  const [page, setPage] = useState<number>(initialPage ? parseInt(initialPage, 10) : 1);
 
   const navigateToPage = (newPage: number) => {
     setPage(newPage);

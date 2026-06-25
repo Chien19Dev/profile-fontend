@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/", "/api/", "/login", "/register"],
+        disallow: ["/admin/", "/api/"],
       },
       {
         userAgent: [
@@ -23,10 +23,9 @@ export default function robots(): MetadataRoute.Robots {
           "cohere-ai",
         ],
         allow: "/",
-        disallow: ["/admin/", "/api/", "/login", "/register"],
+        disallow: ["/admin/", "/api/"],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
-    // host: BASE_URL,
   };
 }

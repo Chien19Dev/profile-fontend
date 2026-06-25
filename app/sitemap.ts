@@ -52,12 +52,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  const skillPages: MetadataRoute.Sitemap = skills.map((skill) => ({
-    url: `${BASE_URL}/skills/${skill.id}`,
-    lastModified: skill.updatedAt || new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.5,
-  }));
+  // const skillPages: MetadataRoute.Sitemap = skills.map((skill) => ({
+  //   url: `${BASE_URL}/skills/${skill.id}`,
+  //   lastModified: skill.updatedAt || new Date(),
+  //   changeFrequency: "monthly" as const,
+  //   priority: 0.5,
+  // }));
 
   const testimonialPages: MetadataRoute.Sitemap = testimonials.map(
     (testimonial) => ({
@@ -72,7 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...blogPages,
     ...projectPages,
-    ...skillPages,
+    // ...skillPages,
     ...testimonialPages,
   ];
 }

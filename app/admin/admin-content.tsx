@@ -238,7 +238,11 @@ export default function AdminPage() {
 
   useLayoutEffect(() => {
     const s = searchParams?.get("section") as Section | null;
-    if (s && s !== section) {
+    if (!s) {
+      router.replace("?section=profiles", { scroll: false });
+      loadProfiles();
+      loadPostCount();
+    } else if (s !== section) {
       setSection(s);
       switch (s) {
         case "profiles":
@@ -262,9 +266,30 @@ export default function AdminPage() {
         default:
           break;
       }
-    } else if (!s) {
-      loadProfiles();
-      loadPostCount();
+    } else {
+      switch (section) {
+        case "profiles":
+          if (profiles.length === 0) loadProfiles();
+          break;
+        case "projects":
+          if (projects.length === 0) loadProjects();
+          break;
+        case "skills":
+          if (skills.length === 0) loadSkills();
+          break;
+        case "testimonials":
+          if (testimonials.length === 0) loadTestimonials();
+          break;
+        case "contacts":
+          if (contacts.length === 0) loadContacts();
+          break;
+        case "users":
+          if (users.length === 0) loadUsers();
+          break;
+        default:
+          break;
+      }
+      if (postCount === 0) loadPostCount();
     }
   }, [searchParams]);
 
@@ -502,7 +527,7 @@ export default function AdminPage() {
             {section === "navigation" && <NavigationSection />}
             {section === "analytics" && <AnalyticsDashboard />}
             {section === "users" && (
-              <UsersSection users={users} onReload={loadUsers} />
+              <UsersSection users={users} onReload={loadUsers} loading={usersLoading} />
             )}
           </div>
         </div>

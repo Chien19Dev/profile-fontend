@@ -13,10 +13,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Field, FieldLabel } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 import { alertError, alertSuccess } from "@/lib/alerts";
-import { Camera, Loader2 } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { Camera, Loader2, Eye, EyeOff } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface UserSettingsDialogProps {
   open: boolean;
@@ -38,12 +47,16 @@ export function UserSettingsDialog({
   onSaved,
 }: UserSettingsDialogProps) {
   const { update } = useSession();
+  const router = useRouter();
   const [name, setName] = useState(initialName || "");
   const [bio, setBio] = useState(initialBio || "");
   const [image, setImage] = useState(initialImage || "");
   const [imageUploading, setImageUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -131,6 +144,15 @@ export function UserSettingsDialog({
       alertSuccess("Đã cập nhật hồ sơ");
       await update();
       onSaved();
+      if (showPassword && newPassword) {
+        await signOut({ redirect: false });
+        router.push("/login");
+        return;
+      }
+      setShowPassword(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
       onOpenChange(false);
     } catch {
       alertError("Có lỗi xảy ra");
@@ -193,45 +215,93 @@ export function UserSettingsDialog({
               rows={3}
             />
           </div>
-          <button
-            type="button"
-            className="text-xs text-primary font-medium hover:underline"
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-xs text-primary font-medium rounded-full"
             onClick={() => setShowPassword((v) => !v)}
           >
             {showPassword ? "Ẩn đổi mật khẩu" : "Đổi mật khẩu"}
-          </button>
+          </Button>
 
-          {showPassword && (
-            <div className="space-y-3 border border-border rounded-lg p-4">
-              <div className="space-y-1.5">
-                <Label>Mật khẩu hiện tại</Label>
-                <Input
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Nhập mật khẩu hiện tại..."
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Mật khẩu mới</Label>
-                <Input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Tối thiểu 6 ký tự..."
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Xác nhận mật khẩu mới</Label>
-                <Input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Nhập lại mật khẩu mới..."
-                />
-              </div>
-            </div>
-          )}
+          <AnimatePresence>
+            {showPassword && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
+                className="space-y-3 border border-border rounded-lg p-4 overflow-hidden"
+              >
+                <Field>
+                  <FieldLabel>Mật khẩu hiện tại</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Nhập mật khẩu hiện tại..."
+                    />
+                    <InputGroupAddon
+                      align="inline-end"
+                      className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      onClick={() => setShowCurrentPassword((v) => !v)}
+                    >
+                      {showCurrentPassword ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
+                    </InputGroupAddon>
+                  </InputGroup>
+                </Field>
+                <Field>
+                  <FieldLabel>Mật khẩu mới</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Tối thiểu 6 ký tự..."
+                    />
+                    <InputGroupAddon
+                      align="inline-end"
+                      className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      onClick={() => setShowNewPassword((v) => !v)}
+                    >
+                      {showNewPassword ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
+                    </InputGroupAddon>
+                  </InputGroup>
+                </Field>
+                <Field>
+                  <FieldLabel>Xác nhận mật khẩu mới</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Nhập lại mật khẩu mới..."
+                    />
+                    <InputGroupAddon
+                      align="inline-end"
+                      className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
+                    </InputGroupAddon>
+                  </InputGroup>
+                </Field>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </DialogPanel>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

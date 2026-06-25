@@ -33,12 +33,12 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Người dùng không tồn tại" }, { status: 404 });
     }
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Lỗi khi lấy thông tin người dùng:", error);
     return NextResponse.json(
       { error: "Failed to fetch user" },
       { status: 500 },
@@ -66,33 +66,31 @@ export async function PATCH(
     const body = await request.json();
     const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true, password: true } });
     if (!targetUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Người dùng không tồn tại" }, { status: 404 });
     }
 
-    // Role change: ADMIN only, cannot change ADMIN role
     if (body.role !== undefined) {
       if (!isAdmin) {
-        return NextResponse.json({ error: "Only admin can change roles" }, { status: 403 });
+        return NextResponse.json({ error: "Chỉ admin mới có thể thay đổi vai trò" }, { status: 403 });
       }
       if (targetUser.role === "ADMIN") {
         return NextResponse.json(
-          { error: "Cannot change role of an Admin user" },
+          { error: "Không thể thay đổi vai trò của người dùng Admin" },
           { status: 403 },
         );
       }
     }
 
-    // Password change: self only
     if (body.newPassword !== undefined) {
       if (!isSelf) {
-        return NextResponse.json({ error: "Cannot change another user's password" }, { status: 403 });
+        return NextResponse.json({ error: "Không thể thay đổi mật khẩu của người dùng khác" }, { status: 403 });
       }
       if (!body.currentPassword) {
-        return NextResponse.json({ error: "Current password required" }, { status: 400 });
+        return NextResponse.json({ error: "Mật khẩu hiện tại là bắt buộc" }, { status: 400 });
       }
       const isValid = await bcrypt.compare(body.currentPassword, targetUser.password);
       if (!isValid) {
-        return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
+        return NextResponse.json({ error: "Mật khẩu hiện tại không chính xác" }, { status: 400 });
       }
     }
 
@@ -130,7 +128,7 @@ export async function PATCH(
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error("Error updating user:", error);
+    console.error("Lỗi khi cập nhật người dùng:", error);
     return NextResponse.json(
       { error: "Failed to update user" },
       { status: 500 },
@@ -150,23 +148,23 @@ export async function DELETE(
     const { userId } = await params;
     if (session.user.id === userId) {
       return NextResponse.json(
-        { error: "Cannot delete your own account" },
+        { error: "Không thể xóa tài khoản của chính bạn" },
         { status: 400 },
       );
     }
     const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
     if (targetUser?.role === "ADMIN") {
       return NextResponse.json(
-        { error: "Cannot delete an Admin user" },
+        { error: "Không thể xóa tài khoản của người dùng Admin" },
         { status: 403 },
       );
     }
     await prisma.user.delete({ where: { id: userId } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting user:", error);
+    console.error("Lỗi khi xóa người dùng:", error);
     return NextResponse.json(
-      { error: "Failed to delete user" },
+      { error: "Không thể xóa người dùng" },
       { status: 500 },
     );
   }

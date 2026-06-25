@@ -95,8 +95,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.email = user.email;
         token.name = user.name;
         token.picture = user.image;
-        // Role is already available from authorize() for credentials
-        // or from signIn() callback for Google
         token.role = (user as any).role || "USER";
       }
       return token;

@@ -140,14 +140,6 @@ export default function UserProfilePage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="deco-page relative min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Đang tải...</p>
-      </div>
-    );
-  }
-
   if (!user) {
     return (
       <div className="deco-page relative min-h-screen flex items-center justify-center">
@@ -168,33 +160,47 @@ export default function UserProfilePage() {
             bottomLeftClassName="!-bottom-3"
           >
             <div className="flex items-center gap-4">
-              <Avatar className="size-16 text-2xl">
-                <AvatarImage
-                  src={user.image || undefined}
-                  alt={user.name || "Avatar"}
-                />
-                <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                  {user.name?.[0]?.toUpperCase() || "?"}
-                </AvatarFallback>
-              </Avatar>
+              {loading ? (
+                <Skeleton className="size-16 rounded-full" />
+              ) : (
+                <Avatar className="size-16 text-2xl">
+                  <AvatarImage
+                    src={user.image || undefined}
+                    alt={user.name || "Avatar"}
+                  />
+                  <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                    {user.name?.[0]?.toUpperCase() || "?"}
+                  </AvatarFallback>
+                </Avatar>
+              )}
               <div className="flex-1">
-                <h1 className="deco-title text-2xl text-foreground">
-                  {user.name || "Ẩn danh"}
-                </h1>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
-                {user.bio && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {user.bio}
-                  </p>
+                {loading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-32" />
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-64" />
+                  </div>
+                ) : (
+                  <>
+                    <h1 className="deco-title text-2xl text-foreground">
+                      {user.name || "Ẩn danh"}
+                    </h1>
+                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                    {user.bio && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {user.bio}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                      <Calendar className="size-3" />
+                      Tham gia{" "}
+                      {new Date(user.createdAt).toLocaleDateString("vi-VN", {
+                        year: "numeric",
+                        month: "long",
+                      })}
+                    </p>
+                  </>
                 )}
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <Calendar className="size-3" />
-                  Tham gia{" "}
-                  {new Date(user.createdAt).toLocaleDateString("vi-VN", {
-                    year: "numeric",
-                    month: "long",
-                  })}
-                </p>
               </div>
               {!isOwnProfile && session && (
                 <Button
@@ -225,50 +231,59 @@ export default function UserProfilePage() {
             </div>
 
             <div className="grid grid-cols-5 gap-3 border-t border-border pt-4">
-              {[
-                { label: "Bình luận", count: user._count?.comments || 0 },
-                { label: "Thích", count: user._count?.likes || 0 },
-                { label: "Đã lưu", count: user._count?.bookmarks || 0 },
-                {
-                  label: "Đang theo dõi",
-                  count: user._count?.following || 0,
-                  followType: "following" as const,
-                },
-                {
-                  label: "Người theo dõi",
-                  count: user._count?.followers || 0,
-                  followType: "followers" as const,
-                },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className={
-                    "text-center" +
-                    (stat.followType && stat.count > 0
-                      ? " cursor-pointer hover:bg-muted/60 rounded-md transition-colors py-1 -my-1"
-                      : "")
-                  }
-                  onClick={
-                    stat.followType && stat.count > 0
-                      ? () =>
-                        setFollowDialog({
-                          open: true,
-                          type: stat.followType!,
-                        })
-                      : undefined
-                  }
-                >
-                  <p
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="text-center space-y-1">
+                    <Skeleton className="h-5 w-8 mx-auto" />
+                    <Skeleton className="h-3 w-16 mx-auto" />
+                  </div>
+                ))
+              ) : (
+                [
+                  { label: "Bình luận", count: user._count?.comments || 0 },
+                  { label: "Thích", count: user._count?.likes || 0 },
+                  { label: "Đã lưu", count: user._count?.bookmarks || 0 },
+                  {
+                    label: "Đang theo dõi",
+                    count: user._count?.following || 0,
+                    followType: "following" as const,
+                  },
+                  {
+                    label: "Người theo dõi",
+                    count: user._count?.followers || 0,
+                    followType: "followers" as const,
+                  },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
                     className={
-                      "text-lg font-medium tabular-nums" +
-                      (stat.followType && stat.count > 0 ? " text-primary" : "")
+                      "text-center" +
+                      (stat.followType && stat.count > 0
+                        ? " cursor-pointer hover:bg-muted/60 rounded-md transition-colors py-1 -my-1"
+                        : "")
+                    }
+                    onClick={
+                      stat.followType && stat.count > 0
+                        ? () =>
+                          setFollowDialog({
+                            open: true,
+                            type: stat.followType!,
+                          })
+                        : undefined
                     }
                   >
-                    {stat.count}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                </div>
-              ))}
+                    <p
+                      className={
+                        "text-lg font-medium tabular-nums" +
+                        (stat.followType && stat.count > 0 ? " text-primary" : "")
+                      }
+                    >
+                      {stat.count}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                  </div>
+                ))
+              )}
             </div>
           </DecoFrame>
           <div className="mt-6">

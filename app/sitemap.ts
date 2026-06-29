@@ -1,8 +1,8 @@
 import {
-    getPublishedPosts,
-    getPublishedProjects,
-    getPublishedSkills,
-    getPublishedTestimonials,
+  getPublishedPosts,
+  getPublishedProjects,
+  getPublishedSkills,
+  getPublishedTestimonials,
 } from "@/lib/data";
 import type { MetadataRoute } from "next";
 
@@ -38,14 +38,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const blogPages: MetadataRoute.Sitemap = posts.map((post) => ({
+  const blogPages: MetadataRoute.Sitemap = posts.map((post: any) => ({
     url: `${BASE_URL}/blog/${post.slug}`,
     lastModified: post.updatedAt || post.publishedAt || new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
-  const projectPages: MetadataRoute.Sitemap = projects.map((project) => ({
+  const projectPages: MetadataRoute.Sitemap = projects.map((project: any) => ({
     url: `${BASE_URL}/projects/${project.id}`,
     lastModified: project.updatedAt || project.createdAt || new Date(),
     changeFrequency: "monthly" as const,
@@ -60,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // }));
 
   const testimonialPages: MetadataRoute.Sitemap = testimonials.map(
-    (testimonial) => ({
+    (testimonial: any) => ({
       url: `${BASE_URL}/testimonials/${testimonial.id}`,
       lastModified: testimonial.updatedAt || new Date(),
       changeFrequency: "monthly" as const,

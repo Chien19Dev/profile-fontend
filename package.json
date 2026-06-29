@@ -1,5 +1,5 @@
 {
-  "name": "profile-fontend",
+  "name": "chien-portfolio",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -25,7 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",
-    "lucide-react": "^1.17.0",
+    "lucide-react": "^1.22.0",
     "next": "16.2.7",
     "next-auth": "^5.0.0-beta.31",
     "next-themes": "^0.4.6",

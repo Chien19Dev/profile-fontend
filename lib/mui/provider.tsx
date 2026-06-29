@@ -6,17 +6,27 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { useTheme } from "next-themes";
 import { createMuiTheme } from "./theme";
 
-interface Props {
+interface MuiProviderProps {
   children: React.ReactNode;
 }
 
-export default function MuiProvider({ children }: Props) {
+export default function MuiProvider({ children }: MuiProviderProps) {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const theme = React.useMemo(
-    () => createMuiTheme(resolvedTheme === "dark" ? "dark" : "light"),
-    [resolvedTheme],
+    () =>
+      createMuiTheme(
+        mounted ? (resolvedTheme === "dark" ? "dark" : "light") : "dark",
+      ),
+    [mounted, resolvedTheme],
   );
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <AppRouterCacheProvider>

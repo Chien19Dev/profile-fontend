@@ -3,7 +3,6 @@ import { SessionSync } from "@/components/session-sync";
 import { ThemeProvider } from "@/components/theme-provider";
 import { auth } from "@/lib/auth";
 import { getCvExists, getNavigationItems } from "@/lib/data";
-import { prisma } from "@/lib/prisma";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
@@ -138,9 +137,7 @@ export default async function RootLayout({
               navItems={navItems}
               isAdmin={isAdmin}
             />
-            <MuiProvider>
-            {children}
-            </MuiProvider>
+            <MuiProvider>{children}</MuiProvider>
             <Analytics />
           </ThemeProvider>
         </SessionProvider>

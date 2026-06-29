@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogDescription,
@@ -10,29 +9,36 @@ import {
   DialogPopup,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Loader2 } from "lucide-react";
+import {
+  Camera,
+  Loader2,
+  User,
+  Briefcase,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+} from "lucide-react";
+import {
+  FaGithub,
+  FaLinkedin,
+  FaTwitter,
+  FaInstagram,
+  FaFacebook,
+} from "react-icons/fa";
 import { useRef, useState } from "react";
 import { alertError } from "@/lib/alerts";
 import type { Profile } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
+import SaveIcon from "@mui/icons-material/Save";
+import AddIcon from "@mui/icons-material/Add";
 
 type ProfileForm = Omit<Profile, "id" | "createdAt" | "updatedAt">;
-
-const EXTRA_FIELDS: Record<string, string> = {
-  email: "Email",
-  phone: "Số điện thoại",
-  location: "Địa điểm",
-  githubUrl: "GitHub URL",
-  linkedinUrl: "LinkedIn URL",
-  twitterUrl: "Twitter / X URL",
-  instagramUrl: "Instagram URL",
-  facebookUrl: "Facebook URL",
-  websiteUrl: "Website URL",
-};
 
 interface Props {
   profile: ProfileForm;
@@ -141,147 +147,256 @@ export function ProfileEditDialog({
             </div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Họ và tên *</Label>
-              <Input
-                value={profile.fullName}
-                onChange={(e) =>
-                  onChange({ ...profile, fullName: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Chức danh *</Label>
-              <Input
-                value={profile.title}
-                onChange={(e) =>
-                  onChange({ ...profile, title: e.target.value })
-                }
-                required
-              />
-            </div>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Họ và tên"
+              value={profile.fullName}
+              onChange={(e) =>
+                onChange({ ...profile, fullName: e.target.value })
+              }
+              required
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <User className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Chức danh"
+              value={profile.title}
+              onChange={(e) => onChange({ ...profile, title: e.target.value })}
+              required
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Briefcase className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
           </div>
-          <div className="space-y-2">
-            <Label>Giới thiệu *</Label>
-            <Textarea
+          <div className="grid grid-cols-1 gap-4">
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Giới thiệu"
               value={profile.bio}
               onChange={(e) => onChange({ ...profile, bio: e.target.value })}
               required
+              multiline
               rows={3}
             />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Số điện thoại</Label>
-              <Input
-                value={profile.phone || ""}
-                onChange={(e) =>
-                  onChange({ ...profile, phone: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input
-                value={profile.email || ""}
-                onChange={(e) =>
-                  onChange({ ...profile, email: e.target.value })
-                }
-              />
-            </div>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Số điện thoại"
+              value={profile.phone || ""}
+              onChange={(e) => onChange({ ...profile, phone: e.target.value })}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Phone className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Email"
+              value={profile.email || ""}
+              onChange={(e) => onChange({ ...profile, email: e.target.value })}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Mail className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
           </div>
-          <div className="space-y-2">
-            <Label>Địa điểm</Label>
-            <Input
+          <div className="grid grid-cols-1 gap-4">
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Địa điểm"
               value={profile.location || ""}
               onChange={(e) =>
                 onChange({ ...profile, location: e.target.value })
               }
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <MapPin className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>GitHub URL</Label>
-              <Input
-                value={profile.githubUrl || ""}
-                onChange={(e) =>
-                  onChange({ ...profile, githubUrl: e.target.value })
-                }
-                placeholder="https://github.com/username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>LinkedIn URL</Label>
-              <Input
-                value={profile.linkedinUrl || ""}
-                onChange={(e) =>
-                  onChange({ ...profile, linkedinUrl: e.target.value })
-                }
-                placeholder="https://linkedin.com/in/username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Twitter / X URL</Label>
-              <Input
-                value={profile.twitterUrl || ""}
-                onChange={(e) =>
-                  onChange({ ...profile, twitterUrl: e.target.value })
-                }
-                placeholder="https://twitter.com/username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Instagram URL</Label>
-              <Input
-                value={profile.instagramUrl || ""}
-                onChange={(e) =>
-                  onChange({ ...profile, instagramUrl: e.target.value })
-                }
-                placeholder="https://instagram.com/username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Facebook URL</Label>
-              <Input
-                value={profile.facebookUrl || ""}
-                onChange={(e) =>
-                  onChange({ ...profile, facebookUrl: e.target.value })
-                }
-                placeholder="https://facebook.com/username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Website URL</Label>
-              <Input
-                value={profile.websiteUrl || ""}
-                onChange={(e) =>
-                  onChange({ ...profile, websiteUrl: e.target.value })
-                }
-                placeholder="https://yourwebsite.com"
-              />
-            </div>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="GitHub URL"
+              value={profile.githubUrl || ""}
+              onChange={(e) =>
+                onChange({ ...profile, githubUrl: e.target.value })
+              }
+              placeholder="https://github.com/username"
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <FaGithub className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="LinkedIn URL"
+              value={profile.linkedinUrl || ""}
+              onChange={(e) =>
+                onChange({ ...profile, linkedinUrl: e.target.value })
+              }
+              placeholder="https://linkedin.com/in/username"
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <FaLinkedin className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Twitter / X URL"
+              value={profile.twitterUrl || ""}
+              onChange={(e) =>
+                onChange({ ...profile, twitterUrl: e.target.value })
+              }
+              placeholder="https://twitter.com/username"
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <FaTwitter className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Instagram URL"
+              value={profile.instagramUrl || ""}
+              onChange={(e) =>
+                onChange({ ...profile, instagramUrl: e.target.value })
+              }
+              placeholder="https://instagram.com/username"
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <FaInstagram className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Facebook URL"
+              value={profile.facebookUrl || ""}
+              onChange={(e) =>
+                onChange({ ...profile, facebookUrl: e.target.value })
+              }
+              placeholder="https://facebook.com/username"
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <FaFacebook className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Website URL"
+              value={profile.websiteUrl || ""}
+              onChange={(e) =>
+                onChange({ ...profile, websiteUrl: e.target.value })
+              }
+              placeholder="https://yourwebsite.com"
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Globe className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
           </div>
         </DialogPanel>
         <DialogFooter>
           <Button
-            variant="outline"
+            variant="outlined"
             onClick={() => onOpenChange(false)}
             disabled={loading}
+            startIcon={<CloseIcon />}
           >
             Huỷ
           </Button>
-          <Button onClick={onSave} disabled={loading || imageUploading}>
-            {loading ? (
-              <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
-                {isEditing ? "Đang cập nhật..." : "Đang tạo..."}
-              </>
-            ) : isEditing ? (
-              "Cập nhật"
-            ) : (
-              "Tạo"
-            )}
+          <Button
+            variant="contained"
+            onClick={onSave}
+            disabled={loading || imageUploading}
+            startIcon={
+              loading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : isEditing ? (
+                <SaveIcon />
+              ) : (
+                <AddIcon />
+              )
+            }
+          >
+            {loading
+              ? isEditing
+                ? "Đang cập nhật..."
+                : "Đang tạo..."
+              : isEditing
+                ? "Cập nhật"
+                : "Tạo"}
           </Button>
         </DialogFooter>
       </DialogPopup>

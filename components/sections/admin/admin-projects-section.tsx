@@ -1,12 +1,12 @@
 import { Fragment, useState } from "react";
-import { Button } from "@/components/ui/button";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
 import { Badge } from "@/components/ui/badge";
 import { api, Project } from "@/lib/api";
 import { alertSuccess, alertError } from "@/lib/alerts";
 import { WsTable } from "@/components/admin/ws-table";
 import { ProjectEditDialog } from "@/components/sections/admin/project-edit-dialog";
 import { ProjectDetailDialog } from "@/components/sections/pages/project-detail-dialog";
-import { Plus } from "lucide-react";
 
 type ProjectForm = Omit<Project, "id" | "createdAt" | "updatedAt"> & {
   technologiesText: string;
@@ -29,11 +29,7 @@ interface Props {
   loading?: boolean;
 }
 
-export function ProjectsSection({
-  projects,
-  onReload,
-  loading,
-}: Props) {
+export function ProjectsSection({ projects, onReload, loading }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState("");
   const [form, setForm] = useState<ProjectForm>(emptyProject);
@@ -104,8 +100,11 @@ export function ProjectsSection({
       <div className="p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Danh sách dự án</h2>
-          <Button onClick={() => handleOpenDialog(false)}>
-            <Plus className="size-4 mr-2" />
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog(false)}
+          >
             Tạo mới
           </Button>
         </div>

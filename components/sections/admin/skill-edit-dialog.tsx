@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogDescription,
@@ -10,11 +9,16 @@ import {
   DialogPopup,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Loader2 } from "lucide-react";
+import { Loader2, Zap, Folder, Star, Hash } from "lucide-react";
 import type { Skill } from "@/lib/api";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
+import SaveIcon from "@mui/icons-material/Save";
+import AddIcon from "@mui/icons-material/Add";
 
 type SkillForm = Omit<Skill, "id" | "createdAt" | "updatedAt">;
 
@@ -41,54 +45,96 @@ export function SkillEditDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPopup className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Chỉnh sửa kỹ năng" : "Tạo kỹ năng mới"}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? "Chỉnh sửa kỹ năng" : "Tạo kỹ năng mới"}
+          </DialogTitle>
           <DialogDescription>
-            {isEditing ? "Cập nhật thông tin kỹ năng" : "Thêm kỹ năng mới vào danh sách"}
+            {isEditing
+              ? "Cập nhật thông tin kỹ năng"
+              : "Thêm kỹ năng mới vào danh sách"}
           </DialogDescription>
         </DialogHeader>
-        <DialogPanel className="space-y-4">
-          <div className="space-y-2">
-            <Label>Tên kỹ năng *</Label>
-            <Input
-              value={skill.name}
-              onChange={(e) => onChange({ ...skill, name: e.target.value })}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Danh mục</Label>
-            <Input
-              value={skill.category || ""}
-              onChange={(e) => onChange({ ...skill, category: e.target.value })}
-              placeholder="Frontend, Backend, DevOps..."
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Icon</Label>
-            <Input
-              value={skill.icon || ""}
-              onChange={(e) => onChange({ ...skill, icon: e.target.value })}
-              placeholder="lucide-react icon name"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Mức độ (%)</Label>
-            <Input
-              type="number"
-              min={0}
-              max={100}
-              value={skill.level || 0}
-              onChange={(e) => onChange({ ...skill, level: Number(e.target.value) })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Thứ tự</Label>
-            <Input
-              type="number"
-              value={skill.order || 0}
-              onChange={(e) => onChange({ ...skill, order: Number(e.target.value) })}
-            />
-          </div>
+        <DialogPanel className="grid gap-4">
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Tên kỹ năng"
+            value={skill.name}
+            onChange={(e) => onChange({ ...skill, name: e.target.value })}
+            required
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Zap className="size-4 text-muted-foreground" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Danh mục"
+            value={skill.category || ""}
+            onChange={(e) => onChange({ ...skill, category: e.target.value })}
+            placeholder="Frontend, Backend, DevOps..."
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Folder className="size-4 text-muted-foreground" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Icon"
+            value={skill.icon || ""}
+            onChange={(e) => onChange({ ...skill, icon: e.target.value })}
+            placeholder="lucide-react icon name"
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Star className="size-4 text-muted-foreground" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Mức độ (%)"
+            type="number"
+            value={skill.level || ""}
+            onChange={(e) =>
+              onChange({ ...skill, level: Number(e.target.value) })
+            }
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Thứ tự"
+            type="number"
+            value={skill.order || ""}
+            onChange={(e) =>
+              onChange({ ...skill, order: Number(e.target.value) })
+            }
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Hash className="size-4 text-muted-foreground" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
           <div className="flex items-center gap-2">
             <Switch
               checked={skill.published !== false}
@@ -102,18 +148,35 @@ export function SkillEditDialog({
           </div>
         </DialogPanel>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button
+            variant="outlined"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+            startIcon={<CloseIcon />}
+          >
             Huỷ
           </Button>
-          <Button onClick={onSave} disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
-                {isEditing ? "Đang cập nhật..." : "Đang tạo..."}
-              </>
-            ) : (
-              isEditing ? "Cập nhật" : "Tạo"
-            )}
+          <Button
+            variant="contained"
+            onClick={onSave}
+            disabled={loading}
+            startIcon={
+              loading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : isEditing ? (
+                <SaveIcon />
+              ) : (
+                <AddIcon />
+              )
+            }
+          >
+            {loading
+              ? isEditing
+                ? "Đang cập nhật..."
+                : "Đang tạo..."
+              : isEditing
+                ? "Cập nhật"
+                : "Tạo"}
           </Button>
         </DialogFooter>
       </DialogPopup>

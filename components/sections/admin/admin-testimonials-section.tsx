@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
 import { api, Testimonial } from "@/lib/api";
 import { alertSuccess, alertError } from "@/lib/alerts";
 import { WsTable } from "@/components/admin/ws-table";
 import { TestimonialEditDialog } from "@/components/sections/admin/testimonial-edit-dialog";
-import { Plus } from "lucide-react";
 import { useState } from "react";
 
 type TestimonialForm = Omit<Testimonial, "id" | "createdAt" | "updatedAt">;
@@ -86,8 +86,11 @@ export function AdminTestimonialsSection({
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Danh sách đánh giá</h2>
-        <Button onClick={() => handleOpenDialog(false)}>
-          <Plus className="size-4 mr-2" />
+        <Button
+          variant="outlined"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog(false)}
+        >
           Tạo mới
         </Button>
       </div>

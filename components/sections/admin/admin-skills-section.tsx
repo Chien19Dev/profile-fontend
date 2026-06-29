@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
 import { api, Skill } from "@/lib/api";
 import { alertSuccess, alertError } from "@/lib/alerts";
 import { WsTable } from "@/components/admin/ws-table";
 import { SkillEditDialog } from "@/components/sections/admin/skill-edit-dialog";
-import { Plus } from "lucide-react";
 import { useState } from "react";
 
 type SkillForm = Omit<Skill, "id" | "createdAt" | "updatedAt">;
@@ -22,11 +22,7 @@ interface Props {
   loading?: boolean;
 }
 
-export function SkillsSection({
-  skills,
-  onReload,
-  loading,
-}: Props) {
+export function SkillsSection({ skills, onReload, loading }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState("");
   const [form, setForm] = useState<SkillForm>(emptySkill);
@@ -80,8 +76,11 @@ export function SkillsSection({
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Danh sách kỹ năng</h2>
-        <Button onClick={() => handleOpenDialog(false)}>
-          <Plus className="size-4 mr-2" />
+        <Button
+          variant="outlined"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog(false)}
+        >
           Tạo mới
         </Button>
       </div>

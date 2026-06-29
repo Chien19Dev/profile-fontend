@@ -59,7 +59,7 @@ export function BlogAdminShell({
             </header>
           )}
 
-          <main className="flex-1 overflow-auto scrollbar-hide">
+          <main className="flex-1 overflow-auto">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}

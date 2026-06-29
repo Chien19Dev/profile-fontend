@@ -48,7 +48,7 @@ export function BlogSidebar({ postCount = 0 }: BlogSidebarProps) {
         <div className="deco-rule mt-4" />
       </div>
 
-      <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-3 space-y-0.5">
+      <nav className="flex-1 min-h-0 overflow-y-auto px-3 space-y-0.5">
         {NAV.map(({ href, label, icon: Icon, exact }) => {
           const active = exact ? pathname === href : pathname.startsWith(href);
           return (

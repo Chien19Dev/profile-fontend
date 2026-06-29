@@ -1,24 +1,14 @@
 "use client";
 
-import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogPanel,
-  DialogPopup,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Loader2, Zap, Folder, Star, Hash } from "lucide-react";
+import { Zap, Folder, Star, Hash } from "lucide-react";
 import type { Skill } from "@/lib/api";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
-import Button from "@mui/material/Button";
-import CloseIcon from "@mui/icons-material/Close";
-import SaveIcon from "@mui/icons-material/Save";
-import AddIcon from "@mui/icons-material/Add";
+import DialogComponent from "@/components/common/DialogComponent";
+import Stack from "@mui/material/Stack";
+import Grid from "@mui/material/Grid";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
 
 type SkillForm = Omit<Skill, "id" | "createdAt" | "updatedAt">;
 
@@ -42,144 +32,132 @@ export function SkillEditDialog({
   loading = false,
 }: Props) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPopup className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Chỉnh sửa kỹ năng" : "Tạo kỹ năng mới"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEditing
-              ? "Cập nhật thông tin kỹ năng"
-              : "Thêm kỹ năng mới vào danh sách"}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogPanel className="grid gap-4">
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Tên kỹ năng"
-            value={skill.name}
-            onChange={(e) => onChange({ ...skill, name: e.target.value })}
-            required
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Zap className="size-4 text-muted-foreground" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Danh mục"
-            value={skill.category || ""}
-            onChange={(e) => onChange({ ...skill, category: e.target.value })}
-            placeholder="Frontend, Backend, DevOps..."
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Folder className="size-4 text-muted-foreground" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Icon"
-            value={skill.icon || ""}
-            onChange={(e) => onChange({ ...skill, icon: e.target.value })}
-            placeholder="lucide-react icon name"
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Star className="size-4 text-muted-foreground" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Mức độ (%)"
-            type="number"
-            value={skill.level || ""}
-            onChange={(e) =>
-              onChange({ ...skill, level: Number(e.target.value) })
-            }
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Thứ tự"
-            type="number"
-            value={skill.order || ""}
-            onChange={(e) =>
-              onChange({ ...skill, order: Number(e.target.value) })
-            }
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Hash className="size-4 text-muted-foreground" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={skill.published !== false}
-              onCheckedChange={(checked: boolean) =>
-                onChange({ ...skill, published: checked })
+    <DialogComponent
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title={isEditing ? "Chỉnh sửa kỹ năng" : "Tạo kỹ năng mới"}
+      description={
+        isEditing
+          ? "Cập nhật thông tin kỹ năng"
+          : "Thêm kỹ năng mới vào danh sách"
+      }
+      maxWidth="sm"
+      loading={loading}
+      confirmText={
+        loading
+          ? isEditing
+            ? "Đang cập nhật..."
+            : "Đang tạo..."
+          : isEditing
+            ? "Cập nhật"
+            : "Tạo"
+      }
+      cancelText="Huỷ"
+      onConfirm={onSave}
+    >
+      <Stack spacing={3}>
+        <TextField
+          label="Tên kỹ năng"
+          value={skill.name}
+          onChange={(e) => onChange({ ...skill, name: e.target.value })}
+          required
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Zap className="size-4 text-muted-foreground" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+
+        <TextField
+          label="Danh mục"
+          value={skill.category || ""}
+          onChange={(e) => onChange({ ...skill, category: e.target.value })}
+          placeholder="Frontend, Backend, DevOps..."
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Folder className="size-4 text-muted-foreground" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+
+        <TextField
+          label="Icon"
+          value={skill.icon || ""}
+          onChange={(e) => onChange({ ...skill, icon: e.target.value })}
+          placeholder="lucide-react icon name"
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Star className="size-4 text-muted-foreground" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              label="Mức độ (%)"
+              type="number"
+              value={skill.level || ""}
+              onChange={(e) =>
+                onChange({
+                  ...skill,
+                  level: Number(e.target.value),
+                })
               }
             />
-            <Label className="text-sm text-muted-foreground cursor-pointer">
-              {skill.published !== false ? "Đã xuất bản" : "Bản nháp"}
-            </Label>
-          </div>
-        </DialogPanel>
-        <DialogFooter>
-          <Button
-            variant="outlined"
-            onClick={() => onOpenChange(false)}
-            disabled={loading}
-            startIcon={<CloseIcon />}
-          >
-            Huỷ
-          </Button>
-          <Button
-            variant="contained"
-            onClick={onSave}
-            disabled={loading}
-            startIcon={
-              loading ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : isEditing ? (
-                <SaveIcon />
-              ) : (
-                <AddIcon />
-              )
-            }
-          >
-            {loading
-              ? isEditing
-                ? "Đang cập nhật..."
-                : "Đang tạo..."
-              : isEditing
-                ? "Cập nhật"
-                : "Tạo"}
-          </Button>
-        </DialogFooter>
-      </DialogPopup>
-    </Dialog>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              label="Thứ tự"
+              type="number"
+              value={skill.order || ""}
+              onChange={(e) =>
+                onChange({
+                  ...skill,
+                  order: Number(e.target.value),
+                })
+              }
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Hash className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+          </Grid>
+        </Grid>
+
+        <FormControlLabel
+          control={
+            <Switch
+              checked={skill.published !== false}
+              onChange={(e) =>
+                onChange({
+                  ...skill,
+                  published: e.target.checked,
+                })
+              }
+            />
+          }
+          label={skill.published !== false ? "Đã xuất bản" : "Bản nháp"}
+        />
+      </Stack>
+    </DialogComponent>
   );
 }

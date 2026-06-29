@@ -19,7 +19,7 @@ export function UsersSection({
   const userCount = users.filter((u) => u.role === "USER").length;
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-hide p-6 space-y-6">
+    <div className="flex-1 overflow-y-auto p-6 space-y-6">
       <div className="flex items-center gap-3 flex-wrap">
         {loading ? (
           <Fragment>

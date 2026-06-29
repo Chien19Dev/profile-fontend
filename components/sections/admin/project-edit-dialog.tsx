@@ -1,32 +1,18 @@
 "use client";
 
-import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogPanel,
-  DialogPopup,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Pattern } from "@/components/upload-file";
-import {
-  Loader2,
-  FolderOpen,
-  Link as LinkIcon,
-  Code,
-  Globe,
-} from "lucide-react";
+import { FolderOpen, Code, Globe } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import type { Project } from "@/lib/api";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
-import Button from "@mui/material/Button";
-import CloseIcon from "@mui/icons-material/Close";
-import SaveIcon from "@mui/icons-material/Save";
-import AddIcon from "@mui/icons-material/Add";
+import DialogComponent from "@/components/common/DialogComponent";
+import Grid from "@mui/material/Grid";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Switch from "@mui/material/Switch";
 
 type ProjectForm = Omit<Project, "id" | "createdAt" | "updatedAt"> & {
   technologiesText: string;
@@ -55,161 +41,152 @@ export function ProjectEditDialog({
   loading = false,
 }: Props) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPopup className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Chỉnh sửa dự án" : "Tạo dự án mới"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEditing
-              ? "Cập nhật thông tin dự án"
-              : "Thêm dự án mới vào danh sách"}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogPanel className="grid gap-4">
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Tên dự án"
-            value={project.title}
-            onChange={(e) => onChange({ ...project, title: e.target.value })}
-            required
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <FolderOpen className="size-4 text-muted-foreground" />
-                  </InputAdornment>
-                ),
-              },
-            }}
+    <DialogComponent
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title={isEditing ? "Chỉnh sửa dự án" : "Tạo dự án mới"}
+      description={
+        isEditing ? "Cập nhật thông tin dự án" : "Thêm dự án mới vào danh sách"
+      }
+      maxWidth="md"
+      loading={loading}
+      confirmText={
+        loading
+          ? isEditing
+            ? "Đang cập nhật..."
+            : "Đang tạo..."
+          : isEditing
+            ? "Cập nhật"
+            : "Tạo"
+      }
+      cancelText="Huỷ"
+      onConfirm={onSave}
+    >
+      <Stack spacing={3}>
+        <TextField
+          label="Tên dự án"
+          value={project.title}
+          onChange={(e) => onChange({ ...project, title: e.target.value })}
+          required
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <FolderOpen className="size-4 text-muted-foreground" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+
+        <TextField
+          label="Mô tả"
+          value={project.description}
+          onChange={(e) =>
+            onChange({ ...project, description: e.target.value })
+          }
+          required
+          multiline
+          rows={3}
+        />
+
+        <Box>
+          <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+            Ảnh dự án
+          </Typography>
+
+          <Pattern
+            maxSize={5 * 1024 * 1024}
+            accept="image/*"
+            multiple
+            value={project.images}
+            onUploadComplete={(urls) => onChange({ ...project, images: urls })}
+            onUploadingChange={onImageUploadingChange}
           />
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Mô tả"
-            value={project.description}
-            onChange={(e) =>
-              onChange({ ...project, description: e.target.value })
-            }
-            required
-            multiline
-            rows={3}
-          />
-          <div className="space-y-2">
-            <Label>Ảnh dự án</Label>
-            <Pattern
-              maxSize={5 * 1024 * 1024}
-              accept="image/*"
-              multiple={true}
-              value={project.images}
-              onUploadComplete={(urls) =>
-                onChange({ ...project, images: urls })
+        </Box>
+
+        <TextField
+          label="Công nghệ"
+          value={project.technologiesText}
+          onChange={(e) =>
+            onChange({
+              ...project,
+              technologiesText: e.target.value,
+            })
+          }
+          placeholder="React, Next.js, TypeScript..."
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Code className="size-4 text-muted-foreground" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              label="GitHub URL"
+              value={project.githubUrl || ""}
+              onChange={(e) =>
+                onChange({
+                  ...project,
+                  githubUrl: e.target.value,
+                })
               }
-              onUploadingChange={onImageUploadingChange}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <FaGithub className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
-          </div>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Công nghệ (phân cách bằng dấu phẩy)"
-            value={project.technologiesText}
-            onChange={(e) =>
-              onChange({ ...project, technologiesText: e.target.value })
-            }
-            placeholder="React, TypeScript, TailwindCSS"
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Code className="size-4 text-muted-foreground" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="GitHub URL (tùy chọn)"
-            value={project.githubUrl || ""}
-            onChange={(e) =>
-              onChange({ ...project, githubUrl: e.target.value })
-            }
-            placeholder="https://github.com/username/repo"
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <FaGithub className="size-4 text-muted-foreground" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Demo URL (tùy chọn)"
-            value={project.demoUrl || ""}
-            onChange={(e) => onChange({ ...project, demoUrl: e.target.value })}
-            placeholder="https://your-project-demo.com"
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Globe className="size-4 text-muted-foreground" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <div className="flex items-center gap-2">
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              label="Demo URL"
+              value={project.demoUrl || ""}
+              onChange={(e) =>
+                onChange({
+                  ...project,
+                  demoUrl: e.target.value,
+                })
+              }
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Globe className="size-4 text-muted-foreground" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+          </Grid>
+        </Grid>
+
+        <FormControlLabel
+          control={
             <Switch
               checked={project.published !== false}
-              onCheckedChange={(checked: boolean) =>
-                onChange({ ...project, published: checked })
+              onChange={(e) =>
+                onChange({
+                  ...project,
+                  published: e.target.checked,
+                })
               }
             />
-            <Label className="text-sm text-muted-foreground cursor-pointer">
-              {project.published !== false ? "Đã xuất bản" : "Bản nháp"}
-            </Label>
-          </div>
-        </DialogPanel>
-        <DialogFooter>
-          <Button
-            variant="outlined"
-            onClick={() => onOpenChange(false)}
-            disabled={loading}
-            startIcon={<CloseIcon />}
-          >
-            Huỷ
-          </Button>
-          <Button
-            variant="contained"
-            onClick={onSave}
-            disabled={loading}
-            startIcon={
-              loading ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : isEditing ? (
-                <SaveIcon />
-              ) : (
-                <AddIcon />
-              )
-            }
-          >
-            {loading
-              ? isEditing
-                ? "Đang cập nhật..."
-                : "Đang tạo..."
-              : isEditing
-                ? "Cập nhật"
-                : "Tạo"}
-          </Button>
-        </DialogFooter>
-      </DialogPopup>
-    </Dialog>
+          }
+          label={project.published !== false ? "Đã xuất bản" : "Bản nháp"}
+        />
+      </Stack>
+    </DialogComponent>
   );
 }

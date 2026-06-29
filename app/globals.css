@@ -242,6 +242,18 @@ body {
   box-sizing: border-box;
 }
 
+html,
+body,
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -251,16 +263,10 @@ body {
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  html::-webkit-scrollbar {
-    display: none;
-  }
   body {
     @apply bg-background text-foreground antialiased;
     scrollbar-width: none;
     -ms-overflow-style: none;
-  }
-  body::-webkit-scrollbar {
-    display: none;
   }
   code,
   kbd,
@@ -806,14 +812,6 @@ body {
   color: black !important;
 }
 
-.scrollbar-hide {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
 .blog-content {
   color: var(--foreground);
   font-size: 1rem;
@@ -982,7 +980,6 @@ body {
   font-family: var(--font-mono);
 }
 
-/* CKEditor code block specific styling */
 .blog-content pre[class*="language-"],
 .blog-content pre.code-block {
   margin: 1.5rem 0 !important;

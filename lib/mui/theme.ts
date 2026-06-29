@@ -255,9 +255,8 @@ export function createMuiTheme(mode: "light" | "dark") {
       MuiTooltip: {
         styleOverrides: {
           tooltip: {
-            background: "var(--popover)",
-            color: "var(--popover-foreground)",
-            border: "1px solid var(--border)",
+            background: "var(--primary)",
+            color: "var(--primary-foreground)",
           },
         },
       },

@@ -1,11 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverPopup,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverPopup, PopoverTrigger } from "@/components/ui/popover";
 import type { Notification } from "@/lib/api";
 import { Bell, Check } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -30,12 +26,13 @@ export function NotificationBell() {
         const data = JSON.parse(event.data);
         if (data.unreadCount !== undefined) {
           setUnreadCount(data.unreadCount);
-          if (data.unreadCount > notifications.filter((n) => !n.isRead).length) {
+          if (
+            data.unreadCount > notifications.filter((n) => !n.isRead).length
+          ) {
             loadNotifications();
           }
         }
-      } catch {
-      }
+      } catch {}
     };
 
     eventSource.onerror = () => {
@@ -55,8 +52,7 @@ export function NotificationBell() {
         setNotifications(data);
         setUnreadCount(data.filter((n: Notification) => !n.isRead).length);
       }
-    } catch {
-    }
+    } catch {}
   }
 
   async function markAsRead(id: string) {
@@ -68,8 +64,7 @@ export function NotificationBell() {
         prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch {
-    }
+    } catch {}
   }
 
   async function markAllRead() {
@@ -81,8 +76,7 @@ export function NotificationBell() {
       });
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);
-    } catch {
-    }
+    } catch {}
   }
 
   if (!isAdmin) return null;
@@ -101,19 +95,22 @@ export function NotificationBell() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        render={
-          <Button variant="ghost" size="sm" className="relative" />
-        }
+        render={<Button variant="ghost" size="sm" className="relative" />}
       >
         <Bell className="size-4" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 size-4 rounded-full bg-destructive text-destructive-foreground text-[0.6rem] font-bold flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 size-4 rounded-full bg-primary text-primary-foreground text-[0.6rem] font-bold flex items-center justify-center">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </PopoverTrigger>
 
-      <PopoverPopup side="bottom" align="end" sideOffset={8} className="w-80 p-0">
+      <PopoverPopup
+        side="bottom"
+        align="end"
+        sideOffset={8}
+        className="w-80 p-0"
+      >
         <div className="flex items-center justify-between pb-3 border-b border-border">
           <span className="text-sm font-medium">Thông báo</span>
           {unreadCount > 0 && (
@@ -129,7 +126,7 @@ export function NotificationBell() {
             Không có thông báo
           </div>
         ) : (
-          <div className="divide-y divide-border bg-muted/30 backdrop-blur-md max-h-80 overflow-y-auto scrollbar-hide">
+          <div className="divide-y divide-border bg-muted/30 backdrop-blur-md max-h-80 overflow-y-auto">
             {notifications.slice(0, 10).map((notif) => (
               <div
                 key={notif.id}
@@ -141,7 +138,8 @@ export function NotificationBell() {
                   </p>
                   {!notif.isRead && (
                     <Button
-                      variant="ghost" size="sm"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => markAsRead(notif.id)}
                       className="shrink-0 text-primary hover:text-primary/80"
                     >

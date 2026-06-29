@@ -1,14 +1,17 @@
-import { Edit, Eye, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import Paper from "@mui/material/Paper";
+import TableBody from "@mui/material/TableBody";
+import Tooltip from "@mui/material/Tooltip";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import Skeleton from "@mui/material/Skeleton";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export interface WsRow {
   key: string;
@@ -28,92 +31,119 @@ export function WsTable({
   loading?: boolean;
 }) {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow className="border-b border-border bg-muted/20 backdrop-blur-md">
-          {cols.map((col) => (
-            <TableHead
-              key={col}
-              className="px-5 py-2.5 text-left text-[0.6rem] tracking-widest uppercase text-muted-foreground font-normal"
-            >
-              {col}
-            </TableHead>
-          ))}
-          <TableHead className="w-24 px-3 py-2.5 text-right text-[0.6rem] tracking-widest uppercase text-muted-foreground font-normal">
-            Thao tác
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-
-      <TableBody>
-        {loading ? (
-          Array.from({ length: 5 }).map((_, i) => (
-            <TableRow key={i} className="border-b border-border/50">
-              {cols.map((_, j) => (
-                <TableCell key={j} className="px-5 py-3">
-                  <Skeleton className="h-4 w-full" />
-                </TableCell>
-              ))}
-              <TableCell className="px-3 py-3">
-                <Skeleton className="h-8 w-8" />
-              </TableCell>
-            </TableRow>
-          ))
-        ) : rows.length === 0 ? (
+    <TableContainer
+      component={Paper}
+      elevation={0}
+      sx={{
+        border: "1px solid var(--border)",
+        bgcolor: "var(--card)",
+      }}
+    >
+      <Table>
+        <TableHead>
           <TableRow>
+            {cols.map((col) => (
+              <TableCell
+                key={col}
+                sx={{
+                  fontSize: "0.65rem",
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  fontWeight: 500,
+                }}
+              >
+                {col}
+              </TableCell>
+            ))}
+
             <TableCell
-              colSpan={cols.length + 1}
-              className="px-5 py-8 text-xs text-muted-foreground text-center"
+              align="right"
+              sx={{
+                width: 120,
+                fontSize: "0.65rem",
+                textTransform: "uppercase",
+                letterSpacing: 1,
+                fontWeight: 500,
+              }}
             >
-              Chưa có dữ liệu
+              Thao tác
             </TableCell>
           </TableRow>
-        ) : (
-          rows.map((row) => (
-            <TableRow
-              key={row.key}
-              className="group border-b border-border/50 hover:bg-muted/90 transition-colors bg-muted/10 backdrop-blur-md"
-            >
-              {row.cells.map((cell, i) => (
-                <TableCell key={i} className="px-5 py-3 max-w-50">
-                  {cell}
-                </TableCell>
-              ))}
+        </TableHead>
 
-              <TableCell className="px-3 py-3">
-                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
-                  {row.onView && (
-                    <Button
-                      size="icon-sm"
-                      variant="ghost"
-                      onClick={row.onView}
-                      aria-label="Xem chi tiết"
-                    >
-                      <Eye className="size-3.5" />
-                    </Button>
-                  )}
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    onClick={row.onEdit}
-                    aria-label="Chỉnh sửa"
-                  >
-                    <Edit className="size-3.5" />
-                  </Button>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    onClick={row.onDelete}
-                    aria-label="Xóa"
-                  >
-                    <Trash2 className="size-3.5" />
-                  </Button>
-                </div>
+        <TableBody>
+          {loading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <TableRow key={i}>
+                {cols.map((_, j) => (
+                  <TableCell key={j}>
+                    <Skeleton />
+                  </TableCell>
+                ))}
+                <TableCell align="right">
+                  <Skeleton width={90} />
+                </TableCell>
+              </TableRow>
+            ))
+          ) : rows.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={cols.length + 1} align="center">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ py: 5 }}
+                >
+                  Chưa có dữ liệu
+                </Typography>
               </TableCell>
             </TableRow>
-          ))
-        )}
-      </TableBody>
-    </Table>
+          ) : (
+            rows.map((row) => (
+              <TableRow
+                key={row.key}
+                hover
+                sx={{
+                  "& .actions": {
+                    opacity: 0,
+                    transition: ".2s",
+                  },
+                  "&:hover .actions": {
+                    opacity: 1,
+                  },
+                }}
+              >
+                {row.cells.map((cell, i) => (
+                  <TableCell key={i}>{cell}</TableCell>
+                ))}
+
+                <TableCell align="right">
+                  <div className="actions flex justify-end gap-1">
+                    {row.onView && (
+                      <Tooltip title="Xem chi tiết" placement="top">
+                        <IconButton size="small" onClick={row.onView}>
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
+                    <Tooltip title="Chỉnh sửa" placement="top">
+                      <IconButton size="small" onClick={row.onEdit}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Xóa" placement="top">
+                      <IconButton size="small" onClick={row.onDelete}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }

@@ -1,149 +1,130 @@
-import type { FormEvent } from "react";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { api, Skill } from "@/lib/api";
 import { alertSuccess, alertError } from "@/lib/alerts";
-import { WorkspaceSplit } from "@/components/admin/workspace-split";
-import { WsField } from "@/components/admin/ws-field";
-import { WsSubmit } from "@/components/admin/ws-submit";
 import { WsTable } from "@/components/admin/ws-table";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { SkillEditDialog } from "@/components/sections/admin/skill-edit-dialog";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 
 type SkillForm = Omit<Skill, "id" | "createdAt" | "updatedAt">;
 
+const emptySkill: SkillForm = {
+  name: "",
+  category: "",
+  icon: "",
+  level: 0,
+  order: 0,
+};
+
 interface Props {
   skills: Skill[];
-  form: SkillForm;
-  editingId: string;
-  onChange: (f: SkillForm) => void;
-  onSubmit: (e: FormEvent) => void;
-  onEdit: (item: Skill) => void;
   onReload: () => void;
-  emptyForm: SkillForm;
-  setEditingId: (id: string) => void;
   loading?: boolean;
 }
 
 export function SkillsSection({
   skills,
-  form,
-  editingId,
-  onChange,
-  onSubmit,
-  onEdit,
   onReload,
-  emptyForm,
-  setEditingId,
   loading,
 }: Props) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState("");
+  const [form, setForm] = useState<SkillForm>(emptySkill);
+  const [saving, setSaving] = useState(false);
+
+  const handleOpenDialog = (isEdit = false) => {
+    if (!isEdit) {
+      setForm(emptySkill);
+      setEditingId("");
+    }
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setForm(emptySkill);
+    setEditingId("");
+  };
+
+  const handleEdit = (item: Skill) => {
+    setForm({ ...emptySkill, ...item });
+    setEditingId(item.id);
+    setDialogOpen(true);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const payload = {
+      ...form,
+      level: Number(form.level || 0),
+      order: Number(form.order || 0),
+    };
+    try {
+      if (editingId) {
+        await api.skills.update(editingId, payload);
+        alertSuccess("Đã cập nhật kỹ năng");
+      } else {
+        await api.skills.create(payload);
+        alertSuccess("Đã tạo kỹ năng");
+      }
+      handleCloseDialog();
+      onReload();
+    } catch {
+      alertError("Có lỗi xảy ra khi lưu kỹ năng");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <WorkspaceSplit
-      form={
-        <form onSubmit={onSubmit} className="space-y-2">
-          <WsField label="Tên kỹ năng">
-            <Input
-              size="lg"
-              value={form.name}
-              onChange={(e) => onChange({ ...form, name: e.target.value })}
-              required
-            />
-          </WsField>
-          <WsField label="Danh mục">
-            <Input
-              size="lg"
-              value={form.category || ""}
-              onChange={(e) => onChange({ ...form, category: e.target.value })}
-            />
-          </WsField>
-          <WsField label="Icon">
-            <Input
-              size="lg"
-              value={form.icon || ""}
-              onChange={(e) => onChange({ ...form, icon: e.target.value })}
-            />
-          </WsField>
-          <WsField label="Mức độ (%)">
-            <Input
-              size="lg"
-              type="number"
-              min={0}
-              max={100}
-              value={form.level || 0}
-              onChange={(e) =>
-                onChange({ ...form, level: Number(e.target.value) })
-              }
-            />
-          </WsField>
-          <WsField label="Thứ tự">
-            <Input
-              size="lg"
-              type="number"
-              value={form.order || 0}
-              onChange={(e) =>
-                onChange({ ...form, order: Number(e.target.value) })
-              }
-            />
-          </WsField>
-          <WsField label="Xuất bản">
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={form.published !== false}
-                onCheckedChange={(checked: boolean) =>
-                  onChange({ ...form, published: checked })
-                }
-              />
-              <Label className="text-sm text-muted-foreground">
-                {form.published !== false ? "Đã xuất bản" : "Bản nháp"}
-              </Label>
-            </div>
-          </WsField>
-          <WsSubmit
-            isEditing={!!editingId}
-            label="kỹ năng"
-            onCancel={
-              editingId
-                ? () => {
-                    onChange(emptyForm);
-                    setEditingId("");
-                  }
-                : undefined
+    <div className="p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Danh sách kỹ năng</h2>
+        <Button onClick={() => handleOpenDialog(false)}>
+          <Plus className="size-4 mr-2" />
+          Tạo mới
+        </Button>
+      </div>
+      <WsTable
+        cols={["Kỹ năng", "Danh mục", "Mức độ"]}
+        loading={loading}
+        rows={skills.map((item) => ({
+          key: item.id,
+          cells: [
+            <p key="name" className="text-sm font-medium">
+              {item.name}
+            </p>,
+            <span key="cat" className="text-xs text-muted-foreground">
+              {item.category || "—"}
+            </span>,
+            <span
+              key="lvl"
+              className="text-xs tabular-nums text-primary font-medium"
+            >
+              {item.level ? `${item.level}%` : "—"}
+            </span>,
+          ],
+          onEdit: () => handleEdit(item),
+          onDelete: async () => {
+            try {
+              await api.skills.remove(item.id);
+              alertSuccess("Đã xóa kỹ năng");
+              onReload();
+            } catch {
+              alertError("Lỗi khi xóa");
             }
-          />
-        </form>
-      }
-      list={
-        <WsTable
-          cols={["Kỹ năng", "Danh mục", "Mức độ"]}
-          loading={loading}
-          rows={skills.map((item) => ({
-            key: item.id,
-            cells: [
-              <p key="name" className="text-sm font-medium">
-                {item.name}
-              </p>,
-              <span key="cat" className="text-xs text-muted-foreground">
-                {item.category || "—"}
-              </span>,
-              <span
-                key="lvl"
-                className="text-xs tabular-nums text-primary font-medium"
-              >
-                {item.level ? `${item.level}%` : "—"}
-              </span>,
-            ],
-            onEdit: () => onEdit(item),
-            onDelete: async () => {
-              try {
-                await api.skills.remove(item.id);
-                alertSuccess("Đã xóa kỹ năng");
-                onReload();
-              } catch {
-                alertError("Lỗi khi xóa");
-              }
-            },
-          }))}
-        />
-      }
-    />
+          },
+        }))}
+      />
+      <SkillEditDialog
+        skill={form}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onChange={setForm}
+        onSave={handleSave}
+        isEditing={!!editingId}
+        loading={saving}
+      />
+    </div>
   );
 }

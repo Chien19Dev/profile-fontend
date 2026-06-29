@@ -1,173 +1,143 @@
-import type { FormEvent } from "react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { api, Testimonial } from "@/lib/api";
 import { alertSuccess, alertError } from "@/lib/alerts";
-import { WorkspaceSplit } from "@/components/admin/workspace-split";
-import { WsField } from "@/components/admin/ws-field";
-import { WsSubmit } from "@/components/admin/ws-submit";
 import { WsTable } from "@/components/admin/ws-table";
-import { Pattern } from "@/components/upload-file";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { TestimonialEditDialog } from "@/components/sections/admin/testimonial-edit-dialog";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 
 type TestimonialForm = Omit<Testimonial, "id" | "createdAt" | "updatedAt">;
 
+const emptyTestimonial: TestimonialForm = {
+  authorName: "",
+  authorTitle: "",
+  content: "",
+  avatar: "",
+  order: 0,
+};
+
 interface Props {
   testimonials: Testimonial[];
-  form: TestimonialForm;
-  editingId: string;
-  onChange: (f: TestimonialForm) => void;
-  onSubmit: (e: FormEvent) => void;
-  onEdit: (item: Testimonial) => void;
   onReload: () => void;
-  emptyForm: TestimonialForm;
-  setEditingId: (id: string) => void;
-  onImageUploadingChange?: (isUploading: boolean) => void;
   loading?: boolean;
 }
 
 export function AdminTestimonialsSection({
   testimonials,
-  form,
-  editingId,
-  onChange,
-  onSubmit,
-  onEdit,
   onReload,
-  emptyForm,
-  setEditingId,
-  onImageUploadingChange,
   loading,
 }: Props) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState("");
+  const [form, setForm] = useState<TestimonialForm>(emptyTestimonial);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const handleOpenDialog = (isEdit = false) => {
+    if (!isEdit) {
+      setForm(emptyTestimonial);
+      setEditingId("");
+    }
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setForm(emptyTestimonial);
+    setEditingId("");
+  };
+
+  const handleEdit = (item: Testimonial) => {
+    setForm({ ...emptyTestimonial, ...item });
+    setEditingId(item.id);
+    setDialogOpen(true);
+  };
+
+  const handleSave = async () => {
+    if (imageUploading) {
+      alertError("Đang tải ảnh lên, vui lòng đợi...");
+      return;
+    }
+
+    setSaving(true);
+    const payload = {
+      ...form,
+      order: Number(form.order || 0),
+    };
+
+    try {
+      if (editingId) {
+        await api.testimonials.update(editingId, payload);
+        alertSuccess("Đã cập nhật đánh giá");
+      } else {
+        await api.testimonials.create(payload);
+        alertSuccess("Đã thêm đánh giá");
+      }
+      handleCloseDialog();
+      onReload();
+    } catch {
+      alertError("Có lỗi xảy ra khi lưu đánh giá");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <WorkspaceSplit
-      form={
-        <form onSubmit={onSubmit} className="space-y-3">
-          <WsField label="Tên người đánh giá">
-            <Input
-              size="lg"
-              value={form.authorName}
-              onChange={(e) =>
-                onChange({ ...form, authorName: e.target.value })
-              }
-              required
-            />
-          </WsField>
-          <WsField label="Chức danh / Công ty">
-            <Input
-              size="lg"
-              value={form.authorTitle}
-              onChange={(e) =>
-                onChange({ ...form, authorTitle: e.target.value })
-              }
-              required
-            />
-          </WsField>
-          <WsField label="Nội dung đánh giá">
-            <Textarea
-              size="lg"
-              value={form.content}
-              onChange={(e) => onChange({ ...form, content: e.target.value })}
-              rows={4}
-              required
-            />
-          </WsField>
-          <WsField label="Ảnh đại diện (URL hoặc upload)">
-            <Input
-              size="lg"
-              value={form.avatar || ""}
-              onChange={(e) => onChange({ ...form, avatar: e.target.value })}
-              placeholder="https://..."
-              className="mb-2"
-            />
-            <Pattern
-              maxSize={2 * 1024 * 1024}
-              accept="image/*"
-              multiple={false}
-              value={form.avatar ? [form.avatar] : []}
-              onUploadComplete={(urls) =>
-                onChange({ ...form, avatar: urls[0] || "" })
-              }
-              onUploadingChange={onImageUploadingChange}
-            />
-          </WsField>
-          <WsField label="Thứ tự hiển thị">
-            <Input
-              size="lg"
-              type="number"
-              value={form.order || 0}
-              onChange={(e) =>
-                onChange({ ...form, order: Number(e.target.value) })
-              }
-            />
-          </WsField>
-          <WsField label="Xuất bản">
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={form.published !== false}
-                onCheckedChange={(checked: boolean) =>
-                  onChange({ ...form, published: checked })
-                }
-              />
-              <Label className="text-sm text-muted-foreground">
-                {form.published !== false ? "Đã xuất bản" : "Bản nháp"}
-              </Label>
-            </div>
-          </WsField>
-          <WsSubmit
-            isEditing={!!editingId}
-            label="đánh giá"
-            onCancel={
-              editingId
-                ? () => {
-                    onChange(emptyForm);
-                    setEditingId("");
-                  }
-                : undefined
+    <div className="p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Danh sách đánh giá</h2>
+        <Button onClick={() => handleOpenDialog(false)}>
+          <Plus className="size-4 mr-2" />
+          Tạo mới
+        </Button>
+      </div>
+      <WsTable
+        cols={["Người đánh giá", "Nội dung", "Thứ tự"]}
+        loading={loading}
+        rows={testimonials.map((item) => ({
+          key: item.id,
+          cells: [
+            <div key="author">
+              <p className="text-sm font-medium">{item.authorName}</p>
+              <p className="text-xs text-muted-foreground">
+                {item.authorTitle}
+              </p>
+            </div>,
+            <p
+              key="content"
+              className="text-xs text-muted-foreground line-clamp-2 max-w-55"
+            >
+              {item.content}
+            </p>,
+            <span
+              key="order"
+              className="text-xs tabular-nums text-primary font-medium"
+            >
+              {item.order ?? 0}
+            </span>,
+          ],
+          onEdit: () => handleEdit(item),
+          onDelete: async () => {
+            try {
+              await api.testimonials.remove(item.id);
+              alertSuccess("Đã xóa đánh giá");
+              onReload();
+            } catch {
+              alertError("Lỗi khi xóa đánh giá");
             }
-          />
-        </form>
-      }
-      list={
-        <WsTable
-          cols={["Người đánh giá", "Nội dung", "Thứ tự"]}
-          loading={loading}
-          rows={testimonials.map((item) => ({
-            key: item.id,
-            cells: [
-              <div key="author">
-                <p className="text-sm font-medium">{item.authorName}</p>
-                <p className="text-xs text-muted-foreground">
-                  {item.authorTitle}
-                </p>
-              </div>,
-              <p
-                key="content"
-                className="text-xs text-muted-foreground line-clamp-2 max-w-55"
-              >
-                {item.content}
-              </p>,
-              <span
-                key="order"
-                className="text-xs tabular-nums text-primary font-medium"
-              >
-                {item.order ?? 0}
-              </span>,
-            ],
-            onEdit: () => onEdit(item),
-            onDelete: async () => {
-              try {
-                await api.testimonials.remove(item.id);
-                alertSuccess("Đã xóa đánh giá");
-                onReload();
-              } catch {
-                alertError("Lỗi khi xóa đánh giá");
-              }
-            },
-          }))}
-        />
-      }
-    />
+          },
+        }))}
+      />
+      <TestimonialEditDialog
+        testimonial={form}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onChange={setForm}
+        onSave={handleSave}
+        isEditing={!!editingId}
+        onImageUploadingChange={setImageUploading}
+        loading={saving}
+      />
+    </div>
   );
 }

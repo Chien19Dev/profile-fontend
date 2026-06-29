@@ -15,6 +15,11 @@ export const usersApi = {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
+  setPassword: (id: string, data: { password: string }) =>
+    request<User>(`/users/${id}/password`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };
 
 export const publicUsersApi = {

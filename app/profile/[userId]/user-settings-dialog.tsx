@@ -34,6 +34,7 @@ interface UserSettingsDialogProps {
   initialName: string | null;
   initialBio: string | null;
   initialImage: string | null;
+  hasPassword: boolean;
   onSaved: () => void;
 }
 
@@ -44,6 +45,7 @@ export function UserSettingsDialog({
   initialName,
   initialBio,
   initialImage,
+  hasPassword,
   onSaved,
 }: UserSettingsDialogProps) {
   const { update } = useSession();
@@ -109,11 +111,15 @@ export function UserSettingsDialog({
       return;
     }
     if (showPassword && newPassword !== confirmPassword) {
-      alertError("Mật khẩu mới không khớp");
+      alertError("Mật khẩu không khớp");
       return;
     }
     if (showPassword && newPassword.length > 0 && newPassword.length < 6) {
-      alertError("Mật khẩu mới phải có ít nhất 6 ký tự");
+      alertError("Mật khẩu phải có ít nhất 6 ký tự");
+      return;
+    }
+    if (showPassword && hasPassword && !currentPassword) {
+      alertError("Mật khẩu hiện tại là bắt buộc");
       return;
     }
 
@@ -124,9 +130,26 @@ export function UserSettingsDialog({
         bio: bio.trim(),
         image,
       };
+
       if (showPassword && newPassword) {
-        payload.currentPassword = currentPassword;
-        payload.newPassword = newPassword;
+        if (hasPassword) {
+          // Change password - requires current password
+          payload.currentPassword = currentPassword;
+          payload.newPassword = newPassword;
+        } else {
+          // Create password - use the new password API endpoint
+          const passwordRes = await fetch(`/api/users/${userId}/password`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: newPassword }),
+          });
+
+          if (!passwordRes.ok) {
+            const err = await passwordRes.json();
+            alertError(err.error || "Tạo mật khẩu thất bại");
+            return;
+          }
+        }
       }
 
       const res = await fetch(`/api/users/${userId}`, {
@@ -141,7 +164,7 @@ export function UserSettingsDialog({
         return;
       }
 
-      alertSuccess("Đã cập nhật hồ sơ");
+      alertSuccess(hasPassword && showPassword && newPassword ? "Đã thay đổi mật khẩu" : "Đã cập nhật hồ sơ");
       await update();
       onSaved();
       if (showPassword && newPassword) {
@@ -221,7 +244,7 @@ export function UserSettingsDialog({
             className="text-xs text-primary font-medium rounded-full"
             onClick={() => setShowPassword((v) => !v)}
           >
-            {showPassword ? "Ẩn đổi mật khẩu" : "Đổi mật khẩu"}
+            {showPassword ? "Ẩn đổi mật khẩu" : (hasPassword ? "Đổi mật khẩu" : "Tạo mật khẩu")}
           </Button>
 
           <AnimatePresence>
@@ -233,30 +256,37 @@ export function UserSettingsDialog({
                 transition={{ duration: 0.2, ease: "easeInOut" }}
                 className="space-y-3 border border-border rounded-lg p-4 overflow-hidden"
               >
+                {!hasPassword && (
+                  <p className="text-xs text-muted-foreground">
+                    Tạo mật khẩu để đồng bộ đăng nhập giữa email và tài khoản Google
+                  </p>
+                )}
+                {hasPassword && (
+                  <Field>
+                    <FieldLabel>Mật khẩu hiện tại</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Nhập mật khẩu hiện tại..."
+                      />
+                      <InputGroupAddon
+                        align="inline-end"
+                        className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                        onClick={() => setShowCurrentPassword((v) => !v)}
+                      >
+                        {showCurrentPassword ? (
+                          <EyeOff className="size-4" />
+                        ) : (
+                          <Eye className="size-4" />
+                        )}
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </Field>
+                )}
                 <Field>
-                  <FieldLabel>Mật khẩu hiện tại</FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      type={showCurrentPassword ? "text" : "password"}
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="Nhập mật khẩu hiện tại..."
-                    />
-                    <InputGroupAddon
-                      align="inline-end"
-                      className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                      onClick={() => setShowCurrentPassword((v) => !v)}
-                    >
-                      {showCurrentPassword ? (
-                        <EyeOff className="size-4" />
-                      ) : (
-                        <Eye className="size-4" />
-                      )}
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Field>
-                <Field>
-                  <FieldLabel>Mật khẩu mới</FieldLabel>
+                  <FieldLabel>{hasPassword ? "Mật khẩu mới" : "Mật khẩu"}</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       type={showNewPassword ? "text" : "password"}
@@ -278,13 +308,13 @@ export function UserSettingsDialog({
                   </InputGroup>
                 </Field>
                 <Field>
-                  <FieldLabel>Xác nhận mật khẩu mới</FieldLabel>
+                  <FieldLabel>{hasPassword ? "Xác nhận mật khẩu mới" : "Xác nhận mật khẩu"}</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Nhập lại mật khẩu mới..."
+                      placeholder="Nhập lại mật khẩu..."
                     />
                     <InputGroupAddon
                       align="inline-end"

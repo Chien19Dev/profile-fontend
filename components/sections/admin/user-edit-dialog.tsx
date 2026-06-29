@@ -14,9 +14,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { alertError } from "@/lib/alerts";
+import { alertError, alertSuccess } from "@/lib/alerts";
+import { usersApi } from "@/lib/api/users";
 import type { User } from "@/lib/api";
-import { Camera, Loader2, Mail } from "lucide-react";
+import { Camera, Loader2, Mail, Lock, Key } from "lucide-react";
 import { useRef, useState } from "react";
 
 export function UserEditDialog({
@@ -38,11 +39,23 @@ export function UserEditDialog({
   const [imageUploading, setImageUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+
+  const hasPassword = user.hasPassword === true;
+
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
       setEditName(user.name || "");
       setEditBio(user.bio || "");
       setEditImage(user.image || "");
+      setShowPasswordSection(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     }
     onOpenChange(nextOpen);
   };
@@ -85,6 +98,32 @@ export function UserEditDialog({
       bio: editBio || undefined,
       image: editImage || undefined,
     });
+  }
+
+  async function handlePasswordSave() {
+    if (newPassword.length < 6) {
+      alertError("Mật khẩu phải có ít nhất 6 ký tự");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alertError("Mật khẩu xác nhận không khớp");
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      await usersApi.setPassword(user.id, { password: newPassword });
+      alertSuccess(hasPassword ? "Đã thay đổi mật khẩu" : "Đã tạo mật khẩu thành công");
+      setShowPasswordSection(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch {
+      alertError("Có lỗi xảy ra khi lưu mật khẩu");
+    } finally {
+      setPasswordLoading(false);
+    }
   }
 
   return (
@@ -148,9 +187,82 @@ export function UserEditDialog({
               rows={3}
             />
           </div>
+
+          {!showPasswordSection ? (
+            <Button
+              variant="outline"
+              type="button"
+              className="w-full"
+              onClick={() => setShowPasswordSection(true)}
+            >
+              <Key className="size-4 mr-2" />
+              {hasPassword ? "Đổi mật khẩu" : "Tạo mật khẩu"}
+            </Button>
+          ) : (
+            <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+              <div className="flex items-center gap-2">
+                <Lock className="size-4" />
+                <Label className="font-medium">
+                  {hasPassword ? "Đổi mật khẩu" : "Tạo mật khẩu mới"}
+                </Label>
+              </div>
+              {!hasPassword && (
+                <p className="text-xs text-muted-foreground">
+                  Tạo mật khẩu để đồng bộ đăng nhập giữa email và tài khoản Google
+                </p>
+              )}
+              <div className="space-y-1.5">
+                <Label>Mật khẩu mới</Label>
+                <Input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Nhập mật khẩu mới..."
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Xác nhận mật khẩu</Label>
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Nhập lại mật khẩu..."
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setShowPasswordSection(false);
+                    setCurrentPassword("");
+                    setNewPassword("");
+                    setConfirmPassword("");
+                  }}
+                  disabled={passwordLoading}
+                >
+                  Huỷ
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={handlePasswordSave}
+                  disabled={passwordLoading || !newPassword || !confirmPassword}
+                >
+                  {passwordLoading ? (
+                    <>
+                      <Loader2 className="size-4 mr-2 animate-spin" />
+                      Đang lưu...
+                    </>
+                  ) : (
+                    "Lưu mật khẩu"
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogPanel>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Huỷ
           </Button>
           <Button onClick={handleSave} disabled={loading}>

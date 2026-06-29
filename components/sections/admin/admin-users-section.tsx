@@ -4,6 +4,7 @@ import { User } from "@/lib/api";
 import { Shield, ShieldCheck, Users2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserCard } from "./user-card";
+import { Fragment } from "react";
 
 export function UsersSection({
   users,
@@ -21,13 +22,13 @@ export function UsersSection({
     <div className="flex-1 overflow-y-auto scrollbar-hide p-6 space-y-6">
       <div className="flex items-center gap-3 flex-wrap">
         {loading ? (
-          <>
+          <Fragment>
             <Skeleton className="h-8 w-20" />
             <Skeleton className="h-8 w-20" />
             <Skeleton className="h-8 w-20" />
-          </>
+          </Fragment>
         ) : (
-          <>
+          <Fragment>
             <StatPill
               icon={<Users2 className="h-3.5 w-3.5" />}
               value={users.length}
@@ -51,14 +52,17 @@ export function UsersSection({
               border="border-white/[0.06]"
               text="text-foreground/70"
             />
-          </>
+          </Fragment>
         )}
       </div>
 
       {loading ? (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="p-4 border border-border rounded-lg space-y-3">
+            <div
+              key={i}
+              className="p-4 border border-border rounded-lg space-y-3"
+            >
               <div className="flex items-center gap-3">
                 <Skeleton className="h-10 w-10 rounded-full" />
                 <div className="flex-1 space-y-2">

@@ -183,6 +183,7 @@ export type User = {
   image?: string | null;
   bio?: string | null;
   role: string;
+  hasPassword?: boolean;
   createdAt?: string;
   _count?: {
     comments?: number;

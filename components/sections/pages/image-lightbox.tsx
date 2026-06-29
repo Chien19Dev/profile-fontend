@@ -1,10 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogPopup,
-} from "@/components/ui/dialog";
+import { Dialog, DialogPopup } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { Fragment, useEffect } from "react";
@@ -50,12 +47,12 @@ export function ImageLightbox({
       }}
     >
       <DialogPopup
-        className="max-w-4xl border-0 bg-transparent p-2 shadow-none sm:max-w-4xl"
+        className="max-w-4xl border-0 bg-transparent p-2 shadow-none sm:max-w-4xl md:max-w-6xl lg:max-w-7xl"
         bottomStickOnMobile={false}
       >
         {openIndex !== null && images[openIndex] && (
           <div className="relative mx-auto w-full">
-            <div className="relative aspect-square w-full max-h-[min(75vh,680px)]">
+            <div className="relative aspect-square w-full h-auto lg:max-h-[min(75vh,800px)]">
               <Image
                 src={images[openIndex]}
                 alt={`${title} - ảnh ${openIndex + 1}`}
@@ -72,7 +69,9 @@ export function ImageLightbox({
                     className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-black/50 text-white hover:bg-black/70"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onNavigate((openIndex - 1 + images.length) % images.length);
+                      onNavigate(
+                        (openIndex - 1 + images.length) % images.length,
+                      );
                     }}
                     aria-label="Ảnh trước"
                   >

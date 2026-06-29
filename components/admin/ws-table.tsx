@@ -18,7 +18,15 @@ export interface WsRow {
   onDelete: () => void;
 }
 
-export function WsTable({ cols, rows, loading }: { cols: string[]; rows: WsRow[]; loading?: boolean }) {
+export function WsTable({
+  cols,
+  rows,
+  loading,
+}: {
+  cols: string[];
+  rows: WsRow[];
+  loading?: boolean;
+}) {
   return (
     <Table>
       <TableHeader>
@@ -31,7 +39,9 @@ export function WsTable({ cols, rows, loading }: { cols: string[]; rows: WsRow[]
               {col}
             </TableHead>
           ))}
-          <TableHead className="w-16" />
+          <TableHead className="w-24 px-3 py-2.5 text-right text-[0.6rem] tracking-widest uppercase text-muted-foreground font-normal">
+            Thao tác
+          </TableHead>
         </TableRow>
       </TableHeader>
 

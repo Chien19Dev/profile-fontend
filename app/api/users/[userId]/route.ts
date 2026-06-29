@@ -20,6 +20,7 @@ export async function GET(
         image: true,
         role: true,
         createdAt: true,
+        password: true,
         _count: {
           select: {
             comments: true,
@@ -36,7 +37,14 @@ export async function GET(
       return NextResponse.json({ error: "Người dùng không tồn tại" }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    // Add hasPassword field and remove password from response
+    const userWithHasPassword = {
+      ...user,
+      hasPassword: !!user.password,
+      password: undefined,
+    };
+
+    return NextResponse.json(userWithHasPassword);
   } catch (error) {
     console.error("Lỗi khi lấy thông tin người dùng:", error);
     return NextResponse.json(

@@ -12,9 +12,8 @@ import { ProjectsSection } from "@/components/sections/admin/admin-projects-sect
 import { SkillsSection } from "@/components/sections/admin/admin-skills-section";
 import { AdminTestimonialsSection } from "@/components/sections/admin/admin-testimonials-section";
 import { UsersSection } from "@/components/sections/admin/admin-users-section";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { alertError, alertSuccess } from "@/lib/alerts";
+import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined";
 import {
   api,
   ContactMessage,
@@ -26,55 +25,9 @@ import {
 } from "@/lib/api";
 import { Section } from "@/types/types";
 import { RefreshCw } from "lucide-react";
-import { FormEvent, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
-type ProfileForm = Omit<Profile, "id" | "createdAt" | "updatedAt">;
-type ProjectForm = Omit<Project, "id" | "createdAt" | "updatedAt"> & {
-  technologiesText: string;
-  images: string[];
-};
-type SkillForm = Omit<Skill, "id" | "createdAt" | "updatedAt">;
-type TestimonialForm = Omit<Testimonial, "id" | "createdAt" | "updatedAt">;
-
-const emptyProfile: ProfileForm = {
-  fullName: "",
-  title: "",
-  bio: "",
-  avatar: "",
-  email: "",
-  phone: "",
-  location: "",
-  githubUrl: "",
-  linkedinUrl: "",
-  twitterUrl: "",
-  instagramUrl: "",
-  facebookUrl: "",
-  websiteUrl: "",
-};
-const emptyProject: ProjectForm = {
-  title: "",
-  description: "",
-  images: [],
-  githubUrl: "",
-  demoUrl: "",
-  technologies: [],
-  technologiesText: "",
-};
-const emptySkill: SkillForm = {
-  name: "",
-  category: "",
-  icon: "",
-  level: 0,
-  order: 0,
-};
-const emptyTestimonial: TestimonialForm = {
-  authorName: "",
-  authorTitle: "",
-  content: "",
-  avatar: "",
-  order: 0,
-};
+import Button from "@mui/material/Button";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -96,18 +49,6 @@ export default function AdminPage() {
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [postCount, setPostCount] = useState(0);
-
-  const [profile, setProfile] = useState<ProfileForm>(emptyProfile);
-  const [project, setProject] = useState<ProjectForm>(emptyProject);
-  const [skill, setSkill] = useState<SkillForm>(emptySkill);
-  const [testimonial, setTestimonial] =
-    useState<TestimonialForm>(emptyTestimonial);
-  const [imageUploading, setImageUploading] = useState(false);
-
-  const [editingProfileId, setEditingProfileId] = useState("");
-  const [editingProjectId, setEditingProjectId] = useState("");
-  const [editingSkillId, setEditingSkillId] = useState("");
-  const [editingTestimonialId, setEditingTestimonialId] = useState("");
 
   async function loadProfiles() {
     setProfilesLoading(true);
@@ -180,8 +121,7 @@ export default function AdminPage() {
     try {
       const data = await api.posts.count();
       setPostCount(data.count);
-    } catch {
-    }
+    } catch {}
   }
 
   const handleRefresh = () => {
@@ -293,110 +233,7 @@ export default function AdminPage() {
     }
   }, [searchParams]);
 
-  async function saveProfile(e: FormEvent) {
-    e.preventDefault();
-    try {
-      if (editingProfileId) {
-        await api.profiles.update(editingProfileId, profile);
-        alertSuccess("Đã cập nhật hồ sơ");
-      } else {
-        await api.profiles.create(profile);
-        alertSuccess("Đã tạo hồ sơ");
-      }
-      setProfile(emptyProfile);
-      setEditingProfileId("");
-      await loadProfiles();
-    } catch {
-      alertError("Có lỗi xảy ra khi lưu hồ sơ");
-    }
-  }
-
-  async function saveProject(e: FormEvent) {
-    e.preventDefault();
-
-    if (imageUploading) {
-      alertError("Đang tải ảnh lên, vui lòng đợi...");
-      return;
-    }
-
-    const payload = {
-      ...project,
-      technologies: project.technologiesText
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
-    };
-    delete (payload as Partial<ProjectForm>).technologiesText;
-    try {
-      if (editingProjectId) {
-        await api.projects.update(editingProjectId, payload);
-        alertSuccess("Đã cập nhật dự án");
-      } else {
-        await api.projects.create(payload);
-        alertSuccess("Đã tạo dự án");
-      }
-      setProject(emptyProject);
-      setEditingProjectId("");
-      await loadProjects();
-    } catch {
-      alertError("Có lỗi xảy ra khi lưu dự án");
-    }
-  }
-
-  async function saveSkill(e: FormEvent) {
-    e.preventDefault();
-    const payload = {
-      ...skill,
-      level: Number(skill.level || 0),
-      order: Number(skill.order || 0),
-    };
-    try {
-      if (editingSkillId) {
-        await api.skills.update(editingSkillId, payload);
-        alertSuccess("Đã cập nhật kỹ năng");
-      } else {
-        await api.skills.create(payload);
-        alertSuccess("Đã tạo kỹ năng");
-      }
-      setSkill(emptySkill);
-      setEditingSkillId("");
-      await loadSkills();
-    } catch {
-      alertError("Có lỗi xảy ra khi lưu kỹ năng");
-    }
-  }
-
-  async function saveTestimonial(e: FormEvent) {
-    e.preventDefault();
-
-    if (imageUploading) {
-      alertError("Đang tải ảnh lên, vui lòng đợi...");
-      return;
-    }
-
-    const payload = {
-      ...testimonial,
-      order: Number(testimonial.order || 0),
-    };
-
-    try {
-      if (editingTestimonialId) {
-        await api.testimonials.update(editingTestimonialId, payload);
-        alertSuccess("Đã cập nhật đánh giá");
-      } else {
-        await api.testimonials.create(payload);
-        alertSuccess("Đã thêm đánh giá");
-      }
-      setTestimonial(emptyTestimonial);
-      setEditingTestimonialId("");
-      await loadTestimonials();
-    } catch {
-      alertError("Có lỗi xảy ra khi lưu đánh giá");
-    }
-  }
-
   const newUnread = contacts.filter((c) => !c.isRead).length;
-
 
   return (
     <div className="deco-page relative min-h-screen">
@@ -410,12 +247,10 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center gap-2 flex-cols">
             <Button
-              variant="default"
-              size="default"
+              variant="contained"
               onClick={handleRefresh}
-              className="rounded-sm"
+              startIcon={<CachedOutlinedIcon fontSize="small" />}
             >
-              <RefreshCw className="size-3.5" />
               Làm mới
             </Button>
             <NotificationBell />
@@ -448,75 +283,28 @@ export default function AdminPage() {
             {section === "profiles" && (
               <ProfilesSection
                 profiles={profiles}
-                form={profile}
-                editingId={editingProfileId}
-                onChange={setProfile}
-                onSubmit={saveProfile}
-                onEdit={(item) => {
-                  setEditingProfileId(item.id);
-                  setProfile({ ...emptyProfile, ...item });
-                }}
                 onReload={loadProfiles}
-                emptyForm={emptyProfile}
-                setEditingId={setEditingProfileId}
                 loading={profilesLoading}
               />
             )}
             {section === "projects" && (
               <ProjectsSection
                 projects={projects}
-                form={project}
-                editingId={editingProjectId}
-                onChange={setProject}
-                onSubmit={saveProject}
-                onEdit={(item) => {
-                  setEditingProjectId(item.id);
-                  setProject({
-                    ...emptyProject,
-                    ...item,
-                    images: (item as any).images || [],
-                    technologiesText: (item.technologies || []).join(", "),
-                  } as ProjectForm);
-                }}
                 onReload={loadProjects}
-                emptyForm={emptyProject}
-                setEditingId={setEditingProjectId}
-                onImageUploadingChange={setImageUploading}
                 loading={projectsLoading}
               />
             )}
             {section === "skills" && (
               <SkillsSection
                 skills={skills}
-                form={skill}
-                editingId={editingSkillId}
-                onChange={setSkill}
-                onSubmit={saveSkill}
-                onEdit={(item) => {
-                  setEditingSkillId(item.id);
-                  setSkill({ ...emptySkill, ...item });
-                }}
                 onReload={loadSkills}
-                emptyForm={emptySkill}
-                setEditingId={setEditingSkillId}
                 loading={skillsLoading}
               />
             )}
             {section === "testimonials" && (
               <AdminTestimonialsSection
                 testimonials={testimonials}
-                form={testimonial}
-                editingId={editingTestimonialId}
-                onChange={setTestimonial}
-                onSubmit={saveTestimonial}
-                onEdit={(item) => {
-                  setEditingTestimonialId(item.id);
-                  setTestimonial({ ...emptyTestimonial, ...item });
-                }}
                 onReload={loadTestimonials}
-                emptyForm={emptyTestimonial}
-                setEditingId={setEditingTestimonialId}
-                onImageUploadingChange={setImageUploading}
                 loading={testimonialsLoading}
               />
             )}
@@ -527,7 +315,11 @@ export default function AdminPage() {
             {section === "navigation" && <NavigationSection />}
             {section === "analytics" && <AnalyticsDashboard />}
             {section === "users" && (
-              <UsersSection users={users} onReload={loadUsers} loading={usersLoading} />
+              <UsersSection
+                users={users}
+                onReload={loadUsers}
+                loading={usersLoading}
+              />
             )}
           </div>
         </div>

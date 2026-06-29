@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, Fragment, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
+import { ForgotPasswordDialog } from "@/components/auth/forgot-password-dialog";
 
 interface LoginFormProps {
   googleEnabled: boolean;
@@ -21,6 +22,8 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [email, setEmail] = useState("");
 
   const authError = searchParams.get("error");
 
@@ -42,6 +45,7 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
     setError("");
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
+    setEmail(email);
     const password = formData.get("password") as string;
 
     try {
@@ -161,6 +165,15 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
               </div>
             </div>
             <PasswordInput id="password" name="password" required />
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setForgotPasswordOpen(true)}
+                className="text-sm text-primary hover:underline"
+              >
+                Quên mật khẩu?
+              </button>
+            </div>
             {(error || initialError) && (
               <div className="text-sm text-destructive">
                 {error || initialError}
@@ -200,6 +213,11 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
           </div>
         </div>
       </div>
+      <ForgotPasswordDialog
+        open={forgotPasswordOpen}
+        onOpenChange={setForgotPasswordOpen}
+        email={email}
+      />
     </div>
   );
 }

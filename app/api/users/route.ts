@@ -19,6 +19,7 @@ export async function GET() {
         bio: true,
         role: true,
         createdAt: true,
+        password: true,
         _count: {
           select: {
             comments: true,
@@ -31,7 +32,14 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(users);
+    // Add hasPassword field to each user
+    const usersWithHasPassword = users.map((user) => ({
+      ...user,
+      hasPassword: !!user.password,
+      password: undefined, // Remove password from response
+    }));
+
+    return NextResponse.json(usersWithHasPassword);
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(

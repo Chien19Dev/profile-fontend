@@ -10,6 +10,7 @@ import { SessionProvider } from "next-auth/react";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import MuiProvider from "@/lib/mui/provider";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -137,7 +138,9 @@ export default async function RootLayout({
               navItems={navItems}
               isAdmin={isAdmin}
             />
+            <MuiProvider>
             {children}
+            </MuiProvider>
             <Analytics />
           </ThemeProvider>
         </SessionProvider>

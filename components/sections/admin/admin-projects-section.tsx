@@ -1,180 +1,160 @@
-import type { FormEvent } from "react";
 import { Fragment, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { api, Project } from "@/lib/api";
 import { alertSuccess, alertError } from "@/lib/alerts";
-import { WorkspaceSplit } from "@/components/admin/workspace-split";
-import { WsField } from "@/components/admin/ws-field";
-import { WsSubmit } from "@/components/admin/ws-submit";
 import { WsTable } from "@/components/admin/ws-table";
-import { Pattern } from "@/components/upload-file";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { ProjectEditDialog } from "@/components/sections/admin/project-edit-dialog";
 import { ProjectDetailDialog } from "@/components/sections/pages/project-detail-dialog";
+import { Plus } from "lucide-react";
 
 type ProjectForm = Omit<Project, "id" | "createdAt" | "updatedAt"> & {
   technologiesText: string;
   images: string[];
 };
 
+const emptyProject: ProjectForm = {
+  title: "",
+  description: "",
+  images: [],
+  githubUrl: "",
+  demoUrl: "",
+  technologies: [],
+  technologiesText: "",
+};
+
 interface Props {
   projects: Project[];
-  form: ProjectForm;
-  editingId: string;
-  onChange: (f: ProjectForm) => void;
-  onSubmit: (e: FormEvent) => void;
-  onEdit: (item: Project) => void;
   onReload: () => void;
-  emptyForm: ProjectForm;
-  setEditingId: (id: string) => void;
-  onImageUploadingChange?: (isUploading: boolean) => void;
   loading?: boolean;
 }
 
 export function ProjectsSection({
   projects,
-  form,
-  editingId,
-  onChange,
-  onSubmit,
-  onEdit,
   onReload,
-  emptyForm,
-  setEditingId,
-  onImageUploadingChange,
   loading,
 }: Props) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState("");
+  const [form, setForm] = useState<ProjectForm>(emptyProject);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [detailProject, setDetailProject] = useState<Project | null>(null);
+
+  const handleOpenDialog = (isEdit = false) => {
+    if (!isEdit) {
+      setForm(emptyProject);
+      setEditingId("");
+    }
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setForm(emptyProject);
+    setEditingId("");
+  };
+
+  const handleEdit = (item: Project) => {
+    setForm({
+      ...emptyProject,
+      ...item,
+      images: (item as any).images || [],
+      technologiesText: (item.technologies || []).join(", "),
+    } as ProjectForm);
+    setEditingId(item.id);
+    setDialogOpen(true);
+  };
+
+  const handleSave = async () => {
+    if (imageUploading) {
+      alertError("Đang tải ảnh lên, vui lòng đợi...");
+      return;
+    }
+
+    setSaving(true);
+    const payload = {
+      ...form,
+      technologies: form.technologiesText
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
+    };
+    delete (payload as Partial<ProjectForm>).technologiesText;
+
+    try {
+      if (editingId) {
+        await api.projects.update(editingId, payload);
+        alertSuccess("Đã cập nhật dự án");
+      } else {
+        await api.projects.create(payload);
+        alertSuccess("Đã tạo dự án");
+      }
+      handleCloseDialog();
+      onReload();
+    } catch {
+      alertError("Có lỗi xảy ra khi lưu dự án");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Fragment>
-      <WorkspaceSplit
-        form={
-          <form onSubmit={onSubmit} className="space-y-2">
-            <WsField label="Tên dự án">
-              <Input
-                size="lg"
-                value={form.title}
-                onChange={(e) => onChange({ ...form, title: e.target.value })}
-                required
-              />
-            </WsField>
-            <WsField label="Mô tả">
-              <Textarea
-                size="lg"
-                value={form.description}
-                onChange={(e) =>
-                  onChange({ ...form, description: e.target.value })
-                }
-                required
-                rows={3}
-              />
-            </WsField>
-            <WsField label="Ảnh dự án">
-              <Pattern
-                maxSize={5 * 1024 * 1024}
-                accept="image/*"
-                multiple={true}
-                value={form.images}
-                onUploadComplete={(urls) => onChange({ ...form, images: urls })}
-                onUploadingChange={onImageUploadingChange}
-              />
-            </WsField>
-            <WsField label="Công nghệ (phân cách bằng dấu phẩy)">
-              <Input
-                size="lg"
-                value={form.technologiesText}
-                onChange={(e) =>
-                  onChange({ ...form, technologiesText: e.target.value })
-                }
-              />
-            </WsField>
-            <WsField label="GitHub URL (tùy chọn)">
-              <Input
-                size="lg"
-                value={form.githubUrl || ""}
-                onChange={(e) =>
-                  onChange({ ...form, githubUrl: e.target.value })
-                }
-                placeholder="https://github.com/username/repo"
-              />
-            </WsField>
-            <WsField label="Demo URL (tùy chọn)">
-              <Input
-                size="lg"
-                value={form.demoUrl || ""}
-                onChange={(e) => onChange({ ...form, demoUrl: e.target.value })}
-                placeholder="https://your-project-demo.com"
-              />
-            </WsField>
-            <WsField label="Xuất bản">
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={form.published !== false}
-                  onCheckedChange={(checked: boolean) =>
-                    onChange({ ...form, published: checked })
-                  }
-                />
-                <Label className="text-sm text-muted-foreground">
-                  {form.published !== false ? "Đã xuất bản" : "Bản nháp"}
-                </Label>
-              </div>
-            </WsField>
-            <WsSubmit
-              isEditing={!!editingId}
-              label="dự án"
-              onCancel={
-                editingId
-                  ? () => {
-                      onChange(emptyForm);
-                      setEditingId("");
-                    }
-                  : undefined
+      <div className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Danh sách dự án</h2>
+          <Button onClick={() => handleOpenDialog(false)}>
+            <Plus className="size-4 mr-2" />
+            Tạo mới
+          </Button>
+        </div>
+        <WsTable
+          cols={["Dự án", "Công nghệ"]}
+          loading={loading}
+          rows={projects.map((item) => ({
+            key: item.id,
+            cells: [
+              <p key="title" className="text-sm font-medium truncate">
+                {item.title}
+              </p>,
+              <div key="tags" className="flex flex-wrap gap-1">
+                {(item.technologies || []).slice(0, 3).map((t) => (
+                  <Badge key={t} variant="outline" size="sm">
+                    {t}
+                  </Badge>
+                ))}
+                {(item.technologies || []).length > 3 && (
+                  <span className="text-xs text-muted-foreground">
+                    +{(item.technologies || []).length - 3}
+                  </span>
+                )}
+              </div>,
+            ],
+            onView: () => setDetailProject(item),
+            onEdit: () => handleEdit(item),
+            onDelete: async () => {
+              try {
+                await api.projects.remove(item.id);
+                alertSuccess("Đã xóa dự án");
+                onReload();
+              } catch {
+                alertError("Lỗi khi xóa");
               }
-            />
-          </form>
-        }
-        list={
-          <WsTable
-            cols={["Dự án", "Công nghệ"]}
-            loading={loading}
-            rows={projects.map((item) => ({
-              key: item.id,
-              cells: [
-                <p key="title" className="text-sm font-medium truncate">
-                  {item.title}
-                </p>,
-                <div key="tags" className="flex flex-wrap gap-1">
-                  {(item.technologies || []).slice(0, 3).map((t) => (
-                    <Badge key={t} variant="outline" size="sm">
-                      {t}
-                    </Badge>
-                  ))}
-                  {(item.technologies || []).length > 3 && (
-                    <span className="text-xs text-muted-foreground">
-                      +{(item.technologies || []).length - 3}
-                    </span>
-                  )}
-                </div>,
-              ],
-              onView: () => setDetailProject(item),
-              onEdit: () => onEdit(item),
-              onDelete: async () => {
-                try {
-                  await api.projects.remove(item.id);
-                  alertSuccess("Đã xóa dự án");
-                  onReload();
-                } catch {
-                  alertError("Lỗi khi xóa");
-                }
-              },
-            }))}
-          />
-        }
-      />
-
+            },
+          }))}
+        />
+        <ProjectEditDialog
+          project={form}
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          onChange={setForm}
+          onSave={handleSave}
+          isEditing={!!editingId}
+          onImageUploadingChange={setImageUploading}
+          loading={saving}
+        />
+      </div>
       <ProjectDetailDialog
         project={detailProject}
         open={detailProject !== null}

@@ -1,9 +1,15 @@
 "use client";
 
 import { Globe, Mail, MapPin, Phone } from "lucide-react";
-import { FaFacebook, FaGithub, FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
+import {
+  FaFacebook,
+  FaGithub,
+  FaInstagram,
+  FaLinkedinIn,
+  FaXTwitter,
+} from "react-icons/fa6";
 import { Profile } from "@/lib/api";
-import {Fragment} from "react";
+import { Fragment, useEffect, useState } from "react";
 import { DecoFrame } from "@/components/sections/deco-frame";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -17,6 +23,81 @@ interface ProfileCardProps {
   profile: Profile | null;
   initials: string;
   loading: boolean;
+}
+
+function useTypewriter(text: string, speed = 60, startDelay = 0, cycle = 0) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    setDisplayed("");
+    setDone(false);
+    let i = 0;
+    const delay = setTimeout(() => {
+      const interval = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) {
+          clearInterval(interval);
+          setDone(true);
+        }
+      }, speed);
+      return () => clearInterval(interval);
+    }, startDelay);
+    return () => clearTimeout(delay);
+  }, [text, speed, startDelay, cycle]);
+
+  return { displayed, done };
+}
+
+const Cursor = ({ color = "bg-foreground" }: { color?: string }) => (
+  <span
+    className={`inline-block w-0.5 h-[1em] ${color} ml-0.5 align-text-bottom animate-[blink_1s_step-start_infinite]`}
+  />
+);
+
+function ProfileTypewriter({ name, title }: { name: string; title: string }) {
+  const [cycle, setCycle] = useState(0);
+  const [titleDelay, setTitleDelay] = useState(99999);
+
+  const { displayed: nameText, done: nameDone } = useTypewriter(
+    name,
+    60,
+    0,
+    cycle,
+  );
+  const { displayed: titleText, done: titleDone } = useTypewriter(
+    title,
+    55,
+    titleDelay,
+    cycle,
+  );
+
+  useEffect(() => {
+    if (nameDone) setTitleDelay(300);
+  }, [nameDone]);
+
+  useEffect(() => {
+    if (!titleDone) return;
+    const t = setTimeout(() => {
+      setTitleDelay(99999);
+      setCycle((c) => c + 1);
+    }, 5000);
+    return () => clearTimeout(t);
+  }, [titleDone]);
+
+  return (
+    <div>
+      <Label className="deco-title text-3xl md:text-4xl text-foreground">
+        {nameText}
+        {!nameDone && <Cursor color="bg-foreground" />}
+      </Label>
+      <p className="mt-3 text-lg text-primary font-medium tracking-wide min-h-7">
+        {titleText}
+        {nameDone && !titleDone && <Cursor color="bg-primary" />}
+      </p>
+    </div>
+  );
 }
 
 export function ProfileCard({ profile, initials, loading }: ProfileCardProps) {
@@ -35,13 +116,11 @@ export function ProfileCard({ profile, initials, loading }: ProfileCardProps) {
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="deco-eyebrow mb-2">Giới thiệu</p>
-            <Label className="deco-title text-3xl md:text-4xl text-foreground">
-              {profile?.fullName || "Hồ sơ của bạn"}
-            </Label>
-            <p className="mt-3 text-lg text-primary font-medium tracking-wide">
-              {profile?.title || "Fullstack Developer"}
-            </p>
+            {/* <p className="deco-eyebrow mb-2">Giới thiệu</p> */}
+            <ProfileTypewriter
+              name={profile?.fullName || "Hồ sơ của bạn"}
+              title={profile?.title || "Fullstack Developer"}
+            />
           </div>
           <Separator className="bg-primary/30" />
           <p className="text-muted-foreground leading-relaxed">

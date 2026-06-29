@@ -218,14 +218,16 @@ export function UserCard({
             </SelectContent>
           </Select>
           {isAdmin && (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               type="button"
               onClick={() => setEditOpen(true)}
-              className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-muted-foreground/40 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200 cursor-pointer"
+              className="text-muted-foreground/40 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200"
               title="Chỉnh sửa"
             >
               <Pencil className="h-3.5 w-3.5" />
-            </button>
+            </Button>
           )}
         </div>
         {!isAdmin && (

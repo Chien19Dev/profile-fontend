@@ -73,9 +73,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const dbUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
-        if (!dbUser) return false;
-        user.id = dbUser.id;
-        (user as any).role = dbUser.role;
+
+        if (!dbUser) {
+          await prisma.user.create({
+            data: {
+              email: user.email,
+              name: user.name || null,
+              image: user.image || null,
+              password: "",
+              role: "USER",
+            },
+          });
+        } else {
+          user.id = dbUser.id;
+          (user as any).role = dbUser.role;
+          if (dbUser.name) {
+            user.name = dbUser.name;
+          }
+          if (dbUser.image) {
+            user.image = dbUser.image;
+          }
+        }
       }
       return true;
     },
@@ -93,8 +111,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.sub = user.id ?? token.sub;
         token.email = user.email;
-        token.name = user.name;
-        token.picture = user.image;
+        token.name = user.name ?? token.name;
+        token.picture = user.image ?? token.picture;
         token.role = (user as any).role || "USER";
       }
       return token;

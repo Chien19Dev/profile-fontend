@@ -36,6 +36,7 @@ export default function UserProfilePage() {
     bio: string | null;
     image: string | null;
     createdAt: string;
+    hasPassword?: boolean;
     _count?: {
       comments: number;
       likes: number;
@@ -389,6 +390,7 @@ export default function UserProfilePage() {
         initialName={user.name}
         initialBio={user.bio}
         initialImage={user.image}
+        hasPassword={user.hasPassword ?? false}
         onSaved={() => loadUser()}
       />
     </div>

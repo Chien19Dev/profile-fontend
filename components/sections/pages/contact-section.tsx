@@ -3,13 +3,14 @@
 import { FormEvent, useState } from "react";
 import { Loader2, Send } from "lucide-react";
 import { api } from "@/lib/api";
+import SendIcon from "@mui/icons-material/Send";
 import { DecoFrame } from "@/components/sections/deco-frame";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { SectionHeading } from "../admin/admin-section-heading";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import { alertSuccess } from "@/lib/alerts";
 
 const emptyForm = { name: "", email: "", subject: "", message: "" };
 
@@ -32,7 +33,7 @@ export function ContactSection() {
     if (honeypot) {
       setTimeout(() => {
         setForm(emptyForm);
-        setNotice("Tin nhắn đã được gửi thành công.");
+        alertSuccess("Tin nhắn đã được gửi thành công.");
         setSending(false);
       }, 1000);
       return;
@@ -41,7 +42,7 @@ export function ContactSection() {
     try {
       await api.contacts.create(form);
       setForm(emptyForm);
-      setNotice("Tin nhắn đã được gửi thành công.");
+      alertSuccess("Tin nhắn đã được gửi thành công.");
     } finally {
       setSending(false);
     }
@@ -65,66 +66,67 @@ export function ContactSection() {
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="contact-name">Họ tên</Label>
-            <Input
-              id="contact-name"
-              size="lg"
+            <TextField
+              label="Họ và tên"
+              variant="outlined"
               value={form.name}
               onChange={field("name")}
               required
-              placeholder="Nguyễn Văn A"
+              fullWidth
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="contact-email">Email</Label>
-            <Input
-              id="contact-email"
-              size="lg"
+            <TextField
+              label="Email"
+              variant="outlined"
               type="email"
               value={form.email}
               onChange={field("email")}
               required
-              placeholder="email@example.com"
+              fullWidth
             />
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="contact-subject">Tiêu đề</Label>
-            <Input
-              id="contact-subject"
-              size="lg"
+            <TextField
+              label="Tiêu đề"
+              variant="outlined"
               value={form.subject}
               onChange={field("subject")}
-              placeholder="Chủ đề tin nhắn"
+              fullWidth
             />
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="contact-message">Nội dung</Label>
-            <Textarea
-              id="contact-message"
-              size="lg"
+            <TextField
+              label="Nội dung tin nhắn"
+              variant="outlined"
               value={form.message}
               onChange={field("message")}
               required
+              fullWidth
+              multiline
               rows={4}
-              placeholder="Nội dung tin nhắn..."
             />
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          <Button type="submit" disabled={sending}>
-            {sending ? <Loader2 className="animate-spin" /> : <Send />}
-            Gửi tin nhắn
+          <Button
+            variant="contained"
+            type="submit"
+            disabled={sending}
+            startIcon={
+              sending ? (
+                <Loader2 className="animate-spin" size={16} />
+              ) : (
+                <SendIcon fontSize="small" />
+              )
+            }
+          >
+            {sending ? "Đang gửi..." : "Gửi tin nhắn"}
           </Button>
-
-          {notice && (
-            <Alert variant="success" className="flex-1 min-w-50">
-              <AlertDescription>{notice}</AlertDescription>
-            </Alert>
-          )}
         </div>
       </form>
     </DecoFrame>

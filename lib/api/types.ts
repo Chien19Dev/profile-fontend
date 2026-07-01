@@ -218,3 +218,14 @@ export type AnalyticsData = {
   devices: { device: string; count: number }[];
   browsers: { browser: string; count: number }[];
 };
+
+export type Service = {
+  id: string;
+  imageUrl: string;
+  title: string;
+  description: string;
+  order?: number;
+  published?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};

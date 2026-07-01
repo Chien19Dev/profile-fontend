@@ -10,6 +10,7 @@ import { ContactsSection } from "@/components/sections/admin/admin-contacts-sect
 import { ProfilesSection } from "@/components/sections/admin/admin-profiles-section";
 import { ProjectsSection } from "@/components/sections/admin/admin-projects-section";
 import { SkillsSection } from "@/components/sections/admin/admin-skills-section";
+import { AdminServicesSection } from "@/components/sections/admin/admin-services-section";
 import { AdminTestimonialsSection } from "@/components/sections/admin/admin-testimonials-section";
 import { UsersSection } from "@/components/sections/admin/admin-users-section";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,7 @@ import {
   Profile,
   Project,
   Skill,
+  Service,
   Testimonial,
   User,
 } from "@/lib/api";
@@ -39,12 +41,14 @@ export default function AdminPage() {
   const [profilesLoading, setProfilesLoading] = useState(false);
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [skillsLoading, setSkillsLoading] = useState(false);
+  const [servicesLoading, setServicesLoading] = useState(false);
   const [testimonialsLoading, setTestimonialsLoading] = useState(false);
   const [contactsLoading, setContactsLoading] = useState(false);
   const [usersLoading, setUsersLoading] = useState(false);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -81,6 +85,17 @@ export default function AdminPage() {
     } catch {
     } finally {
       setSkillsLoading(false);
+    }
+  }
+
+  async function loadServices() {
+    setServicesLoading(true);
+    try {
+      const data = await api.services.list();
+      setServices(data);
+    } catch {
+    } finally {
+      setServicesLoading(false);
     }
   }
 
@@ -135,6 +150,9 @@ export default function AdminPage() {
       case "skills":
         loadSkills();
         break;
+      case "services":
+        loadServices();
+        break;
       case "testimonials":
         loadTestimonials();
         break;
@@ -161,6 +179,9 @@ export default function AdminPage() {
         break;
       case "skills":
         if (skills.length === 0) loadSkills();
+        break;
+      case "services":
+        if (services.length === 0) loadServices();
         break;
       case "testimonials":
         if (testimonials.length === 0) loadTestimonials();
@@ -194,6 +215,9 @@ export default function AdminPage() {
         case "skills":
           if (skills.length === 0) loadSkills();
           break;
+        case "services":
+          if (services.length === 0) loadServices();
+          break;
         case "testimonials":
           if (testimonials.length === 0) loadTestimonials();
           break;
@@ -216,6 +240,9 @@ export default function AdminPage() {
           break;
         case "skills":
           if (skills.length === 0) loadSkills();
+          break;
+        case "services":
+          if (services.length === 0) loadServices();
           break;
         case "testimonials":
           if (testimonials.length === 0) loadTestimonials();
@@ -269,6 +296,7 @@ export default function AdminPage() {
               profiles: profiles.length,
               projects: projects.length,
               skills: skills.length,
+              services: services.length,
               testimonials: testimonials.length,
               unread: newUnread,
               posts: postCount,
@@ -299,6 +327,13 @@ export default function AdminPage() {
                 skills={skills}
                 onReload={loadSkills}
                 loading={skillsLoading}
+              />
+            )}
+            {section === "services" && (
+              <AdminServicesSection
+                services={services}
+                onReload={loadServices}
+                loading={servicesLoading}
               />
             )}
             {section === "testimonials" && (

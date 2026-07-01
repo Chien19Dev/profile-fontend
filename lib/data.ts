@@ -1,4 +1,4 @@
-import type { Profile, Project, Skill, Testimonial } from "@/lib/api";
+import type { Profile, Project, Skill, Service, Testimonial } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 
 const profileSelect = {
@@ -29,58 +29,77 @@ export async function getHomePageData(): Promise<{
   profile: Profile | null;
   projects: Project[];
   skills: Skill[];
+  services: Service[];
   testimonials: Testimonial[];
 }> {
-  const [profileResult, projectsResult, skillsResult, testimonialsResult] =
-    await Promise.allSettled([
-      prisma.profile.findFirst({
-        orderBy: { createdAt: "desc" },
-        select: profileSelect,
-      }),
-      prisma.project.findMany({
-        where: { published: true },
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          technologies: true,
-          githubUrl: true,
-          demoUrl: true,
-          published: true,
-          createdAt: true,
-          images: true,
-        },
-      }),
-      prisma.skill.findMany({
-        where: { published: true },
-        orderBy: [{ order: "asc" }, { createdAt: "desc" }],
-        select: {
-          id: true,
-          name: true,
-          category: true,
-          icon: true,
-          level: true,
-          order: true,
-          published: true,
-          createdAt: true,
-        },
-      }),
-      prisma.testimonial.findMany({
-        where: { published: true },
-        orderBy: [{ order: "asc" }, { createdAt: "desc" }],
-        select: {
-          id: true,
-          authorName: true,
-          authorTitle: true,
-          content: true,
-          avatar: true,
-          order: true,
-          published: true,
-          createdAt: true,
-        },
-      }),
-    ]);
+  const [
+    profileResult,
+    projectsResult,
+    skillsResult,
+    servicesResult,
+    testimonialsResult,
+  ] = await Promise.allSettled([
+    prisma.profile.findFirst({
+      orderBy: { createdAt: "desc" },
+      select: profileSelect,
+    }),
+    prisma.project.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        technologies: true,
+        githubUrl: true,
+        demoUrl: true,
+        published: true,
+        createdAt: true,
+        images: true,
+      },
+    }),
+    prisma.skill.findMany({
+      where: { published: true },
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+      select: {
+        id: true,
+        name: true,
+        category: true,
+        icon: true,
+        level: true,
+        order: true,
+        published: true,
+        createdAt: true,
+      },
+    }),
+    prisma.service.findMany({
+      where: { published: true },
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+      select: {
+        id: true,
+        imageUrl: true,
+        title: true,
+        description: true,
+        order: true,
+        published: true,
+        createdAt: true,
+      },
+    }),
+    prisma.testimonial.findMany({
+      where: { published: true },
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+      select: {
+        id: true,
+        authorName: true,
+        authorTitle: true,
+        content: true,
+        avatar: true,
+        order: true,
+        published: true,
+        createdAt: true,
+      },
+    }),
+  ]);
 
   return {
     profile:
@@ -94,6 +113,10 @@ export async function getHomePageData(): Promise<{
     skills:
       skillsResult.status === "fulfilled"
         ? (serialize(skillsResult.value) as unknown as Skill[])
+        : [],
+    services:
+      servicesResult.status === "fulfilled"
+        ? (serialize(servicesResult.value) as unknown as Service[])
         : [],
     testimonials:
       testimonialsResult.status === "fulfilled"
@@ -131,6 +154,14 @@ export async function getPublishedTestimonials() {
     where: { published: true },
     orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     select: { id: true, authorName: true, updatedAt: true },
+  });
+}
+
+export async function getPublishedServices() {
+  return prisma.service.findMany({
+    where: { published: true },
+    orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+    select: { id: true, title: true, updatedAt: true },
   });
 }
 

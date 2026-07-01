@@ -236,3 +236,14 @@ model PasswordResetOTP {
   @@index([email])
   @@index([expiresAt])
 }
+
+model Service {
+  id          String   @id @default(cuid())
+  imageUrl    String
+  title       String
+  description String
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

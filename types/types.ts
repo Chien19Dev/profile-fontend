@@ -9,4 +9,5 @@ export type Section =
   | "navigation"
   | "notifications"
   | "categories"
-  | "users";
+  | "users"
+  | "services";

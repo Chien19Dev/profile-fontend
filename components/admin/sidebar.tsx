@@ -16,6 +16,7 @@ interface SidebarProps {
     profiles: number;
     projects: number;
     skills: number;
+    services: number;
     testimonials: number;
     unread: number;
     posts: number;
@@ -34,6 +35,7 @@ const NAV_ITEMS: {
   { id: "profiles", label: "Hồ sơ", countKey: "profiles" },
   { id: "projects", label: "Dự án", countKey: "projects" },
   { id: "skills", label: "Kỹ năng", countKey: "skills" },
+  { id: "services", label: "Dịch vụ", countKey: "services" },
   { id: "testimonials", label: "Đánh giá", countKey: "testimonials" },
   { id: "posts", label: "Blog", countKey: "posts", href: "/admin/blogs" },
   { id: "categories", label: "Danh mục", countKey: "categories" },
@@ -135,36 +137,34 @@ export function Sidebar({ section, onSection, counts, loading }: SidebarProps) {
       </nav>
 
       <div className="p-2 border-t border-border grid grid-cols-2 gap-2">
-        {loading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="bg-background/70 px-3 py-1 flex flex-row items-center gap-2"
-            >
-              <Skeleton className="h-5 w-6" />
-              <Skeleton className="h-3 w-10" />
-            </div>
-          ))
-        ) : (
-          [
-            { n: counts.profiles, l: "Hồ sơ" },
-            { n: counts.projects, l: "Dự án" },
-            { n: counts.skills, l: "Kỹ năng" },
-            { n: counts.testimonials, l: "Đánh giá" },
-          ].map(({ n, l }) => (
-            <div
-              key={l}
-              className="bg-background/70 px-3 py-1 flex flex-row items-center gap-2"
-            >
-              <Label className="text-base font-medium leading-none tabular-nums">
-                {n}
-              </Label>
-              <Label className="text-[0.6rem] tracking-wide text-muted-foreground mt-1">
-                {l}
-              </Label>
-            </div>
-          ))
-        )}
+        {loading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-background/70 px-3 py-1 flex flex-row items-center gap-2"
+              >
+                <Skeleton className="h-5 w-6" />
+                <Skeleton className="h-3 w-10" />
+              </div>
+            ))
+          : [
+              { n: counts.profiles, l: "Hồ sơ" },
+              { n: counts.projects, l: "Dự án" },
+              { n: counts.skills, l: "Kỹ năng" },
+              { n: counts.testimonials, l: "Đánh giá" },
+            ].map(({ n, l }) => (
+              <div
+                key={l}
+                className="bg-background/70 px-3 py-1 flex flex-row items-center gap-2"
+              >
+                <Label className="text-base font-medium leading-none tabular-nums">
+                  {n}
+                </Label>
+                <Label className="text-[0.6rem] tracking-wide text-muted-foreground mt-1">
+                  {l}
+                </Label>
+              </div>
+            ))}
       </div>
     </aside>
   );

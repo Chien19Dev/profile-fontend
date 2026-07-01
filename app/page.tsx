@@ -8,7 +8,8 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://chien19.vercel.app";
 
 export default async function Page() {
-  const { profile, projects, skills, testimonials } = await getHomePageData();
+  const { profile, projects, skills, services, testimonials } =
+    await getHomePageData();
   const sameAs = [
     profile?.githubUrl,
     profile?.linkedinUrl,
@@ -69,6 +70,7 @@ export default async function Page() {
         profile={profile}
         projects={projects}
         skills={skills}
+        services={services}
         testimonials={testimonials}
       />
     </Fragment>

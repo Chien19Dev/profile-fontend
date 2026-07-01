@@ -5,8 +5,9 @@ import { ProfileCard } from "@/components/sections/pages/profile-card";
 import { ProjectsSection } from "@/components/sections/pages/projects-section";
 import { RegisteredUsersSection } from "@/components/sections/pages/registered-users-section";
 import { SkillsSection } from "@/components/sections/pages/skills-section";
+import { ServicesSection } from "@/components/sections/pages/services-section";
 import { TestimonialsSection } from "@/components/sections/pages/testimonials-section";
-import type { Profile, Project, Skill, Testimonial } from "@/lib/api";
+import type { Profile, Project, Service, Skill, Testimonial } from "@/lib/api";
 import { fadeUp } from "@/lib/motion";
 import { motion } from "framer-motion";
 import { useMemo } from "react";
@@ -17,6 +18,7 @@ interface HomePageProps {
   profile: Profile | null;
   projects: Project[];
   skills: Skill[];
+  services: Service[];
   testimonials: Testimonial[];
 }
 
@@ -24,6 +26,7 @@ export function HomePage({
   profile,
   projects,
   skills,
+  services,
   testimonials,
 }: HomePageProps) {
   const initials = useMemo(() => {
@@ -79,12 +82,20 @@ export function HomePage({
           transition={{ ...fadeUp.transition, delay: 0.22 }}
           className="mt-10 md:mt-14"
         >
-          <TestimonialsSection testimonials={testimonials} loading={false} />
+          <ServicesSection services={services} loading={false} />
         </MotionDiv>
 
         <MotionDiv
           {...fadeUp}
           transition={{ ...fadeUp.transition, delay: 0.26 }}
+          className="mt-10 md:mt-14"
+        >
+          <TestimonialsSection testimonials={testimonials} loading={false} />
+        </MotionDiv>
+
+        <MotionDiv
+          {...fadeUp}
+          transition={{ ...fadeUp.transition, delay: 0.30 }}
           className="mt-10 md:mt-14"
         >
           <RegisteredUsersSection />

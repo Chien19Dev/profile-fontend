@@ -11,6 +11,7 @@ import Link from "next/link";
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { AiWriterButton, type AiWriterResult } from "./ai-writer-button";
+import { BlogPostPreviewDialog } from "./blog-post-preview-dialog";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { DateTimePickerField } from "@/components/common/date-time-picker";
@@ -93,6 +94,7 @@ export function BlogPostEditor({
   const [adminUsers, setAdminUsers] = useState<
     { id: string; name: string | null; email: string }[]
   >([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/users")
@@ -451,7 +453,10 @@ export function BlogPostEditor({
           </div>
         </DecoFrame>
         {form.title && (
-          <DecoFrame className="p-5">
+          <DecoFrame
+            className="p-5 cursor-pointer hover:border-primary/50 transition-colors"
+            onClick={() => setPreviewOpen(true)}
+          >
             <Stack spacing={2}>
               <Stack
                 direction="row"
@@ -518,6 +523,12 @@ export function BlogPostEditor({
           </DecoFrame>
         )}
       </aside>
+
+      <BlogPostPreviewDialog
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        form={form}
+      />
     </div>
   );
 }

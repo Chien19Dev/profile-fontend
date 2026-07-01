@@ -4,11 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Edit, Trash2, Clock, User } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { DecoFrame } from "@/components/sections/deco-frame";
 import { api, Post } from "@/lib/api";
 import { alertSuccess, alertError } from "@/lib/alerts";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+import Button from "@mui/material/Button";
 
 interface BlogPostListProps {
   posts: Post[];
@@ -18,24 +22,72 @@ interface BlogPostListProps {
 export function BlogPostList({ posts, onReload }: BlogPostListProps) {
   if (posts.length === 0) {
     return (
-      <DecoFrame accent className="p-12 text-center">
-        <p className="deco-eyebrow mb-3">Chưa có nội dung</p>
-        <h3 className="deco-title text-2xl text-foreground mb-2">
-          Bắt đầu viết bài đầu tiên
-        </h3>
-        <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">
-          Tạo bài viết mới với trình soạn thảo CKEditor, thêm ảnh bìa và xuất bản
-          lên blog của bạn.
-        </p>
-        <Button size="lg" className="rounded-sm" render={<Link href="/admin/blogs/new" />}>
-          Viết bài mới
-        </Button>
+      <DecoFrame accent className="p-12">
+        <Stack
+          sx={{
+            gap: 2,
+            alignItems: "center",
+            textAlign: "center",
+          }}
+        >
+          <Typography
+            variant="overline"
+            color="text.secondary"
+            sx={{
+              letterSpacing: "0.2em",
+              fontWeight: 600,
+            }}
+          >
+            Chưa có nội dung
+          </Typography>
+
+          <Typography variant="h4" sx={{ fontWeight: 700 }}>
+            Bắt đầu viết bài đầu tiên
+          </Typography>
+
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              maxWidth: 360,
+            }}
+          >
+            Tạo bài viết mới với trình soạn thảo CKEditor, thêm ảnh bìa và xuất
+            bản lên blog của bạn.
+          </Typography>
+
+          <Box sx={{ pt: 1 }}>
+            <Button
+              component={Link}
+              href="/admin/blogs/new"
+              variant="contained"
+              size="large"
+              sx={{
+                textTransform: "none",
+                fontWeight: 600,
+                px: 3,
+              }}
+            >
+              Viết bài mới
+            </Button>
+          </Box>
+        </Stack>
       </DecoFrame>
     );
   }
 
   return (
-    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+    <Box
+      sx={{
+        display: "grid",
+        gap: 2.5,
+        gridTemplateColumns: {
+          xs: "1fr",
+          sm: "repeat(2, 1fr)",
+          lg: "repeat(3, 1fr)",
+        },
+      }}
+    >
       {posts.map((post, i) => {
         const date = post.publishedAt
           ? new Date(post.publishedAt).toLocaleDateString("vi-VN", {
@@ -44,7 +96,6 @@ export function BlogPostList({ posts, onReload }: BlogPostListProps) {
               year: "numeric",
             })
           : "—";
-
         return (
           <motion.div
             key={post.id}
@@ -53,7 +104,14 @@ export function BlogPostList({ posts, onReload }: BlogPostListProps) {
             transition={{ duration: 0.35, delay: i * 0.05 }}
           >
             <DecoFrame className="group overflow-hidden h-full flex flex-col hover:border-primary/30 transition-colors">
-              <div className="relative aspect-[16/10] bg-muted/30 overflow-hidden">
+              <Box
+                sx={{
+                  position: "relative",
+                  aspectRatio: "16 / 10",
+                  overflow: "hidden",
+                  bgcolor: "action.hover",
+                }}
+              >
                 {post.coverImage ? (
                   <Image
                     src={post.coverImage}
@@ -63,63 +121,151 @@ export function BlogPostList({ posts, onReload }: BlogPostListProps) {
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/40 text-xs uppercase tracking-widest">
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "text.disabled",
+                      typography: "caption",
+                      textTransform: "uppercase",
+                      letterSpacing: 2,
+                    }}
+                  >
                     Không có ảnh
-                  </div>
+                  </Box>
                 )}
-                <div className="absolute top-3 left-3">
-                  <Badge
-                    variant={post.published ? "success" : "secondary"}
-                    size="sm"
-                  >
-                    {post.published ? "Đã đăng" : "Nháp"}
-                  </Badge>
-                </div>
-              </div>
 
-              <div className="flex-1 flex flex-col p-5">
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 12,
+                    left: 12,
+                  }}
+                >
+                  <Chip
+                    size="small"
+                    color={post.published ? "success" : "default"}
+                    label={post.published ? "Đã đăng" : "Nháp"}
+                  />
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  p: 2.5,
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                }}
+              >
                 {post.category && (
-                  <span className="deco-eyebrow text-[0.6rem] mb-2 block">
-                    {post.category}
-                  </span>
-                )}
-                <h3 className="deco-title text-lg leading-snug line-clamp-2 mb-2">
-                  {post.title}
-                </h3>
-                {post.summary && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">
-                    {post.summary}
-                  </p>
-                )}
-
-                <div className="flex items-center gap-3 text-xs text-muted-foreground mt-auto pt-3 border-t border-border/40">
-                  <span className="inline-flex items-center gap-1">
-                    <User className="size-3" />
-                    {post.author || "Admin"}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <Clock className="size-3" />
-                    {date}
-                  </span>
-                </div>
-
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 rounded-sm"
-                    render={<Link href={`/admin/blogs/${post.id}/edit`} />}
+                  <Typography
+                    variant="overline"
+                    color="text.secondary"
+                    sx={{
+                      fontSize: "0.65rem",
+                      mb: 1,
+                    }}
                   >
-                    <Edit className="size-3.5" />
+                    {post.category}
+                  </Typography>
+                )}
+
+                <Typography
+                  variant="h6"
+                  sx={{
+                    lineHeight: 1.35,
+                    mb: 1,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    fontWeight: 700,
+                  }}
+                >
+                  {post.title}
+                </Typography>
+
+                {post.summary && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      flex: 1,
+                      mb: 2,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {post.summary}
+                  </Typography>
+                )}
+
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  sx={{
+                    mt: "auto",
+                    pt: 2,
+                    borderTop: 1,
+                    borderColor: "divider",
+                  }}
+                >
+                  <Stack direction="row" spacing={0.5}>
+                    <User size={14} />
+                    <Typography variant="caption">
+                      {post.author || "Admin"}
+                    </Typography>
+                  </Stack>
+
+                  <Stack
+                    direction="row"
+                    sx={{
+                      gap: 0.5,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Clock
+                      size={14}
+                      style={{
+                        flexShrink: 0,
+                      }}
+                    />
+                    <Typography variant="caption">{date}</Typography>
+                  </Stack>
+                </Stack>
+
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    mt: 2,
+                  }}
+                >
+                  <Button
+                    component={Link}
+                    href={`/admin/blogs/${post.id}/edit`}
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Edit size={16} />}
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: 600,
+                    }}
+                  >
                     Chỉnh sửa
                   </Button>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    className="text-destructive hover:text-destructive"
-                    aria-label="Xóa bài viết"
+
+                  <IconButton
+                    color="error"
                     onClick={async () => {
                       if (!confirm("Xóa bài viết này?")) return;
+
                       try {
                         await api.posts.remove(post.id);
                         alertSuccess("Đã xóa bài viết");
@@ -129,14 +275,14 @@ export function BlogPostList({ posts, onReload }: BlogPostListProps) {
                       }
                     }}
                   >
-                    <Trash2 className="size-3.5" />
-                  </Button>
-                </div>
-              </div>
+                    <Trash2 size={18} />
+                  </IconButton>
+                </Stack>
+              </Box>
             </DecoFrame>
           </motion.div>
         );
       })}
-    </div>
+    </Box>
   );
 }

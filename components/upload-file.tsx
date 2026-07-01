@@ -9,7 +9,6 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/reui/alert";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -22,9 +21,10 @@ import {
   Image as ImageIcon,
   Upload,
   X,
-  ZoomIn,
   ZoomInIcon,
 } from "lucide-react";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 
 interface GalleryUploadProps {
   maxFiles?: number;
@@ -167,8 +167,11 @@ export function Pattern({
             </p>
           </div>
 
-          <Button onClick={openFileDialog}>
-            <Upload className="h-4 w-4" />
+          <Button
+            variant="contained"
+            onClick={openFileDialog}
+            startIcon={<Upload className="h-4 w-4" />}
+          >
             Chọn hình ảnh
           </Button>
         </div>
@@ -188,7 +191,7 @@ export function Pattern({
             </div>
           </div>
           {files.length > 0 && (
-            <Button onClick={clearFiles} variant="outline" size="sm">
+            <Button variant="outlined" size="small" onClick={clearFiles}>
               Clear all
             </Button>
           )}
@@ -204,27 +207,26 @@ export function Pattern({
                 className="rounded-lg h-full w-full border object-cover transition-all group-hover/item:scale-105"
               />
               <div className="bg-black/50 absolute inset-0 flex items-center justify-center gap-2 opacity-0 transition-opacity group-hover/item:opacity-100">
-                <Button
+                <IconButton
+                  color="secondary"
+                  size="small"
                   onClick={() => {
                     setSelectedImage(url);
                     setIsPreviewLoading(true);
                   }}
-                  variant="secondary"
-                  size="icon"
-                  className="size-7"
                 >
-                  <ZoomInIcon className="opacity-100/80" />
-                </Button>
-                <Button
+                  <ZoomInIcon fontSize="small" />
+                </IconButton>
+
+                <IconButton
+                  color="secondary"
+                  size="small"
                   onClick={() =>
                     updateUrls(imageUrls.filter((item) => item !== url))
                   }
-                  variant="secondary"
-                  size="icon"
-                  className="size-7"
                 >
-                  <X className="opacity-100/8" />
-                </Button>
+                  <X size={16} />
+                </IconButton>
               </div>
             </div>
           ))}
@@ -266,26 +268,24 @@ export function Pattern({
               )}
               <div className="bg-black/50 absolute inset-0 flex items-center justify-center gap-2 opacity-0 transition-opacity group-hover/item:opacity-100">
                 {fileItem.preview && (
-                  <Button
+                  <IconButton
+                    color="secondary"
+                    size="small"
                     onClick={() => {
                       setSelectedImage(fileItem.preview!);
                       setIsPreviewLoading(true);
                     }}
-                    variant="secondary"
-                    size="icon"
-                    className="size-7"
                   >
-                    <ZoomInIcon className="opacity-100/80" />
-                  </Button>
+                    <ZoomInIcon fontSize="small" />
+                  </IconButton>
                 )}
-                <Button
+                <IconButton
+                  color="secondary"
+                  size="small"
                   onClick={() => removeFile(fileItem.id)}
-                  variant="secondary"
-                  size="icon"
-                  className="size-7"
                 >
-                  <X className="opacity-100/8" />
-                </Button>
+                  <X size={16} />
+                </IconButton>
               </div>
               <div className="rounded-b-lg absolute right-0 bottom-0 left-0 bg-black/70 p-2 text-white opacity-0 transition-opacity group-hover:opacity-100">
                 <p className="truncate text-xs font-medium">

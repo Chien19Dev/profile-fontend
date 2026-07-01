@@ -11,7 +11,7 @@ import { WsField } from "@/components/admin/ws-field";
 import { WsSubmit } from "@/components/admin/ws-submit";
 import { WsTable } from "@/components/admin/ws-table";
 import { Pattern } from "@/components/upload-file";
-import { CKEditor } from "@/components/ui/ckeditor";
+import { CKEditor } from "@/components/ui/editor";
 import { Switch } from "@/components/ui/switch";
 
 type PostForm = Omit<Post, "id" | "createdAt" | "updatedAt"> & {

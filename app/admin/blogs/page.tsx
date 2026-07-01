@@ -2,11 +2,12 @@
 
 import { BlogAdminShell } from "@/components/admin/blog/blog-admin-shell";
 import { BlogPostList } from "@/components/admin/blog/blog-post-list";
-import { Button } from "@/components/ui/button";
 import { api, Post } from "@/lib/api";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 import { PenLine, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function BlogAdminPage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -32,25 +33,26 @@ export default function BlogAdminPage() {
       subtitle="Blog Studio"
       title="Quản lý bài viết"
       actions={
-        <Fragment>
+        <Stack direction="row" spacing={1}>
           <Button
-            variant="outline"
-            size="sm"
+            variant="outlined"
+            size="small"
             onClick={load}
-            className="rounded-sm"
+            startIcon={<RefreshCw size={14} />}
           >
-            <RefreshCw className="size-3.5" />
             Làm mới
           </Button>
+
           <Button
-            size="sm"
-            className="rounded-sm"
-            render={<Link href="/admin/blogs/new" />}
+            component={Link}
+            href="/admin/blogs/new"
+            variant="contained"
+            size="small"
+            startIcon={<PenLine size={14} />}
           >
-            <PenLine className="size-3.5" />
             Viết bài mới
           </Button>
-        </Fragment>
+        </Stack>
       }
     >
       {loading ? (

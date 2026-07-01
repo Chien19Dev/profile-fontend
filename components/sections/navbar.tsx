@@ -110,7 +110,7 @@ export default function Navbar({
   return (
     <header className="sticky top-0 z-50 w-full bg-background/92 backdrop-blur-md supports-backdrop-filter:bg-background/75">
       <div className="deco-nav-line" />
-      <nav className="container mx-auto px-4 max-w-330">
+      <nav className="container mx-auto max-w-330">
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
